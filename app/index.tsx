@@ -2,6 +2,8 @@ import customTamaguiConfig from '@/tamagui.config';
 import { Text, View } from "react-native";
 import { Button, Stack, TamaguiProvider } from "tamagui";
 
+
+
 export default function Index() {
   return (
     <TamaguiProvider config={customTamaguiConfig}>
