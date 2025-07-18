@@ -12,7 +12,7 @@ const customTamaguiConfig = createTamagui({
             dark: '#222831',
             blue: '#194A98',
             gray: '#393E46'
-        }
+        },
     },
     settings: {
         disableSSR: true
