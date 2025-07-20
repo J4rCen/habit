@@ -243,7 +243,7 @@ const styles = StyleSheet.create({
   calendarHeader: {
     alignItems: "center",
     justifyContent: "space-between",
-    height: 100,
+    height: 70,
   },
 });
 
