@@ -1,7 +1,7 @@
 import React from "react";
 import Svg, { Path } from 'react-native-svg';
 
-export const ArrowBack = ({size = 64, color = '#fff'}) => {
+const ArrowBack = ({size = 64, color = '#fff'}) => {
     return (
         <Svg
             width={size}
@@ -16,3 +16,5 @@ export const ArrowBack = ({size = 64, color = '#fff'}) => {
         </Svg>
     )
 }
+
+export default ArrowBack
