@@ -1,4 +1,5 @@
 import AsyncStorage from '@react-native-async-storage/async-storage'
+import { Dayjs } from 'dayjs'
 import { create } from 'zustand'
 import { createJSONStorage, persist } from 'zustand/middleware'
 
@@ -25,6 +26,8 @@ export interface IHabitTask {
 
 interface IStore {
   habitTask: Map<number, IHabitTask>
+  startDateUser: Dayjs | null
+  setStartDateUser: (date: Dayjs) => void
   setHabitTask: (habitId: number, habitConfig: IHabitTask) => void
   getHabitTask: (habitId: number) => IHabitTask | null
   updateHabitTask: (habitId: number, habitConfig: IHabitTask) => void
@@ -35,6 +38,10 @@ const useStore = create<IStore>()(
   persist(
     (set, get) => ({
       habitTask: new Map(),
+      startDateUser: null,
+      setStartDateUser: (date) => set(() => {
+        return {startDateUser: date}
+      }),
       setHabitTask: (habitId: number, habitConfig: IHabitTask) =>
         set(() => {
           const map = new Map(get().habitTask)
