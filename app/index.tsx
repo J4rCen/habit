@@ -1,19 +1,19 @@
 import dayjs from "dayjs";
 import { useState } from "react";
-import { Dimensions } from "react-native";
+import { Dimensions, StyleSheet, TouchableOpacity } from "react-native";
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { YStack } from "tamagui";
+import { Text, YStack } from "tamagui";
 import FilteringButtonsTime from "./components/filtering_buttons_time/FilteringButtonsTime";
 import SlidingCalendar from "./components/sliding_calendar/SlidingCalendar";
 import dateConversion from "./utilities/dateConversion";
 
-export default function Index() {
+const { height, width } = Dimensions.get('window');
 
-  type Filter = 'all' | 'morning' | 'day' | 'evening'
+
+export default function Index() {
 
   const [selectDate, setSelectDate] = useState(dateConversion(dayjs()))
   const [selectFilter, setSelectFilter] = useState('all')
-  const { height } = Dimensions.get('window');
 
   return (
     <SafeAreaView>
@@ -22,11 +22,33 @@ export default function Index() {
           selectDate={selectDate}
           setSelectDate={setSelectDate}
         />
-        <FilteringButtonsTime
+        <YStack alignItems="center">
+          <FilteringButtonsTime
           selectFilter={selectFilter}
           setSelectFilter={setSelectFilter}
-        />
+          />
+          <TouchableOpacity
+            style={styles.buttonCreateNewHabit}
+          >
+            <Text
+              color={'$white'}
+              fontSize={18}
+            >Добавить привычку</Text>
+        </TouchableOpacity>
+        </YStack>
       </YStack>
     </SafeAreaView>
   );
 }
+
+const styles = StyleSheet.create({
+  buttonCreateNewHabit: {
+    borderRadius: 10,
+    backgroundColor: '#194A98',
+    width: width - 40,
+    height: 45,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginTop: 10
+  }
+})
