@@ -9,7 +9,6 @@ import dateConversion from "./utilities/dateConversion";
 export default function Index() {
 
   const [selectDate, setSelectDate] = useState(dateConversion(dayjs()))
-
   const { height } = Dimensions.get('window');
 
   return (

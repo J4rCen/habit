@@ -1,3 +1,4 @@
+import useStore from "@/app/store/zustand";
 import { ArrowBack } from "@/app/svgs/arrowBack";
 import dayjs, { Dayjs } from "dayjs";
 import localeRu from "dayjs/locale/ru";
@@ -14,10 +15,8 @@ import {
 import {
   Dimensions,
   FlatList,
-  NativeScrollEvent,
-  NativeSyntheticEvent,
   StyleSheet,
-  TouchableOpacity,
+  TouchableOpacity
 } from "react-native";
 import { Text, XStack, YStack } from "tamagui";
 import dateConversion from "../../utilities/dateConversion";
@@ -33,30 +32,54 @@ interface ISlidingCalendar {
 
 const SCREEN_WIDTH = Dimensions.get("window").width;
 const WEEK_DAYS = ["Пн", "Вт", "Ср", "Чт", "Пт", "Сб", "Вс"];
-const PAGE_INDEX = [0, 1, 2] as const;
 
-const getWeek = (startOfWeek: Dayjs) =>
-  Array.from({ length: 7 }, (_, i) => startOfWeek.add(i, "day"));
+const getWeek = (startOfWeek: Dayjs) => {
+  return  Array.from({ length: 7 }, (_, i) => startOfWeek.add(i, "day"));
+}
+
+const initWeek = (startWeek: Dayjs | null, endWeek: Dayjs = dayjs().startOf('isoWeek')) => {
+  const weekList = []
+
+  do {
+    weekList.push(getWeek(dayjs(startWeek).startOf('isoWeek')))
+    startWeek?.add(1, 'week')
+  } while (startWeek?.isBefore(endWeek));
+
+  return weekList
+
+}
+
+type Week = string | Dayjs[]
 
 const SlidingCalendar = ({ selectDate, setSelectDate }: ISlidingCalendar) => {
   const [currentWeek, setCurrentWeek] = useState(() => dayjs().startOf("isoWeek"));
   const flatListRef = useRef<FlatList>(null);
   const isFlag = useRef(false);
+  
+  const {startDateUser, setStartDateUser} = useStore(store => store)
+  if (!startDateUser) setStartDateUser(dayjs())
+
+  const [weekList, setWeekList] = useState(['Вы еще не пользовались приложением', ...initWeek(dayjs(startDateUser))]) 
+
 
   const today = useMemo(() => dateConversion(dayjs()), []);
-  const weekDates = useMemo(() => {
-    return PAGE_INDEX.map((index) => {
-      if (index === 1) return getWeek(currentWeek);
-      return getWeek(currentWeek.add(index - 1, "week"));
-    });
-  }, [currentWeek]);
 
   const onSelectDate = (day: Dayjs) => setSelectDate(dateConversion(day));
 
   const renderItem = useCallback(
-    ({ index }: { index: number }) => (
-      <XStack style={styles.dates}>
-        {weekDates[index].map((day) => {
+    ({ item }: { item: Week }) => {
+      
+      if (!Array.isArray(item)) {
+        return <XStack width={SCREEN_WIDTH} alignItems='center' justifyContent="center">
+          <Text
+            color={'$white'}
+            fontSize={18}
+          >{item}</Text>
+        </XStack>
+      }
+      
+      return <XStack style={styles.dates}>
+        {item.map((day) => {
           const dateStr = dateConversion(day);
           const isSelected = dateStr === selectDate;
 
@@ -74,35 +97,50 @@ const SlidingCalendar = ({ selectDate, setSelectDate }: ISlidingCalendar) => {
           );
         })}
       </XStack>
-    ),
-    [selectDate, weekDates]
-  );
-
-  const handleScrollEnd = useCallback(
-    (event: NativeSyntheticEvent<NativeScrollEvent>) => {
-      if (isFlag.current) return;
-      isFlag.current = true;
-
-      const index = Math.round(event.nativeEvent.contentOffset.x / SCREEN_WIDTH);
-      if (index === 1) return (isFlag.current = false);
-
-      setCurrentWeek((prev) =>
-        index === 0 ? prev.subtract(1, "week") : prev.add(1, "week")
-      );
-
-      requestAnimationFrame(() => {
-        flatListRef.current?.scrollToIndex({ index: 1, animated: false });
-        isFlag.current = false;
-      });
     },
-    []
+    [selectDate]
   );
 
   const returnToday = () => {
-    const todayDate = dayjs().startOf("isoWeek");
+  const todayDate = dayjs().startOf("isoWeek");
+  const formattedToday = dateConversion(dayjs());
+
+  // Найти индекс недели с сегодняшней датой
+  const todayWeekIndex = weekList.findIndex(item =>
+    Array.isArray(item) &&
+    item.some(day => dateConversion(day) === formattedToday)
+  );
+
+  // Если неделя с сегодняшним днем не найдена, добавить её
+  if (todayWeekIndex === -1) {
+      const newWeek = getWeek(todayDate);
+      const updatedList = [...weekList, newWeek];
+      setWeekList(updatedList);
+
+      // Scroll после обновления списка
+      setTimeout(() => {
+        flatListRef.current?.scrollToIndex({
+          index: updatedList.length - 1,
+          animated: true,
+        });
+      }, 0);
+    } else {
+      // Scroll к найденной неделе
+      flatListRef.current?.scrollToIndex({
+        index: todayWeekIndex,
+        animated: true,
+      });
+    }
+
     setCurrentWeek(todayDate);
-    setSelectDate(dateConversion(dayjs()));
+    setSelectDate(formattedToday);
   };
+
+  const endReached = () => {
+    const newWeek = currentWeek.add(1, 'week')
+    setWeekList(list => [...list, getWeek(newWeek)])
+    setCurrentWeek(newWeek)
+  }
 
   return (
     <YStack>
@@ -133,19 +171,25 @@ const SlidingCalendar = ({ selectDate, setSelectDate }: ISlidingCalendar) => {
 
         <FlatList
           ref={flatListRef}
-          data={PAGE_INDEX}
+          data={weekList}
           renderItem={renderItem}
+          onEndReached={endReached}
+          onEndReachedThreshold={0.25}
           horizontal
           pagingEnabled
           initialScrollIndex={1}
-          onMomentumScrollEnd={handleScrollEnd}
-          keyExtractor={(item) => item.toString()}
           getItemLayout={(_, index) => ({
             length: SCREEN_WIDTH,
             offset: SCREEN_WIDTH * index,
             index,
           })}
           showsHorizontalScrollIndicator={false}
+          onScrollToIndexFailed={({ index }) => {
+            // Попробовать прокрутить повторно через 300 мс
+            setTimeout(() => {
+              flatListRef.current?.scrollToIndex({ index, animated: true });
+            }, 300);
+          }}
         />
       </YStack>
     </YStack>
