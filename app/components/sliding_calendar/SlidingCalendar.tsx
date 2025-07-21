@@ -4,7 +4,7 @@ import dayjs, { Dayjs } from "dayjs";
 import localeRu from "dayjs/locale/ru";
 import isoWeek from "dayjs/plugin/isoWeek";
 import weekday from "dayjs/plugin/weekday";
-import { memo, useCallback, useMemo, useRef, useState } from "react";
+import React, { memo, useCallback, useMemo, useRef, useState } from "react";
 import {
   Dimensions,
   FlatList,
@@ -182,7 +182,7 @@ const SlidingCalendar = memo(({ selectDate, setSelectDate }: ISlidingCalendar) =
           onEndReachedThreshold={0.25}
           horizontal
           pagingEnabled
-          initialScrollIndex={1}
+          initialScrollIndex={weeks.length - 1}
           getItemLayout={(_, index) => ({
             length: SCREEN_WIDTH,
             offset: SCREEN_WIDTH * index,
@@ -247,4 +247,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default SlidingCalendar;
+export default React.memo(SlidingCalendar);
