@@ -4,6 +4,7 @@ import React, { useState } from "react"
 import { Select, styled, YStack } from "tamagui"
 
 interface ISelect {
+    id: number
     width?: number
     height: number
     options: Array<{
@@ -13,7 +14,9 @@ interface ISelect {
     placeholder: string
     value: string
     onChange: (e: string) => void
-    default?: boolean 
+    isOpen: boolean,
+    setIsOpen: (e: boolean) => void
+    setOneActive: (e: number) => void
 }
 
 const CustomSelectTrigger = styled(Select.Trigger, {
@@ -43,9 +46,9 @@ const CustomSelectItemText = styled(Select.ItemText, {
 
 const CustomSelect = (props: ISelect) => {
 
-    const [selectValue, setSelectValue] = useState<string>(props.default ? props.options[0].key : '')
+    const [selectValue, setSelectValue] = useState<string>(props.options[0].key ?? '')
     const [isActive, setIsActive] = useState<boolean>(selectValue ? true : false)
-    const [isOpen, setIsOpen] = useState<boolean>(false)
+   
 
     const memoizedItems = React.useMemo(() => {
         return props.options.map((item, index) => (
@@ -66,7 +69,7 @@ const CustomSelect = (props: ISelect) => {
         props.onChange(val)
 
         setTimeout(() => {
-            setIsOpen(false)
+            props.setIsOpen(false)
         }, 0)
     }
 
@@ -75,20 +78,21 @@ const CustomSelect = (props: ISelect) => {
     }
 
     return (
-        <PlaceholderWrap isActive={isActive} height={props.height} width={props.width} placeholder={props.placeholder}>
+        <PlaceholderWrap isActive={isActive} isOpen={props.isOpen} height={props.height} width={props.width} placeholder={props.placeholder}>
             <Select
+                open={props.isOpen}
+                onOpenChange={() => {
+                    props.setOneActive(props.id)
+                    props.setIsOpen(!props.isOpen)
+                }}
                 value={selectValue} 
                 onValueChange={handleValueChange}
                 defaultValue={selectValue}
-                onOpenChange={() => {
-                    setIsOpen(true)
-                    setIsActive(true)
-                }}
             >
                 <CustomSelectTrigger
                     width={props.width} 
                     iconAfter={<ArrowSelect color="#ffffff" size={20}/>}
-                    zIndex={isOpen ? 12: 3}
+                    zIndex={props.isOpen ? 15 : 2}
                 >
                     <CustomSelectValue>
                         {getLabelByKey(selectValue)}
@@ -96,13 +100,13 @@ const CustomSelect = (props: ISelect) => {
                 </CustomSelectTrigger>
 
                 {
-                    isOpen &&
+                    props.isOpen &&
                     <YStack
                         borderColor={'$blue'}
                         backgroundColor={'$dark'}
                         paddingTop={15}
                         top={-15}
-                        zIndex={isOpen ? 10 : 3}
+                        zIndex={props.isOpen ? 14 : 1}
                         borderWidth={5}
                         borderBottomRightRadius={18}
                         borderBottomLeftRadius={18}

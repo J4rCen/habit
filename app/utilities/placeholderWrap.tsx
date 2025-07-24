@@ -6,12 +6,14 @@ interface IPlaceholderWrap  {
     isActive: boolean
     placeholder: string
     children: React.ReactNode
+    isOpen?: boolean
 }
 
-const PlaceholderWrap = ({ width, height, isActive, placeholder, children }: IPlaceholderWrap) => {
+const PlaceholderWrap = ({ width, height, isActive, placeholder, children, isOpen }: IPlaceholderWrap) => {
     return (
         <YStack position="relative" height={height} width={width}>
             <YStack
+                zIndex={isOpen ? 20 : 10}
                 position="absolute"
                 left={20}
                 pointerEvents="none"
