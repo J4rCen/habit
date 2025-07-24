@@ -14,7 +14,6 @@ const PlaceholderWrap = ({ width, height, isActive, placeholder, children }: IPl
             <YStack
                 position="absolute"
                 left={20}
-                zIndex={10}
                 pointerEvents="none"
                 top={isActive ? -12 : '42%'}
                 transform={isActive ? [] : [{ translateY: -10 }]}

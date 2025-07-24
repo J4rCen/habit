@@ -15,7 +15,7 @@ const CreateNewHabits = () => {
 
     const [habitName, setHabitName] = useState('')
     const [typeOfHabit, setTypeOfHabit] = useState<'reusable' | 'onetime'>('reusable')
-    const [intervalExecution, setIntervalExecution] = useState<string>()
+    const [intervalExecution, setIntervalExecution] = useState<string>("every_day")
 
     return (
         <SafeAreaView>
@@ -75,13 +75,26 @@ const CreateNewHabits = () => {
                             </Button>
                         </XStack>
 
-                        <CustomSelect 
-                            placeholder='Интервал выполнения' 
-                            height={50} 
-                            width={width - 20}
-                            value={intervalExecution}
-                            onChange={(e) => setIntervalExecution(e)}
-                        />
+                        <YStack marginTop={10} gap={15}>
+                            <CustomSelect 
+                                placeholder='Интервал выполнения' 
+                                height={50} 
+                                width={width - 20}
+                                options={[{key: 'every_day', label: 'Каждый день'}, {key: 'certain_days', label: 'Определенные дни недели'}, {key: 'gap', label: 'Промежуток'}]}
+                                default={true}
+                                value={intervalExecution}
+                                onChange={(e) => setIntervalExecution(e)}
+                            />
+                            <CustomSelect 
+                                placeholder='Интервал выполнения' 
+                                height={50} 
+                                width={width - 20}
+                                options={[{key: 'every_day', label: 'Каждый день'}, {key: 'certain_days', label: 'Определенные дни недели'}, {key: 'gap', label: 'Промежуток'}]}
+                                default={true}
+                                value={intervalExecution}
+                                onChange={(e) => setIntervalExecution(e)}
+                            />
+                        </YStack>
                     </YStack>
                 </YStack>
             </PortalProvider>

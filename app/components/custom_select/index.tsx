@@ -1,15 +1,19 @@
 import ArrowSelect from "@/app/svgs/arrowSelect"
 import PlaceholderWrap from "@/app/utilities/placeholderWrap"
 import React, { useState } from "react"
-import { StyleSheet } from "react-native"
-import { Select, styled, Text, YStack } from "tamagui"
+import { Select, styled, YStack } from "tamagui"
 
 interface ISelect {
     width?: number
     height: number
-    value?: string
+    options: Array<{
+        key: string,
+        label: string 
+    }>
     placeholder: string
+    value: string
     onChange: (e: string) => void
+    default?: boolean 
 }
 
 const CustomSelectTrigger = styled(Select.Trigger, {
@@ -23,68 +27,97 @@ const CustomSelectTrigger = styled(Select.Trigger, {
     fontSize: 16
 })
 
+const CustomSelectValue = styled(Select.Value, {
+    fontSize: 18,
+    color: 'white'
+})
 
+const CustomSelectItem = styled(Select.Item, {
+    backgroundColor: 'none'
+})
 
-const CustomItem = (props: {value: string, index: number, text: string}) => {
-    return (
-        <Select.Item value={props.value} index={props.index} backgroundColor={'none'}>
-            <Text
-                color={'white'}
-                fontSize={18}
-            >
-                {props.text}
-            </Text>
-        </Select.Item>
-    )
-}
+const CustomSelectItemText = styled(Select.ItemText, {
+    fontSize: 18,
+    color: 'white'
+})
 
 const CustomSelect = (props: ISelect) => {
 
-    const [isActive, setIsActive] = useState<boolean>(false)
-    const [open, setOpen] = useState<boolean>(false)
+    const [selectValue, setSelectValue] = useState<string>(props.default ? props.options[0].key : '')
+    const [isActive, setIsActive] = useState<boolean>(selectValue ? true : false)
+    const [isOpen, setIsOpen] = useState<boolean>(false)
 
+    const memoizedItems = React.useMemo(() => {
+        return props.options.map((item, index) => (
+            <CustomSelectItem
+                index={index}
+                value={item.key}
+                key={item.key}
+            >
+                <CustomSelectItemText>
+                    {item.label}
+                </CustomSelectItemText>
+            </CustomSelectItem>
+        ))
+    }, [props.options])
+
+    const handleValueChange = (val: string) => {
+        setSelectValue(val)
+        props.onChange(val)
+
+        setTimeout(() => {
+            setIsOpen(false)
+        }, 0)
+    }
+
+    const getLabelByKey = (key: string) => {
+        return props.options.find(option => option.key === key)?.label || ''
+    }
 
     return (
-        <PlaceholderWrap isActive={true} height={props.height} width={props.width} placeholder={props.placeholder}>
-            <Select 
-                open={open} 
-                onOpenChange={setOpen}
-                value={props.value}
-                onValueChange={(e) => {console.log(e), props.onChange(e)}}
+        <PlaceholderWrap isActive={isActive} height={props.height} width={props.width} placeholder={props.placeholder}>
+            <Select
+                value={selectValue} 
+                onValueChange={handleValueChange}
+                defaultValue={selectValue}
+                onOpenChange={() => {
+                    setIsOpen(true)
+                    setIsActive(true)
+                }}
             >
-                <CustomSelectTrigger width={props.width} iconAfter={<ArrowSelect color="#ffffff" size={20}/>}>
-                    <Text color={'white'}
-                fontSize={18}>{props.value}</Text>
+                <CustomSelectTrigger
+                    width={props.width} 
+                    iconAfter={<ArrowSelect color="#ffffff" size={20}/>}
+                    zIndex={isOpen ? 12: 3}
+                >
+                    <CustomSelectValue>
+                        {getLabelByKey(selectValue)}
+                    </CustomSelectValue>
                 </CustomSelectTrigger>
 
-                {open && (
+                {
+                    isOpen &&
                     <YStack
                         borderColor={'$blue'}
+                        backgroundColor={'$dark'}
                         paddingTop={15}
                         top={-15}
-                        zIndex={1}
+                        zIndex={isOpen ? 10 : 3}
                         borderWidth={5}
                         borderBottomRightRadius={18}
                         borderBottomLeftRadius={18}
-
                     >
                         <Select.Content>
                             <Select.Viewport>
-                                <CustomItem value="option1" index={1} text="Опция 1"/>
-                                <CustomItem value="option2" index={2} text="Опция 2"/>
+                                {memoizedItems}
                             </Select.Viewport>
                         </Select.Content>
                     </YStack>
-                )}
-                </Select>
+                }
+
+            </Select>
         </PlaceholderWrap>
     )   
 }
 
-const styles = StyleSheet.create({
-    selectContainer: {
-
-    }
-})
-
-export default CustomSelect
+export default React.memo(CustomSelect)
