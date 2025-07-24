@@ -14,7 +14,7 @@ export interface IHabitTask {
       days_in_row: number
       skip_days: number
     }
-    times_of_day: 'morning' | 'day' | 'evening'
+    times_of_day: 'all' | 'morning' | 'day' | 'evening'
     type_of_task: 'single_mark' | 'reusable_mark' | 'timer'
     timer_time?: string
     quantity?: number

@@ -6,6 +6,7 @@ import { useState } from 'react';
 import { Dimensions } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Button, Text, XStack, YStack } from "tamagui";
+import { optionIntervalExecution, optionTimesOfDay, optionTypeOfTask } from './setDefaultData';
 
 const { height, width } = Dimensions.get('window');
 
@@ -16,7 +17,11 @@ const CreateNewHabits = () => {
     const [habitName, setHabitName] = useState('')
     const [typeOfHabit, setTypeOfHabit] = useState<'reusable' | 'onetime'>('reusable')
     const [intervalExecution, setIntervalExecution] = useState<string>("every_day")
-
+    const [timesOfDay, setTimesOfDay] = useState<string>("every_day")
+    const [typeOfTask, setTypeOfTask] = useState<string>("every_day")
+    const [oneActive, setOneActive] = useState<number>(0)
+    const [isOpen, setIsOpen] = useState<boolean>(false)
+    
     return (
         <SafeAreaView>
             <PortalProvider>
@@ -32,7 +37,7 @@ const CreateNewHabits = () => {
 
                     <YStack 
                         flex={1}
-                        alignItems="center" // центр по горизонтали
+                        alignItems="center"
                         marginTop={20}
                     >
                         <CustomInput
@@ -76,23 +81,43 @@ const CreateNewHabits = () => {
                         </XStack>
 
                         <YStack marginTop={10} gap={15}>
-                            <CustomSelect 
-                                placeholder='Интервал выполнения' 
+                            {typeOfHabit === 'reusable' &&
+                                <CustomSelect
+                                    id={1}
+                                    placeholder='Интервал выполнения' 
+                                    height={50} 
+                                    width={width - 20}
+                                    options={optionIntervalExecution}
+                                    value={intervalExecution}
+                                    onChange={(e) => setIntervalExecution(e)}
+                                    isOpen={oneActive === 1 ? isOpen : false}
+                                    setIsOpen={(e) => setIsOpen(e)}
+                                    setOneActive={(e) => setOneActive(e)}
+                                />
+                            }
+                            <CustomSelect
+                                id={2}
+                                placeholder='Время суток' 
                                 height={50} 
                                 width={width - 20}
-                                options={[{key: 'every_day', label: 'Каждый день'}, {key: 'certain_days', label: 'Определенные дни недели'}, {key: 'gap', label: 'Промежуток'}]}
-                                default={true}
-                                value={intervalExecution}
-                                onChange={(e) => setIntervalExecution(e)}
+                                options={optionTimesOfDay}
+                                value={timesOfDay}
+                                onChange={(e) => setTimesOfDay(e)}
+                                isOpen={oneActive === 2 ? isOpen : false}
+                                setIsOpen={(e) => setIsOpen(e)}
+                                setOneActive={(e) => setOneActive(e)}
                             />
-                            <CustomSelect 
-                                placeholder='Интервал выполнения' 
+                            <CustomSelect
+                                id={3}
+                                placeholder='Тип задачи' 
                                 height={50} 
                                 width={width - 20}
-                                options={[{key: 'every_day', label: 'Каждый день'}, {key: 'certain_days', label: 'Определенные дни недели'}, {key: 'gap', label: 'Промежуток'}]}
-                                default={true}
-                                value={intervalExecution}
-                                onChange={(e) => setIntervalExecution(e)}
+                                options={optionTypeOfTask}
+                                value={typeOfTask}
+                                onChange={(e) => setTypeOfTask(e)}
+                                isOpen={oneActive === 3 ? isOpen : false}
+                                setIsOpen={(e) => setIsOpen(e)}
+                                setOneActive={(e) => setOneActive(e)}
                             />
                         </YStack>
                     </YStack>
