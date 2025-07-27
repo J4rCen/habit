@@ -1,5 +1,6 @@
 import CustomInput from '@/app/components/custom_input';
 import CustomSelect from '@/app/components/custom_select';
+import CustomTimePicker from '@/app/components/timepicker';
 import { SCREEN_HEIGHT, SCREEN_WIDTH, WEEK_DAYS } from '@/app/constants';
 import ArrowBack from '@/app/svgs/arrowBack';
 import { PortalProvider } from '@tamagui/portal';
@@ -21,6 +22,7 @@ const CreateNewHabits = () => {
     const [daysInRow, setDaysInRow] = useState<number>(0)
     const [skipDays, setSkipDays] = useState<number>(0)
     const [quantity, setQuantity] = useState<number>(0)
+    const [timerTime, setTimerTime] = useState('00:00:00')
 
     const toggleDay = (day: string) => {
         setDaysOfWeek((prev) =>
@@ -104,16 +106,16 @@ const CreateNewHabits = () => {
         return (
             <YStack>
                 <CustomInput
-                        value={quantity}
-                        placeholder='Количество'
-                        height={50}
-                        width={SCREEN_WIDTH / 2 - 20}
-                        onChange={(e) => {
-                            if (typeof e === 'number') setQuantity(e);
-                        }}
-                        center={true}
-                        numbersOnly={true}
-                    />
+                    value={quantity}
+                    placeholder='Количество'
+                    height={50}
+                    width={SCREEN_WIDTH / 2 - 20}
+                    onChange={(e) => {
+                        if (typeof e === 'number') setQuantity(e);
+                    }}
+                    center={true}
+                    numbersOnly={true}
+                />
             </YStack>
         )
     }, [quantity])
@@ -236,9 +238,15 @@ const CreateNewHabits = () => {
                                 choiceQuantity
                             }
 
-                            {/* {
+                            {
                                 typeOfTask === 'timer' &&
-                            } */}
+                                <CustomTimePicker 
+                                    width={SCREEN_WIDTH / 2}
+                                    height={50}
+                                    value={timerTime}
+                                    onChange={setTimerTime}
+                                />
+                            }
 
                         </YStack>
                     </YStack>

@@ -12,6 +12,7 @@ interface IInput {
     onChange: (e: string | number) => void;
     center?: boolean;
     numbersOnly?: boolean;
+    onReadonly?: boolean
 }
 
 const CustomInput = (props: IInput) => {
@@ -42,6 +43,7 @@ const CustomInput = (props: IInput) => {
                 borderWidth="$1.5"
                 borderRadius={20}
                 onChangeText={onChangeText}
+                readOnly={props.onReadonly}
                 onFocus={() => setIsActive(true)}
                 onBlur={() => { if (props.value === '') setIsActive(false) }}
                 keyboardType={props.numbersOnly ? "numeric" : "default"}
