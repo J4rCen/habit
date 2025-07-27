@@ -1,31 +1,129 @@
 import CustomInput from '@/app/components/custom_input';
 import CustomSelect from '@/app/components/custom_select';
+import CustomTimePicker from '@/app/components/timepicker';
+import { SCREEN_HEIGHT, SCREEN_WIDTH, WEEK_DAYS } from '@/app/constants';
 import ArrowBack from '@/app/svgs/arrowBack';
 import { PortalProvider } from '@tamagui/portal';
-import { useState } from 'react';
-import { Dimensions } from 'react-native';
+import React, { useMemo, useState } from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Button, Text, XStack, YStack } from "tamagui";
+import { Button, Stack, Text, XStack, YStack } from "tamagui";
 import { optionIntervalExecution, optionTimesOfDay, optionTypeOfTask } from './setDefaultData';
-
-const { height, width } = Dimensions.get('window');
-
-export type IntervalExecution = 'every_day' | 'certain_days' | 'gap'
 
 const CreateNewHabits = () => {
 
     const [habitName, setHabitName] = useState('')
     const [typeOfHabit, setTypeOfHabit] = useState<'reusable' | 'onetime'>('reusable')
     const [intervalExecution, setIntervalExecution] = useState<string>("every_day")
-    const [timesOfDay, setTimesOfDay] = useState<string>("every_day")
-    const [typeOfTask, setTypeOfTask] = useState<string>("every_day")
+    const [timesOfDay, setTimesOfDay] = useState<string>("all")
+    const [typeOfTask, setTypeOfTask] = useState<string>("single_mark")
     const [oneActive, setOneActive] = useState<number>(0)
     const [isOpen, setIsOpen] = useState<boolean>(false)
+    const [daysOfWeek, setDaysOfWeek] = useState<string[]>([])
+    const [daysInRow, setDaysInRow] = useState<number>(0)
+    const [skipDays, setSkipDays] = useState<number>(0)
+    const [quantity, setQuantity] = useState<number>(0)
+    const [timerTime, setTimerTime] = useState('00:00:00')
+
+    const toggleDay = (day: string) => {
+        setDaysOfWeek((prev) =>
+        prev.includes(day)
+            ? prev.filter((d) => d !== day)
+            : [...prev, day]
+        )
+    }
+
+    const choiceOfDays = useMemo(() => {
+        return (
+            <XStack
+                justifyContent="space-evenly"
+                width={SCREEN_WIDTH - 20}
+                marginBottom={5}
+                flexWrap="wrap"
+            >
+                {WEEK_DAYS.map((day, index) => {
+                const isSelected = daysOfWeek.includes(day)
+                return (
+                    <Stack
+                        key={index}
+                        onPress={() => toggleDay(day)}
+                        padding={13}
+                        borderRadius={10}
+                        backgroundColor={isSelected ? '#194A98' : '#393E46'}
+                        alignItems="center"
+                        justifyContent="center"
+                        marginVertical={5}
+                        marginHorizontal={4}
+                        hoverStyle={{
+                            opacity: 0.85,
+                        }}
+                        pressStyle={{
+                            scale: 0.96,
+                        }}
+                    >
+                        <Text color="white" fontSize={16}>
+                            {day}
+                        </Text>
+                    </Stack>
+                )
+                })}
+            </XStack>
+        )
+    }, [daysOfWeek])
+
+    const choiceOfGapInterval = useMemo(() => {
+        return (
+            <YStack alignItems='center' gap={5}>
+                <XStack gap={15} justifyContent='space-between'>
+                    <CustomInput
+                        value={daysInRow}
+                        placeholder='Активность'
+                        height={50}
+                        width={SCREEN_WIDTH / 2 - 20}
+                        onChange={(e) => {
+                            if (typeof e === 'number')setDaysInRow(e)
+                        }}
+                        center={true}
+                        numbersOnly={true}
+                    />
+                    <CustomInput
+                        value={skipDays}
+                        placeholder='Отдых'
+                        height={50}
+                        width={SCREEN_WIDTH / 2 - 20}
+                        onChange={(e) => {
+                            if (typeof e === 'number') setSkipDays(e)
+                        }}
+                        center={true}
+                        numbersOnly={true}
+                    />
+                </XStack>
+                <Text color={'white'} fontSize={12}>*Значение указывается в днях</Text>
+            </YStack>
+        )
+    }, [daysInRow, skipDays])
+
+    const choiceQuantity = useMemo(() => {
+        return (
+            <YStack>
+                <CustomInput
+                    value={quantity}
+                    placeholder='Количество'
+                    height={50}
+                    width={SCREEN_WIDTH / 2 - 20}
+                    onChange={(e) => {
+                        if (typeof e === 'number') setQuantity(e);
+                    }}
+                    center={true}
+                    numbersOnly={true}
+                />
+            </YStack>
+        )
+    }, [quantity])
     
     return (
         <SafeAreaView>
             <PortalProvider>
-                <YStack height={height} backgroundColor={'$dark'}>
+                <YStack height={SCREEN_HEIGHT} position='relative' backgroundColor={'$dark'}>
                     <XStack alignItems='center' marginTop={10}>
                         <ArrowBack size={36}/>
                         <Text
@@ -43,10 +141,10 @@ const CreateNewHabits = () => {
                         <CustomInput
                             value={habitName}
                             height={50}
-                            width={width - 20}
+                            width={SCREEN_WIDTH - 20}
                             placeholder='Название привычке'
                             onChange={(e) => {
-                                setHabitName(e)
+                                if (typeof e === 'string') setHabitName(e)
                             }}
                         />
                         <XStack margin={10}justifyContent='center'>
@@ -55,7 +153,7 @@ const CreateNewHabits = () => {
                                 borderBottomRightRadius={0}
                                 backgroundColor={typeOfHabit === 'reusable' ? '$blue' : "$gray"}
                                 onPress={() => setTypeOfHabit('reusable')}
-                                width={width / 2 - 20}
+                                width={SCREEN_WIDTH / 2 - 20}
                             >
                                 <Text
                                     color={'$white'}
@@ -68,8 +166,10 @@ const CreateNewHabits = () => {
                                 borderTopLeftRadius={0}
                                 borderBottomLeftRadius={0}
                                 backgroundColor={typeOfHabit === 'onetime' ? '$blue' : "$gray"}
-                                onPress={() => setTypeOfHabit('onetime')}
-                                width={width / 2 - 20}
+                                onPress={() => {
+                                    setTypeOfHabit('onetime')
+                                }}
+                                width={SCREEN_WIDTH / 2 - 20}
                             >
                                 <Text
                                 color={'$white'}
@@ -86,7 +186,7 @@ const CreateNewHabits = () => {
                                     id={1}
                                     placeholder='Интервал выполнения' 
                                     height={50} 
-                                    width={width - 20}
+                                    width={SCREEN_WIDTH - 20}
                                     options={optionIntervalExecution}
                                     value={intervalExecution}
                                     onChange={(e) => setIntervalExecution(e)}
@@ -95,11 +195,24 @@ const CreateNewHabits = () => {
                                     setOneActive={(e) => setOneActive(e)}
                                 />
                             }
+
+                            {
+                                typeOfHabit === 'reusable' && 
+                                intervalExecution === 'certain_days' && 
+                                choiceOfDays
+                            }
+
+                            {
+                                typeOfHabit === 'reusable' && 
+                                intervalExecution === 'gap' && 
+                                choiceOfGapInterval
+                            }
+
                             <CustomSelect
                                 id={2}
                                 placeholder='Время суток' 
                                 height={50} 
-                                width={width - 20}
+                                width={SCREEN_WIDTH - 20}
                                 options={optionTimesOfDay}
                                 value={timesOfDay}
                                 onChange={(e) => setTimesOfDay(e)}
@@ -111,7 +224,7 @@ const CreateNewHabits = () => {
                                 id={3}
                                 placeholder='Тип задачи' 
                                 height={50} 
-                                width={width - 20}
+                                width={SCREEN_WIDTH - 20}
                                 options={optionTypeOfTask}
                                 value={typeOfTask}
                                 onChange={(e) => setTypeOfTask(e)}
@@ -119,6 +232,22 @@ const CreateNewHabits = () => {
                                 setIsOpen={(e) => setIsOpen(e)}
                                 setOneActive={(e) => setOneActive(e)}
                             />
+
+                            {
+                                typeOfTask === 'reusable_mark' &&
+                                choiceQuantity
+                            }
+
+                            {
+                                typeOfTask === 'timer' &&
+                                <CustomTimePicker 
+                                    width={SCREEN_WIDTH / 2}
+                                    height={50}
+                                    value={timerTime}
+                                    onChange={setTimerTime}
+                                />
+                            }
+
                         </YStack>
                     </YStack>
                 </YStack>
@@ -127,4 +256,4 @@ const CreateNewHabits = () => {
     )
 }
 
-export default CreateNewHabits
+export default React.memo(CreateNewHabits)

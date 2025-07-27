@@ -1,9 +1,8 @@
+import { SCREEN_WIDTH } from "@/app/constants";
 import { DaySvg, EveningSvg, MorningSvg } from "@/app/svgs/filtersButtonSvgs";
 import { Dispatch, SetStateAction } from "react";
-import { Dimensions, StyleSheet } from "react-native";
+import { StyleSheet } from "react-native";
 import { Button, Text, XStack } from "tamagui";
-
-const SCREEN_WIDTH = Dimensions.get("window").width;
 
 interface IFilteringButtonsTime {
     selectFilter: string, setSelectFilter: 
