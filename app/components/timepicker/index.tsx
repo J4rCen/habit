@@ -25,7 +25,7 @@ const PADDING_ITEMS = Math.floor(VISIBLE_ITEMS / 2)
 
 const generateArray = (length: number) => Array.from({ length }, (_, i) => i.toString().padStart(2, '0'))
 
-const PickerColumn = ({
+const PickerColumn = React.memo(({
 	data,
 	selectedValue,
 	onValueChange,
@@ -79,7 +79,7 @@ const PickerColumn = ({
 			<View style={styles.overlay} pointerEvents="none" />
 		</View>
 	)
-}
+})
 
 const CustomTimePicker = ({ width, height, value, onChange }: ICustomTimePicker) => {
 	const [hours, setHours] = useState('00')
@@ -110,7 +110,7 @@ const CustomTimePicker = ({ width, height, value, onChange }: ICustomTimePicker)
 						placeholder="Время"
 						center
 						onChange={(e) => {
-						if (typeof e === 'string') onChange(e)
+							if (typeof e === 'string') onChange(e)
 						}}
 						onReadonly
 					/>
