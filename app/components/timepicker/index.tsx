@@ -105,6 +105,7 @@ const CustomTimePicker = ({ width, height, value, placeholder, onChange }: ICust
 						value={value}
 						height={height}
 						width={width}
+						alwaysOpen
 						placeholder={placeholder}
 						center
 						onChange={(e) => {

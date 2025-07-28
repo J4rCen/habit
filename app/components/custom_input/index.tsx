@@ -13,6 +13,7 @@ interface IInput {
     center?: boolean;
     numbersOnly?: boolean;
     onReadonly?: boolean
+    alwaysOpen?: boolean
 }
 
 const CustomInput = (props: IInput) => {
@@ -34,7 +35,7 @@ const CustomInput = (props: IInput) => {
     };
 
     return (
-        <PlaceholderWrap height={props.height} width={props.width} isActive={isActive} placeholder={props.placeholder}>
+        <PlaceholderWrap height={props.height} width={props.width} isActive={props.alwaysOpen ? true : isActive} placeholder={props.placeholder}>
             <Input
                 style={[styles.input, props.center ? { textAlign: 'center' } : {}]}
                 width={props.width ?? SCREEN_WIDTH}
