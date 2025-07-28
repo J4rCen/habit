@@ -1,5 +1,6 @@
 import CustomInput from '@/app/components/custom_input';
 import CustomSelect from '@/app/components/custom_select';
+import ReminderToggle from '@/app/components/reminder_toggle';
 import CustomTimePicker from '@/app/components/timepicker';
 import { SCREEN_HEIGHT, SCREEN_WIDTH, WEEK_DAYS } from '@/app/constants';
 import ArrowBack from '@/app/svgs/arrowBack';
@@ -22,7 +23,10 @@ const CreateNewHabits = () => {
     const [daysInRow, setDaysInRow] = useState<number>(0)
     const [skipDays, setSkipDays] = useState<number>(0)
     const [quantity, setQuantity] = useState<number>(0)
-    const [timerTime, setTimerTime] = useState('00:00:00')
+    const [timerTime, setTimerTime] = useState('00:00')
+    const [isOn, setIsOn] = useState(true)
+    const [reminderTime, setReminderTime] = useState(`${new Date().getHours()}:${new Date().getMinutes()}`)
+
 
     const toggleDay = (day: string) => {
         setDaysOfWeek((prev) =>
@@ -123,7 +127,7 @@ const CreateNewHabits = () => {
     return (
         <SafeAreaView>
             <PortalProvider>
-                <YStack height={SCREEN_HEIGHT} position='relative' backgroundColor={'$dark'}>
+                <YStack height={SCREEN_HEIGHT} width={SCREEN_WIDTH} position='relative' backgroundColor={'$dark'}>
                     <XStack alignItems='center' marginTop={10}>
                         <ArrowBack size={36}/>
                         <Text
@@ -245,6 +249,24 @@ const CreateNewHabits = () => {
                                     height={50}
                                     value={timerTime}
                                     onChange={setTimerTime}
+                                    placeholder='Время'
+                                />
+                            }
+
+                           <ReminderToggle
+                                value={isOn}
+                                onChange={setIsOn}
+                           />
+
+                            {
+                                isOn &&
+                                <CustomTimePicker
+                                    width={SCREEN_WIDTH - 20}
+                                    height={50}
+                                    value={reminderTime}
+                                    onChange={setReminderTime}
+                                    placeholder='Укажите время'
+                                    
                                 />
                             }
 

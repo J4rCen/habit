@@ -17,6 +17,7 @@ interface ICustomTimePicker {
 	height: number
 	value: string
 	onChange: (date: string) => void
+	placeholder: string
 }
 
 const ITEM_HEIGHT = 40
@@ -81,22 +82,19 @@ const PickerColumn = React.memo(({
 	)
 })
 
-const CustomTimePicker = ({ width, height, value, onChange }: ICustomTimePicker) => {
+const CustomTimePicker = ({ width, height, value, placeholder, onChange }: ICustomTimePicker) => {
 	const [hours, setHours] = useState('00')
 	const [minutes, setMinutes] = useState('00')
-	const [seconds, setSeconds] = useState('00')
 
 	const parseInitialValue = (val: string) => {
-		const [h = '00', m = '00', s = '00'] = val.split(':')
+		const [h = '00', m = '00'] = val.split(':')
 		setHours(h.padStart(2, '0'))
 		setMinutes(m.padStart(2, '0'))
-		setSeconds(s.padStart(2, '0'))
 	}
 
 	const timeUnits = [
 		{ label: 'Часы', value: hours, setValue: setHours, range: 24 },
 		{ label: 'Минуты', value: minutes, setValue: setMinutes, range: 60 },
-		{ label: 'Секунды', value: seconds, setValue: setSeconds, range: 60 },
 	]
 
 	return (
@@ -107,7 +105,7 @@ const CustomTimePicker = ({ width, height, value, onChange }: ICustomTimePicker)
 						value={value}
 						height={height}
 						width={width}
-						placeholder="Время"
+						placeholder={placeholder}
 						center
 						onChange={(e) => {
 							if (typeof e === 'string') onChange(e)
@@ -157,7 +155,7 @@ const CustomTimePicker = ({ width, height, value, onChange }: ICustomTimePicker)
 								<Button
 								backgroundColor="$blue"
 								onPress={() => {
-									const newTime = `${hours}:${minutes}:${seconds}`
+									const newTime = `${hours}:${minutes}`
 									onChange?.(newTime)
 								}}
 								>
