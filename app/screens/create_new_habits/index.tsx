@@ -172,9 +172,9 @@ const CreateNewHabits = () => {
     }, [quantity])
     
     return (
-        <SafeAreaView style={{backgroundColor: '#222831', height: SCREEN_HEIGHT, width: SCREEN_WIDTH}}>
+        <SafeAreaView style={{height: SCREEN_HEIGHT, width: SCREEN_WIDTH}}>
             <PortalProvider>
-                <ScrollView maxHeight={SCREEN_HEIGHT}>
+                <ScrollView maxHeight={SCREEN_HEIGHT} style={{backgroundColor: '#222831'}}>
                     <YStack width={SCREEN_WIDTH} position='relative' justifyContent='center'>
                         <XStack alignItems='center' marginTop={10}>
                             <View onPress={() => router.back()}>
@@ -321,7 +321,7 @@ const CreateNewHabits = () => {
                                 }
 
                             </YStack>
-                            <YStack gap={10} marginTop={50}>
+                            <YStack gap={10} marginTop={50} marginBottom={50}>
                                 <Button 
                                     fontSize={16} 
                                     color={'white'} 
