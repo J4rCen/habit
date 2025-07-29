@@ -1,4 +1,5 @@
 import dayjs from "dayjs";
+import { router } from "expo-router";
 import { useState } from "react";
 import { Dimensions, StyleSheet, TouchableOpacity } from "react-native";
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -29,6 +30,7 @@ export default function Index() {
           />
           <TouchableOpacity
             style={styles.buttonCreateNewHabit}
+            onPress={() => router.push('./screens/create_new_habits')}
           >
             <Text
               color={'$white'}

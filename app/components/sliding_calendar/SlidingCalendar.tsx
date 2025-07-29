@@ -1,16 +1,16 @@
+import { SCREEN_WIDTH, WEEK_DAYS } from "@/app/constants";
 import useStore from "@/app/store/zustand";
 import ArrowBack from "@/app/svgs/arrowBack";
 import dayjs, { Dayjs } from "dayjs";
 import localeRu from "dayjs/locale/ru";
 import isoWeek from "dayjs/plugin/isoWeek";
 import weekday from "dayjs/plugin/weekday";
-import { memo, useCallback, useMemo, useRef, useState } from "react";
+import React, { memo, useCallback, useMemo, useRef, useState } from "react";
 import {
-  Dimensions,
   FlatList,
   ListRenderItem,
   StyleSheet,
-  TouchableOpacity,
+  TouchableOpacity
 } from "react-native";
 import { Text, XStack, YStack } from "tamagui";
 import dateConversion from "../../utilities/dateConversion";
@@ -23,9 +23,6 @@ interface ISlidingCalendar {
   selectDate: string;
   setSelectDate: (date: string) => void;
 }
-
-const SCREEN_WIDTH = Dimensions.get("window").width;
-const WEEK_DAYS = ["Пн", "Вт", "Ср", "Чт", "Пт", "Сб", "Вс"];
 
 const getWeek = (startOfWeek: Dayjs): Dayjs[] => {
   return Array.from({ length: 7 }, (_, i) => startOfWeek.add(i, "day"));
@@ -182,7 +179,7 @@ const SlidingCalendar = memo(({ selectDate, setSelectDate }: ISlidingCalendar) =
           onEndReachedThreshold={0.25}
           horizontal
           pagingEnabled
-          initialScrollIndex={1}
+          initialScrollIndex={weeks.length - 1}
           getItemLayout={(_, index) => ({
             length: SCREEN_WIDTH,
             offset: SCREEN_WIDTH * index,
@@ -247,4 +244,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default SlidingCalendar;
+export default React.memo(SlidingCalendar);
