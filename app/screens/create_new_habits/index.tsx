@@ -1,7 +1,7 @@
-import CustomInput from '@/app/components/custom_input';
-import CustomSelect from '@/app/components/custom_select';
-import ReminderToggle from '@/app/components/reminder_toggle';
-import CustomTimePicker from '@/app/components/timepicker';
+import CustomInput from '@/app/components/custom_input/CustomInput';
+import CustomSelect from '@/app/components/custom_select/CustomSelect';
+import ReminderToggle from '@/app/components/reminder_toggle/ReminderToggle';
+import CustomTimePicker from '@/app/components/timepicker/CustomTimePicker';
 import { SCREEN_HEIGHT, SCREEN_WIDTH, WEEK_DAYS } from '@/app/constants';
 import useStore, { IHabitTask } from '@/app/store/zustand';
 import ArrowBack from '@/app/svgs/arrowBack';

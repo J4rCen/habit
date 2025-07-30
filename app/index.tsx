@@ -1,13 +1,13 @@
 import dayjs from "dayjs";
 import { router } from "expo-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Dimensions, StyleSheet, TouchableOpacity } from "react-native";
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Text, YStack } from "tamagui";
 import FilteringButtonsTime from "./components/filtering_buttons_time/FilteringButtonsTime";
-import HabitsRender from './components/habits_render';
+import HabitsRender from './components/habits_render/HabitsRender';
 import SlidingCalendar from "./components/sliding_calendar/SlidingCalendar";
-import useStore from "./store/zustand";
+import useStore, { IHabitTask } from "./store/zustand";
 import dateConversion from "./utilities/dateConversion";
 
 const { height, width } = Dimensions.get('window');
@@ -17,18 +17,20 @@ export default function Index() {
 
     const store = useStore(state => state.habitTask)
 
-    console.log(store)
-
     const [selectDate, setSelectDate] = useState(dateConversion(dayjs()))
     const [selectFilter, setSelectFilter] = useState('all')
-    const habitsStore = Array.from(store.values  ()) ?? []
+    const [habitsStore, setHabitStore] = useState<IHabitTask[]>((Array.from(store.values()) ?? []))
+
+    useEffect(() => {
+        setHabitStore((Array.from(store.values()) ?? []))
+    }, [store])
 
     return (
         <SafeAreaView>
         <YStack height={height} backgroundColor='$dark'>
             <SlidingCalendar
-            selectDate={selectDate}
-            setSelectDate={setSelectDate}
+                selectDate={selectDate}
+                setSelectDate={setSelectDate}
             />
             <YStack alignItems="center">
             <FilteringButtonsTime
@@ -47,6 +49,7 @@ export default function Index() {
 
             <HabitsRender
                 habitsStore={habitsStore}
+                selectDate={selectDate}
             />
 
             </YStack>

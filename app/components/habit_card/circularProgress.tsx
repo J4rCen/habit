@@ -2,7 +2,7 @@ import React from 'react'
 import Svg, { Circle, Path } from 'react-native-svg'
 import { Text, View } from 'tamagui'
 
-type GoalType = 'single' | 'multi' | 'timer'
+type GoalType = 'single' | 'reusable' | 'timer'
 
 interface ICircularProgress {
     progress: number
@@ -35,15 +35,15 @@ const CircularProgress = ({
     if (clampedProgress === 1) {
         return (
             <Svg width={size} height={size} viewBox="0 0 100 100">
-            <Circle cx="50" cy="50" r="50" fill="#229C15" />
-            <Path
-                d="M30 52 L45 67 L75 35"
-                fill="none"
-                stroke="white"
-                strokeWidth="10"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-            />
+                <Circle cx="50" cy="50" r="50" fill="#229C15" />
+                <Path
+                    d="M30 52 L45 67 L75 35"
+                    fill="none"
+                    stroke="white"
+                    strokeWidth="10"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                />
             </Svg>
         )
     }
@@ -57,7 +57,7 @@ const CircularProgress = ({
 
     const Mark = () => {
 
-        if (goalType === 'multi' && total != null && value != null) {
+        if (goalType === 'reusable' && total != null && value != null) {
             return (
                 <Text fontSize={14} color="white">
                     {`${value}/${total}`}
