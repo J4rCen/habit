@@ -3,10 +3,18 @@ import { Dayjs } from 'dayjs'
 import { create } from 'zustand'
 import { createJSONStorage, persist } from 'zustand/middleware'
 
+type staticConfig = {
+	isCompleat: boolean,
+	total?: number      // для reusable
+    value?: number      // для reusable
+    elapsed?: number    // для timer
+    duration?: number   // для timer
+}
 export interface IHabitTask {
   habitId: string
   habitConfig: {
 	name: string
+	day_of_create: string,
 	type_of_habit: 'reusable' | 'onetime'
 	interval_execution: 'every_day' | 'certain_days' | 'gap' | null
 	days_of_week?: Array<string> | null
@@ -21,10 +29,7 @@ export interface IHabitTask {
 	reminder: boolean
 	reminder_time?: string | null
   }
-  habitStatic?: {
-	isCompleat: number | undefined,
-	date: Date
-  }
+  habitStatic?: Map<string, staticConfig>
 }
 
 interface IStore {

@@ -6,6 +6,7 @@ import { SCREEN_HEIGHT, SCREEN_WIDTH, WEEK_DAYS } from '@/app/constants';
 import useStore, { IHabitTask } from '@/app/store/zustand';
 import ArrowBack from '@/app/svgs/arrowBack';
 import { PortalProvider } from '@tamagui/portal';
+import dayjs from 'dayjs';
 import { router } from 'expo-router';
 import { nanoid } from 'nanoid/non-secure';
 import React, { useMemo, useState } from 'react';
@@ -44,6 +45,7 @@ const CreateNewHabits = () => {
             habitId: nanoid(),
             habitConfig: {
                 name: habitName,
+                day_of_create: dayjs().format('DD-MM-YYYY'),
                 type_of_habit: typeOfHabit,
                 interval_execution: 
                     typeOfHabit === 'reusable' ? 
@@ -72,6 +74,7 @@ const CreateNewHabits = () => {
             }
         }    
         store.setHabitTask(newHabitData.habitId, newHabitData)
+        router.back()
     }
 
 
@@ -174,7 +177,7 @@ const CreateNewHabits = () => {
     return (
         <SafeAreaView style={{height: SCREEN_HEIGHT, width: SCREEN_WIDTH}}>
             <PortalProvider>
-                <ScrollView maxHeight={SCREEN_HEIGHT} style={{backgroundColor: '#222831'}}>
+                <ScrollView maxHeight={SCREEN_HEIGHT} style={{backgroundColor: '#222831'}} showsVerticalScrollIndicator={false}>
                     <YStack width={SCREEN_WIDTH} position='relative' justifyContent='center'>
                         <XStack alignItems='center' marginTop={10}>
                             <View onPress={() => router.back()}>
@@ -325,7 +328,8 @@ const CreateNewHabits = () => {
                                 <Button 
                                     fontSize={16} 
                                     color={'white'} 
-                                    width={SCREEN_WIDTH - 20} 
+                                    width={SCREEN_WIDTH - 20}
+                                    size={'$5'}
                                     backgroundColor={'$blue'}
                                     onPress={() => saveNewHabit()}
                                 >
@@ -334,7 +338,8 @@ const CreateNewHabits = () => {
                                 <Button 
                                     fontSize={16} 
                                     color={'white'} 
-                                    width={SCREEN_WIDTH - 20} 
+                                    width={SCREEN_WIDTH - 20}
+                                    size={'$5'}
                                     backgroundColor={'$gray'} 
                                     onPress={() => router.back()}
                                 >

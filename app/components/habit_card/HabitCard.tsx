@@ -1,5 +1,5 @@
 import { IHabitTask } from "@/app/store/zustand"
-import React, { useState } from "react"
+import React from "react"
 import { TouchableOpacity } from "react-native"
 import { Text, XStack, YStack } from "tamagui"
 import CircularProgress from "./CircularProgress"
@@ -8,12 +8,10 @@ import CircularProgress from "./CircularProgress"
 interface IHabitCard {
     habitId: string
     habitConfig: IHabitTask['habitConfig']
-    isCompleat: number | undefined 
+    isCompleat: IHabitTask['habitStatic']
 }
 
 const HabitCard = ({habitId, habitConfig, isCompleat}: IHabitCard) => {
-
-    const [progress, setProgress] = useState<number>(isCompleat ?? 0)
 
     // const duration = 15 * 60 // 15 минут в секундах
     // const [elapsed, setElapsed] = useState(0)
@@ -42,7 +40,7 @@ const HabitCard = ({habitId, habitConfig, isCompleat}: IHabitCard) => {
             return (
                 <CircularProgress
                     goalType='single'
-                    progress={progress}
+                    progress={0}
                     size={55}
                 />
             )

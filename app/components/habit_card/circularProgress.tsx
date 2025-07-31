@@ -9,8 +9,8 @@ interface ICircularProgress {
     goalType: GoalType
     size?: number
     strokeWidth?: number
-    total?: number      // для multi
-    value?: number      // для multi
+    total?: number      // для reusable
+    value?: number      // для reusable
     elapsed?: number    // для timer
     duration?: number   // для timer
 }
