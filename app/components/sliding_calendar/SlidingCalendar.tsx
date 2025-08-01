@@ -193,7 +193,7 @@ const SlidingCalendar = memo(({ selectDate, setSelectDate }: ISlidingCalendar) =
             index,
           })}
           showsHorizontalScrollIndicator={false}
-          windowSize={1}
+          windowSize={3}
           maxToRenderPerBatch={3}
           updateCellsBatchingPeriod={50}
           onScrollToIndexFailed={({ index }) => {

@@ -41,7 +41,7 @@ const HabitsRender = (props: IHabitRender) => {
                     key={index}
                     habitId={item.habitId}
                     habitConfig={item.habitConfig}
-                    isCompleat={item.habitStatic}
+                    selectDate={props.selectDate}
                 />
             )
         }))

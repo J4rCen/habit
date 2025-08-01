@@ -71,7 +71,8 @@ const CreateNewHabits = () => {
                     null,
                 reminder: reminderOn,
                 reminder_time: reminderOn ? reminderTime : null
-            }
+            },
+            habitStatic: null
         }    
         store.setHabitTask(newHabitData.habitId, newHabitData)
         router.back()
