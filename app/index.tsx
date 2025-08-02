@@ -37,7 +37,7 @@ export default function Index() {
                 />
                 <TouchableOpacity
                     style={styles.buttonCreateNewHabit}
-                    onPress={() => router.push('./screens/create_new_habits')}
+                    onPress={() => router.navigate('/screens/create_new_habits')}
                 >
                     <Text
                     color={'$white'}

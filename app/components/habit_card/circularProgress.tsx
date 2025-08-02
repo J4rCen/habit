@@ -13,6 +13,8 @@ interface ICircularProgress {
     value?: number      // для reusable
     elapsed?: number    // для timer
     duration?: number   // для timer
+
+    timer?: boolean
 }
 
 const CircularProgress = ({
@@ -23,7 +25,8 @@ const CircularProgress = ({
     size = 80,
     strokeWidth = 8,
     elapsed,
-    duration
+    duration,
+    timer
 }: ICircularProgress) => {
   // Ограничим минимальный размер
     const safeSize = Math.max(size, strokeWidth * 2 + 10)
@@ -53,6 +56,14 @@ const CircularProgress = ({
         const totalMinutes = Math.floor(seconds / 60)
         const hours = Math.floor(totalMinutes / 60)
         const minutes = totalMinutes % 60
+        const remainingSeconds = seconds % 60
+
+        if (timer) {
+            // формат: HH:MM:SS
+            return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`
+        }
+
+        // формат: HH:MM
         return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`
     }
 
@@ -68,11 +79,13 @@ const CircularProgress = ({
 
         if (goalType === 'timer' && duration != null && elapsed != null ) {
             return (
-                <Text fontSize={14} color="white">
+                <Text fontSize={timer ? 30 : 14} color="white">
                     {formatCountdown(Math.max(duration - elapsed, 0))}
                 </Text>
             )
         }
+
+        return null
     }
 
     return (

@@ -1,7 +1,8 @@
 import useStore, { IHabitTask } from "@/app/store/zustand"
+import { router } from "expo-router"
 import React, { useEffect, useState } from "react"
 import { TouchableOpacity } from "react-native"
-import { Text, XStack, YStack } from "tamagui"
+import { Text, View, XStack, YStack } from "tamagui"
 import CircularProgress from "./CircularProgress"
 
 
@@ -17,12 +18,12 @@ const round = (num: number, precision: number = 6) =>
 const HabitCard = ({habitId, habitConfig, selectDate}: IHabitCard) => {
 
     const setIsCompleat = useStore(store => store.setIsCompleat)
-    const getIsCompleat = useStore(store => store.getIsCompleat(habitId))
+    const getIsCompleat = useStore(store => store.getIsCompleat(habitId)?.get(selectDate))
 
     const [progress, setProgress] = useState<number>(0)
 
     useEffect(() => {
-        const value = getIsCompleat?.get(selectDate)
+        const value = getIsCompleat
         if (value && typeof value.isCompleat === 'number') {
             setProgress(value.isCompleat)
         } else {
@@ -77,17 +78,26 @@ const HabitCard = ({habitId, habitConfig, selectDate}: IHabitCard) => {
             )
         }
 
-        // if (habitConfig.type_of_task === 'timer') {
-        //     return (
-        //         <CircularProgress
-        //             goalType='timer'
-        //             duration={}
-        //             elapsed={}
-        //             progress={progress}
-        //             size={55}
-        //         />
-        //     )
-        // }
+        if (habitConfig.type_of_task === 'timer' && habitConfig.timer_time) {
+
+            const times = habitConfig.timer_time?.split(":")
+            const elapsed = getIsCompleat ? getIsCompleat.elapsed : 0
+            
+            const hours = parseInt(times[0]) * 60 * 60
+            const minutes = parseInt(times[1]) * 60
+
+            return (
+                <View onPress={() => router.navigate({pathname: '../../screens/timer', params: {timer: hours + minutes, habitId, selectDate }})}>
+                    <CircularProgress
+                        goalType='timer'
+                        duration={hours + minutes}
+                        elapsed={elapsed}
+                        progress={progress}
+                        size={55}
+                    />
+                </View>
+            )
+        }
     }
 
     const progressUpdate = () => {
@@ -106,8 +116,6 @@ const HabitCard = ({habitId, habitConfig, selectDate}: IHabitCard) => {
                 newProgress = 0
             }
 
-            console.log(newProgress)
-
             setProgress(newProgress)
             setIsCompleat(habitId, selectDate, { 
                 isCompleat: newProgress, 
@@ -115,18 +123,6 @@ const HabitCard = ({habitId, habitConfig, selectDate}: IHabitCard) => {
                 value: newProgress 
             })
         }
-
-        // if (habitConfig.type_of_task === 'timer' && habitConfig.timer_time) {
-        //     const durationInSeconds = parseInt(habitConfig.timer_time) * 60 // если время — в минутах
-        //     const newStatic = {
-        //         isCompleat: 1, // или 0/1 в зависимости от логики завершения таймера
-        //         duration: durationInSeconds,
-        //         elapsed: durationInSeconds // или меньше, если ты считаешь в реальном времени
-        //     }
-
-        //     setProgress(1)
-        //     setIsCompleat(habitId, selectDate, newStatic)
-        // }
     }
 
     return (
