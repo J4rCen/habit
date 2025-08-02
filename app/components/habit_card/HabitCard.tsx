@@ -69,7 +69,7 @@ const HabitCard = ({habitId, habitConfig, selectDate}: IHabitCard) => {
             return (
                 <CircularProgress
                     goalType='reusable'
-                    value={0}
+                    value={Math.round(round(progress * habitConfig.quantity))}
                     total={habitConfig.quantity}
                     progress={progress}
                     size={55}
@@ -105,6 +105,8 @@ const HabitCard = ({habitId, habitConfig, selectDate}: IHabitCard) => {
             if (newProgress > 1) {
                 newProgress = 0
             }
+
+            console.log(newProgress)
 
             setProgress(newProgress)
             setIsCompleat(habitId, selectDate, { 

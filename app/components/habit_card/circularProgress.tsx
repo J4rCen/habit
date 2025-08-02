@@ -33,9 +33,6 @@ const CircularProgress = ({
     const strokeDashoffset = circumference * (1 - clampedProgress)
     const isComplete = Math.round(clampedProgress * 1000) / 1000 === 1
 
-    console.log('progress: ', progress)
-    console.log('clampedProgress: ', clampedProgress)
-
     if (isComplete) {
         return (
             <Svg width={size} height={size} viewBox="0 0 100 100">
