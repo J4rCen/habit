@@ -19,8 +19,8 @@ export interface IHabitTask {
 		interval_execution: 'every_day' | 'certain_days' | 'gap' | null
 		days_of_week?: Array<string> | null
 		gap_interval?: {
-		days_in_row: number
-		skip_days: number
+			days_in_row: number
+			skip_days: number
 		} | null
 		times_of_day: 'all' | 'morning' | 'day' | 'evening'
 		type_of_task: 'single_mark' | 'reusable_mark' | 'timer'
