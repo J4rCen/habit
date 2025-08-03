@@ -7,9 +7,10 @@ import useStore, { IHabitTask } from '@/app/store/zustand';
 import ArrowBack from '@/app/svgs/arrowBack';
 import { PortalProvider } from '@tamagui/portal';
 import dayjs from 'dayjs';
-import { router } from 'expo-router';
+import { router, useLocalSearchParams } from 'expo-router';
 import { nanoid } from 'nanoid/non-secure';
 import React, { useMemo, useState } from 'react';
+import { Alert } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Button, ScrollView, Stack, Text, View, XStack, YStack } from "tamagui";
 import { optionIntervalExecution, optionTimesOfDay, optionTypeOfTask } from './setDefaultData';
@@ -17,32 +18,37 @@ import { optionIntervalExecution, optionTimesOfDay, optionTypeOfTask } from './s
 
 const CreateNewHabits = () => {
 
-    const [habitName, setHabitName] = useState('')
-    const [typeOfHabit, setTypeOfHabit] = useState<'reusable' | 'onetime'>('reusable')
-    const [intervalExecution, setIntervalExecution] = useState<string>("every_day")
-    const [timesOfDay, setTimesOfDay] = useState<string>("all")
-    const [typeOfTask, setTypeOfTask] = useState<string>("single_mark")
-    const [oneActive, setOneActive] = useState<number>(0)
-    const [isOpen, setIsOpen] = useState<boolean>(false)
-    const [daysOfWeek, setDaysOfWeek] = useState<string[]>([])
-    const [daysInRow, setDaysInRow] = useState<number>(0)
-    const [skipDays, setSkipDays] = useState<number>(0)
-    const [quantity, setQuantity] = useState<number>(0)
-    const [timerTime, setTimerTime] = useState('00:00')
-    const [reminderOn, setReminderOn] = useState(false)
+    const {habitId} = useLocalSearchParams()
+    const habitConfig = habitId ? useStore(store => store.getHabitTask(habitId as string)?.habitConfig) : undefined
+
+    const [habitName, setHabitName] = useState(habitConfig ? habitConfig.name : '')
+    const [typeOfHabit, setTypeOfHabit] = useState<'reusable' | 'onetime'>(habitConfig ? habitConfig.type_of_habit : 'reusable')
+    const [intervalExecution, setIntervalExecution] = useState<string>(habitConfig && habitConfig.interval_execution ? habitConfig.interval_execution : "every_day")
+    const [timesOfDay, setTimesOfDay] = useState<string>(habitConfig && habitConfig.times_of_day ? habitConfig.times_of_day : "all")
+    const [typeOfTask, setTypeOfTask] = useState<string>(habitConfig && habitConfig.type_of_task ? habitConfig.type_of_task : "single_mark")
+    const [daysOfWeek, setDaysOfWeek] = useState<string[]>(habitConfig && habitConfig.days_of_week ? habitConfig.days_of_week : [])
+    const [daysInRow, setDaysInRow] = useState<number>(habitConfig && habitConfig.gap_interval?.days_in_row ? habitConfig.gap_interval.days_in_row : 0)
+    const [skipDays, setSkipDays] = useState<number>(habitConfig && habitConfig.gap_interval?.skip_days ? habitConfig.gap_interval.skip_days : 0)
+    const [quantity, setQuantity] = useState<number>(habitConfig && habitConfig.quantity ? habitConfig.quantity : 0)
+    const [timerTime, setTimerTime] = useState( habitConfig && habitConfig.timer_time ? habitConfig.timer_time : '00:00')
+    const [reminderOn, setReminderOn] = useState( habitConfig && habitConfig.reminder ? habitConfig.reminder: false)
     const [reminderTime, setReminderTime] = useState(
+        habitConfig && habitConfig.reminder_time ? habitConfig.reminder_time :
         `${
             new Date().getHours().toString().padStart(2, '0')
         }:${
             new Date().getMinutes().toString().padStart(2, '0')
         }`
     )
+    const [oneActive, setOneActive] = useState<number>(0)
+    const [isOpen, setIsOpen] = useState<boolean>(false)
 
     const store = useStore(state => state)
 
-    const saveNewHabit = () => {
+    const saveHabit = () => {
+
         const newHabitData: IHabitTask = {
-            habitId: nanoid(),
+            habitId: habitId ? habitId as string : nanoid(),
             habitConfig: {
                 name: habitName,
                 day_of_create: dayjs().format('DD-MM-YYYY'),
@@ -73,11 +79,34 @@ const CreateNewHabits = () => {
                 reminder_time: reminderOn ? reminderTime : null
             },
             habitStatic: null
-        }    
-        store.setHabitTask(newHabitData.habitId, newHabitData)
+        }
+
+        if (habitId) {
+            store.updateHabitTask(newHabitData.habitId, newHabitData)
+        } else {
+            store.setHabitTask(newHabitData.habitId, newHabitData)
+        }
+
         router.back()
     }
 
+    const deleteHabit = () => {
+        Alert.alert(
+            "Удаление привычке",
+            "Данное действие полностью удалит привычку, хотите продолжить ?",
+            [
+                { text: "Отмена", style: "cancel" },
+                {
+                    text: "Удалить",
+                    style: "destructive",
+                    onPress: () => {
+                        store.removeHabitTask(habitId as string)
+                        router.back()
+                    },
+                },
+            ]
+        );
+    }
 
     const toggleDay = (day: string) => {
         setDaysOfWeek((prev) =>
@@ -188,7 +217,9 @@ const CreateNewHabits = () => {
                                 marginLeft={5}
                                 color={"$white"}
                                 fontSize={26}
-                            >Добавить привычку</Text>
+                            >
+                                { habitId === undefined ? 'Добавить привычку' : 'Изменить привычку' }
+                            </Text>
                         </XStack>
 
                         <YStack 
@@ -332,9 +363,9 @@ const CreateNewHabits = () => {
                                     width={SCREEN_WIDTH - 20}
                                     size={'$5'}
                                     backgroundColor={'$blue'}
-                                    onPress={() => saveNewHabit()}
+                                    onPress={() => saveHabit()}
                                 >
-                                    Создать
+                                    Сохранить
                                 </Button>
                                 <Button 
                                     fontSize={16} 
@@ -346,6 +377,19 @@ const CreateNewHabits = () => {
                                 >
                                     Отмена
                                 </Button>
+                                {
+                                    habitId &&
+                                    <Button 
+                                        fontSize={16} 
+                                        color={'white'} 
+                                        width={SCREEN_WIDTH - 20}
+                                        size={'$5'}
+                                        backgroundColor={'red'} 
+                                        onPress={() => deleteHabit()}
+                                    >
+                                        Удалить
+                                    </Button>
+                                }
                             </YStack>
                         </YStack>
                     </YStack>

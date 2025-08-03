@@ -28,7 +28,6 @@ const CircularProgress = ({
     duration,
     timer
 }: ICircularProgress) => {
-  // Ограничим минимальный размер
     const safeSize = Math.max(size, strokeWidth * 2 + 10)
     const radius = (safeSize - strokeWidth) / 2
     const circumference = 2 * Math.PI * radius

@@ -2,8 +2,8 @@ import useStore, { IHabitTask } from "@/app/store/zustand"
 import { router } from "expo-router"
 import React, { useEffect, useState } from "react"
 import { TouchableOpacity } from "react-native"
-import { Text, View, XStack, YStack } from "tamagui"
-import CircularProgress from "./CircularProgress"
+import { Select, Text, View, XStack, YStack } from "tamagui"
+import CircularProgress from "./circularProgress"
 
 
 interface IHabitCard {
@@ -19,6 +19,7 @@ const HabitCard = ({habitId, habitConfig, selectDate}: IHabitCard) => {
 
     const setIsCompleat = useStore(store => store.setIsCompleat)
     const getIsCompleat = useStore(store => store.getIsCompleat(habitId)?.get(selectDate))
+    const [isOpen, setIsOpen] = useState(false);
 
     const [progress, setProgress] = useState<number>(0)
 
@@ -31,29 +32,6 @@ const HabitCard = ({habitId, habitConfig, selectDate}: IHabitCard) => {
         }
         }, [getIsCompleat, selectDate]
     )
-
-
-    // const duration = 15 * 60 // 15 минут в секундах
-    // const [elapsed, setElapsed] = useState(0)
-
-    // useEffect(() => {
-    //     const interval = setInterval(() => {
-    //     setElapsed((prev) => {
-    //         if (prev >= duration) {
-    //         clearInterval(interval)
-    //         return duration
-    //         }
-    //         return prev + 1
-    //     })
-    //     }, 1000)
-
-    //     return () => clearInterval(interval)
-    // }, [])
-
-    // const progress = elapsed / duration
-
-
-    // 'single_mark' | 'reusable_mark' | 'timer
 
     const CircularProgressType = () => {
         if (habitConfig.type_of_task === 'single_mark') {
@@ -102,7 +80,7 @@ const HabitCard = ({habitId, habitConfig, selectDate}: IHabitCard) => {
 
     const progressUpdate = () => {
         if (habitConfig.type_of_task === 'single_mark') {
-            const newProgress = progress === 1 ? 0 : 1 // переключаем
+            const newProgress = progress === 1 ? 0 : 1
             setProgress(newProgress)
             setIsCompleat(habitId, selectDate, { isCompleat: newProgress })
         }
@@ -126,33 +104,92 @@ const HabitCard = ({habitId, habitConfig, selectDate}: IHabitCard) => {
     }
 
     return (
-        <YStack
-            height={70} 
-            backgroundColor={'$gray'}
-            borderRadius={10}
-        >
-            <XStack 
-                flex={1}
-                alignItems="center"
-                
+        <Select open={isOpen} onOpenChange={setIsOpen}>
+            <YStack
+                height={70} 
+                backgroundColor={'$gray'}
+                borderRadius={10}
+                zIndex={2}
             >
-                <TouchableOpacity style={{width: '70%', height: '100%', justifyContent: 'center'}}>
-                    <Text
-                        color={'white'}
-                        fontSize={22}
-                        marginLeft={10}
-                    >
-                        {habitConfig.name}
-                    </Text>
-                </TouchableOpacity>
-                <TouchableOpacity 
-                    style={{width: '30%', height: '100%', justifyContent: 'center', alignItems: 'center'}} 
-                    onPress={() => progressUpdate()}
+                <XStack 
+                    flex={1}
+                    alignItems="center"
                 >
-                    <CircularProgressType/>
-                </TouchableOpacity>
-            </XStack>
-        </YStack>
+                    <Select.Trigger
+                        elevation={0}
+                        backgroundColor={'$gray'}
+                        width={'70%'}
+                        height={'100%'}
+                        pressStyle={{
+                            backgroundColor: 'none'
+                        }}
+                        focusStyle={{
+                            backgroundColor: 'none'
+                        }}
+                        hoverStyle={{
+                            backgroundColor: 'none'
+                        }}
+                        borderWidth={0}
+                        borderColor={'none'}
+                        
+                    >
+                        <Text
+                                color={'white'}
+                                fontSize={22}
+                                marginLeft={10}
+                            >
+                                {habitConfig.name}
+                            </Text>
+                    </Select.Trigger>
+                    <TouchableOpacity 
+                        style={{width: '30%', height: '100%', justifyContent: 'center', alignItems: 'center'}} 
+                        onPress={() => progressUpdate()}
+                    >
+                        <CircularProgressType/>
+                    </TouchableOpacity>
+                </XStack>
+            </YStack>
+            {isOpen &&
+                <Select.Content>
+                    <Select.FocusScope focusOnIdle={true}>
+                        <YStack 
+                            backgroundColor={'#2C2F35'}
+                            width={'100%'}
+                            padding={10}
+                            paddingTop={15}
+                            zIndex={1}
+                            borderBottomLeftRadius={10}
+                            borderBottomRightRadius={10}
+                            top={-20}
+                            marginBottom={-20}
+                            gap={10}
+                        >
+                            <XStack>
+                                <TouchableOpacity 
+                                    style={{width: '100%'}}
+                                    onPress={() => router.navigate({pathname: '/screens/create_new_habits', params: {habitId}})}    
+                                >
+                                    <Text
+                                        color={'white'}
+                                        fontSize={'$4.5'}
+                                    >
+                                        Изменить
+                                    </Text>
+                                </TouchableOpacity>
+                            </XStack>
+                            <XStack>
+                                <Text
+                                    color={'white'}
+                                    fontSize={'$4.5'}
+                                >
+                                    Статистика
+                                </Text>
+                            </XStack>
+                        </YStack>
+                    </Select.FocusScope>
+                </Select.Content>
+            }
+        </Select>
     )
 }
 

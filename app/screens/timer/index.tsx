@@ -1,4 +1,4 @@
-import CircularProgress from "@/app/components/habit_card/CircularProgress";
+import CircularProgress from "@/app/components/habit_card/circularProgress";
 import { SCREEN_HEIGHT, SCREEN_WIDTH } from "@/app/constants";
 import useStore from "@/app/store/zustand";
 import ArrowBack from "@/app/svgs/arrowBack";
@@ -29,18 +29,18 @@ const Timer = () => {
 
     const [timerStart, setTimerStart] = useState(false);
     const [elapsed, setElapsed] = useState(isCompleatData?.elapsed ?? 0);
-    const [isFinish, setIsFinish] = useState(isCompleatData?.isCompleat ?? 0); // ← оставляем 0/1
+    const [isFinish, setIsFinish] = useState(isCompleatData?.isCompleat ?? 0);
 
     const elapsedRef = useRef(elapsed);
     const isFinishRef = useRef(isFinish);
 
     const updateCompletion = useCallback(
         (elapsedTime: number, completed: boolean) => {
-        setIsCompleat(habitIdStr, selectDateStr, {
-            isCompleat: completed ? 1 : elapsedTime / duration,
-            duration,
-            elapsed: elapsedTime,
-        });
+            setIsCompleat(habitIdStr, selectDateStr, {
+                isCompleat: completed ? 1 : elapsedTime / duration,
+                duration,
+                elapsed: elapsedTime,
+            });
         },
         [habitIdStr, selectDateStr, duration, setIsCompleat]
     );
@@ -55,25 +55,25 @@ const Timer = () => {
 
     useEffect(() => {
         const beforeRemove = (e: BeforeRemoveEvent) => {
-        if (isFinishRef.current === 1) return;
+            if (isFinishRef.current === 1) return;
 
-        e.preventDefault();
-        Alert.alert(
-            "Выход со страницы таймера",
-            "Таймер остановится, но прогресс сохранится.",
-            [
-                { text: "Отмена", style: "cancel" },
-                {
-                    text: "Выйти",
-                    style: "destructive",
-                    onPress: () => {
-                    setTimerStart(false);
-                    updateCompletion(elapsedRef.current, false);
-                    navigation.dispatch(e.data.action);
+            e.preventDefault();
+            Alert.alert(
+                "Выход со страницы таймера",
+                "Таймер остановится, но прогресс сохранится.",
+                [
+                    { text: "Отмена", style: "cancel" },
+                    {
+                        text: "Выйти",
+                        style: "destructive",
+                        onPress: () => {
+                        setTimerStart(false);
+                        updateCompletion(elapsedRef.current, false);
+                        navigation.dispatch(e.data.action);
+                        },
                     },
-                },
-            ]
-        );
+                ]
+            );
         };
 
         return navigation.addListener("beforeRemove", beforeRemove);
@@ -87,9 +87,9 @@ const Timer = () => {
 
     useEffect(() => {
         if (elapsed >= duration && isFinish !== 1) {
-        updateCompletion(duration, true);
-        setIsFinish(1);
-        setTimerStart(false);
+            updateCompletion(duration, true);
+            setIsFinish(1);
+            setTimerStart(false);
         }
     }, [elapsed, duration, isFinish, updateCompletion]);
 
