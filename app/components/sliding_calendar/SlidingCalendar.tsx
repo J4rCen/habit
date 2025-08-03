@@ -1,8 +1,10 @@
 import { SCREEN_WIDTH, WEEK_DAYS } from "@/app/constants";
 import useStore from "@/app/store/zustand";
 import ArrowBack from "@/app/svgs/arrowBack";
+import dateConversion from "@/app/utilities/dateConversion";
 import dayjs, { Dayjs } from "dayjs";
 import localeRu from "dayjs/locale/ru";
+import customParseFormat from 'dayjs/plugin/customParseFormat';
 import isoWeek from "dayjs/plugin/isoWeek";
 import weekday from "dayjs/plugin/weekday";
 import React, { memo, useCallback, useMemo, useRef, useState } from "react";
@@ -13,11 +15,12 @@ import {
   TouchableOpacity
 } from "react-native";
 import { Text, XStack, YStack } from "tamagui";
-import dateConversion from "../../utilities/dateConversion";
 
 dayjs.extend(isoWeek);
 dayjs.extend(weekday);
+dayjs.extend(customParseFormat)
 dayjs.locale(localeRu);
+
 
 interface ISlidingCalendar {
   selectDate: string;
@@ -42,6 +45,10 @@ const generateInitialWeeks = (startDate: Dayjs, endDate: Dayjs = dayjs()): Dayjs
 
 type WeekItem = Dayjs[] | string;
 
+const keyConversion = (data: Dayjs) => {
+  return data.format('DD-MM-YYYY')
+}
+
 const SlidingCalendar = memo(({ selectDate, setSelectDate }: ISlidingCalendar) => {
   const flatListRef = useRef<FlatList>(null);
   const { startDateUser, setStartDateUser } = useStore(store => store);
@@ -54,10 +61,10 @@ const SlidingCalendar = memo(({ selectDate, setSelectDate }: ISlidingCalendar) =
     ...generateInitialWeeks(dayjs(initialStartDate))
   ]);
 
-  const todayFormatted = useMemo(() => dateConversion(dayjs()), []);
+  const todayFormatted = useMemo(() => keyConversion(dayjs()), []);
 
   const handleSelectDate = useCallback(
-    (day: Dayjs) => setSelectDate(dateConversion(day)),
+    (day: Dayjs) => setSelectDate(keyConversion(day)),
     [setSelectDate]
   );
 
@@ -65,7 +72,7 @@ const SlidingCalendar = memo(({ selectDate, setSelectDate }: ISlidingCalendar) =
     ({ item }) => {
       if (typeof item === 'string') {
         return (
-          <XStack width={SCREEN_WIDTH} alignItems='center' justifyContent="center">
+          <XStack width={SCREEN_WIDTH} style={styles.dayContainer} alignItems='center' justifyContent="center">
             <Text textAlign="center" color={'$white'} fontSize={18}>
               {item}
             </Text>
@@ -76,7 +83,7 @@ const SlidingCalendar = memo(({ selectDate, setSelectDate }: ISlidingCalendar) =
       return (
         <XStack style={styles.dates}>
           {item.map((day) => {
-            const dateStr = dateConversion(day);
+            const dateStr = keyConversion(day);
             const isSelected = dateStr === selectDate;
 
             return (
@@ -100,11 +107,11 @@ const SlidingCalendar = memo(({ selectDate, setSelectDate }: ISlidingCalendar) =
 
   const scrollToToday = useCallback(() => {
     const todayWeek = dayjs().startOf("isoWeek");
-    const todayDateStr = dateConversion(dayjs());
+    const todayDateStr = keyConversion(dayjs());
 
     const todayWeekIndex = weeks.findIndex(week =>
       Array.isArray(week) &&
-      week.some(day => dateConversion(day) === todayDateStr)
+      week.some(day => keyConversion(day) === todayDateStr)
     );
 
     if (todayWeekIndex === -1) {
@@ -137,14 +144,14 @@ const SlidingCalendar = memo(({ selectDate, setSelectDate }: ISlidingCalendar) =
   }, [weeks]);
 
   const keyExtractor = useCallback((item: WeekItem, index: number) => {
-    return Array.isArray(item) ? item[0].format('YYYY-MM-DD') : `msg-${index}`;
+    return Array.isArray(item) ? item[0].format('DD-MM-YYYY') : `msg-${index}`;
   }, []);
 
   return (
     <YStack>
       <XStack style={styles.calendarHeader}>
         <Text marginLeft={10} color={"$white"} fontSize={24}>
-          {selectDate}
+          {dateConversion(dayjs(selectDate, 'DD-MM-YYYY'))}
         </Text>
         {selectDate !== todayFormatted && (
           <TouchableOpacity 
@@ -186,7 +193,7 @@ const SlidingCalendar = memo(({ selectDate, setSelectDate }: ISlidingCalendar) =
             index,
           })}
           showsHorizontalScrollIndicator={false}
-          windowSize={5}
+          windowSize={3}
           maxToRenderPerBatch={3}
           updateCellsBatchingPeriod={50}
           onScrollToIndexFailed={({ index }) => {

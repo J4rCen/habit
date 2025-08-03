@@ -1,4 +1,4 @@
-import CustomInput from '@/app/components/custom_input'
+import CustomInput from '@/app/components/custom_input/CustomInput'
 import { SCREEN_WIDTH } from '@/app/constants'
 import React, { useEffect, useRef, useState } from 'react'
 import {
