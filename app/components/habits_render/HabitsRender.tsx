@@ -1,4 +1,4 @@
-import { SCREEN_HEIGHT, SCREEN_WIDTH } from "@/app/constants"
+import { SCREEN_HEIGHT, SCREEN_WIDTH, SCREEN_WIDTH_400 } from "@/app/constants"
 import { IHabitTask } from '@/app/store/zustand'
 import dayjs from 'dayjs'
 import customParseFormat from 'dayjs/plugin/customParseFormat'
@@ -84,7 +84,7 @@ const HabitsRender = (props: IHabitRender) => {
                 <YStack gap={10} alignItems="center">
                     {   
                         HabitCards.length !== 0 ? HabitCards :
-                        <Text fontSize={'$4'} color={'white'}>У вас пока нет привычек, добавьте её</Text>
+                        <Text fontSize={SCREEN_WIDTH_400 ? 16 : 18} color={'white'}>У вас пока нет привычек, добавьте её</Text>
                     }
                 </YStack>       
             </ScrollView>

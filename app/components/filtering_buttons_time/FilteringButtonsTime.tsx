@@ -1,8 +1,8 @@
-import { SCREEN_WIDTH } from "@/app/constants";
+import { SCREEN_WIDTH, SCREEN_WIDTH_400 } from "@/app/constants";
 import { DaySvg, EveningSvg, MorningSvg } from "@/app/svgs/filtersButtonSvgs";
-import { Dispatch, SetStateAction } from "react";
-import { StyleSheet } from "react-native";
-import { Button, Text, XStack } from "tamagui";
+import React, { Dispatch, SetStateAction } from "react";
+import { StyleSheet, TouchableOpacity } from "react-native";
+import { Text, XStack } from "tamagui";
 
 interface IFilteringButtonsTime {
     selectFilter: string, setSelectFilter: 
@@ -17,52 +17,57 @@ const FilteringButtonsTime = (props: IFilteringButtonsTime) => {
 
     return (
         <XStack style={styles.buttonsContainer} alignItems="center" justifyContent="center" width={SCREEN_WIDTH}>
-            <Button 
-                style={[styles.filterButton, props.selectFilter === 'all' && styles.selectButton]} 
-                borderTopRightRadius={0} 
-                borderBottomRightRadius={0}
+            <TouchableOpacity 
+                style={[styles.filterButton, {borderTopLeftRadius: 10, borderBottomLeftRadius: 10}, props.selectFilter === 'all' && styles.selectButton]}
                 onPress={() => setSelect('all')}
             >
-                <Text color={'$white'}>Любое</Text>
-            </Button>
-            <Button
+                <Text style={styles.buttonText}>Любое</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
                 style={[styles.filterButton, props.selectFilter === 'morning' && styles.selectButton]}  
-                borderRadius={0}
                 onPress={() => setSelect('morning')}
             >
-                <MorningSvg/>
-                <Text color={'$white'}>Утро</Text>
-            </Button>
-            <Button 
+                <XStack alignItems="center" justifyContent="center">
+                    <MorningSvg/>
+                    <Text style={styles.buttonText}>Утро</Text>
+                </XStack>
+            </TouchableOpacity>
+            <TouchableOpacity 
                 style={[styles.filterButton, props.selectFilter === 'day' && styles.selectButton]} 
-                borderRadius={0}
                 onPress={() => setSelect('day')}
             >
-                <DaySvg/>
-                <Text color={'$white'}>День</Text>
-            </Button>
-            <Button 
-                style={[styles.filterButton, props.selectFilter === 'evening' && styles.selectButton]} 
-                borderTopLeftRadius={0} 
-                borderBottomLeftRadius={0}
+                <XStack alignItems="center" justifyContent="center">
+                    <DaySvg/>
+                    <Text style={styles.buttonText}>День</Text>
+                </XStack>
+            </TouchableOpacity>
+            <TouchableOpacity 
+                style={[styles.filterButton, {borderTopRightRadius: 10, borderBottomRightRadius: 10}, props.selectFilter === 'evening' && styles.selectButton]} 
                 onPress={() => setSelect('evening')}
             >
-                <EveningSvg/>
-                <Text color={'$white'}>Вечер</Text>
-            </Button>
+                <XStack alignItems="center" justifyContent="center">
+                    <EveningSvg/>
+                    <Text style={styles.buttonText}>Вечер</Text>
+                </XStack>
+            </TouchableOpacity>
         </XStack>
     )
 }
 
-export default FilteringButtonsTime
+export default React.memo(FilteringButtonsTime)
 
 const styles = StyleSheet.create({
     buttonsContainer: {
         marginTop: 5,
-        width: SCREEN_WIDTH
+        width: SCREEN_WIDTH,
+    },
+    buttonText: {
+        color: '#ffffff',
+        fontSize: SCREEN_WIDTH_400 ? 12 : 14,
+        marginLeft: SCREEN_WIDTH_400 ? 0 : 5
     },
     filterButton: {
-        height: 45,
+        height: SCREEN_WIDTH_400 ? 40 : 45,
         width: (SCREEN_WIDTH / 4) - 10,
         backgroundColor: '#393E46',
         alignItems: 'center',

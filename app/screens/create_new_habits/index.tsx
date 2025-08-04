@@ -2,7 +2,7 @@ import CustomInput from '@/app/components/custom_input/CustomInput';
 import CustomSelect from '@/app/components/custom_select/CustomSelect';
 import ReminderToggle from '@/app/components/reminder_toggle/ReminderToggle';
 import CustomTimePicker from '@/app/components/timepicker/CustomTimePicker';
-import { SCREEN_HEIGHT, SCREEN_WIDTH, WEEK_DAYS } from '@/app/constants';
+import { SCREEN_HEIGHT, SCREEN_WIDTH, SCREEN_WIDTH_400, WEEK_DAYS } from '@/app/constants';
 import useStore, { IHabitTask } from '@/app/store/zustand';
 import ArrowBack from '@/app/svgs/arrowBack';
 import { PortalProvider } from '@tamagui/portal';
@@ -130,7 +130,7 @@ const CreateNewHabits = () => {
                     <Stack
                         key={index}
                         onPress={() => toggleDay(day)}
-                        padding={12}
+                        padding={SCREEN_WIDTH_400 ? 10 :  12}
                         borderRadius={10}
                         backgroundColor={isSelected ? '#194A98' : '#393E46'}
                         alignItems="center"
@@ -144,7 +144,7 @@ const CreateNewHabits = () => {
                             scale: 0.96,
                         }}
                     >
-                        <Text color="white" fontSize={16}>
+                        <Text color="white" fontSize={SCREEN_WIDTH_400 ? 14 : 16}>
                             {day}
                         </Text>
                     </Stack>
@@ -205,8 +205,10 @@ const CreateNewHabits = () => {
     }, [quantity])
     
     return (
-        <SafeAreaView style={{height: SCREEN_HEIGHT, width: SCREEN_WIDTH}}>
+        <View backgroundColor={'$dark'} maxHeight={SCREEN_HEIGHT}>
+        <SafeAreaView>
             <PortalProvider>
+                <YStack style={{height: SCREEN_HEIGHT, width: SCREEN_WIDTH}}>
                 <ScrollView maxHeight={SCREEN_HEIGHT} style={{backgroundColor: '#222831'}} showsVerticalScrollIndicator={false}>
                     <YStack width={SCREEN_WIDTH} position='relative' justifyContent='center'>
                         <XStack alignItems='center' marginTop={10}>
@@ -394,8 +396,10 @@ const CreateNewHabits = () => {
                         </YStack>
                     </YStack>
                 </ScrollView>
+                </YStack>
             </PortalProvider>
         </SafeAreaView>
+        </View>
     )
 }
 
