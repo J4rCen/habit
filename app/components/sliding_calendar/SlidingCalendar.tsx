@@ -1,4 +1,4 @@
-import { SCREEN_WIDTH, WEEK_DAYS } from "@/app/constants";
+import { SCREEN_WIDTH, SCREEN_WIDTH_400, WEEK_DAYS } from "@/app/constants";
 import useStore from "@/app/store/zustand";
 import ArrowBack from "@/app/svgs/arrowBack";
 import dateConversion from "@/app/utilities/dateConversion";
@@ -20,7 +20,6 @@ dayjs.extend(isoWeek);
 dayjs.extend(weekday);
 dayjs.extend(customParseFormat)
 dayjs.locale(localeRu);
-
 
 interface ISlidingCalendar {
   selectDate: string;
@@ -150,7 +149,7 @@ const SlidingCalendar = memo(({ selectDate, setSelectDate }: ISlidingCalendar) =
   return (
     <YStack>
       <XStack style={styles.calendarHeader}>
-        <Text marginLeft={10} color={"$white"} fontSize={24}>
+        <Text marginLeft={10} color={"$white"} fontSize={SCREEN_WIDTH_400 ? 20 : 24}>
           {dateConversion(dayjs(selectDate, 'DD-MM-YYYY'))}
         </Text>
         {selectDate !== todayFormatted && (
@@ -158,9 +157,9 @@ const SlidingCalendar = memo(({ selectDate, setSelectDate }: ISlidingCalendar) =
             style={styles.buttonReturnToday} 
             onPress={scrollToToday}
           >
-            <XStack>
-              <ArrowBack size={32} />
-              <Text color={"$white"} fontSize={22}>
+            <XStack justifyContent="center" alignContent="center">
+              <ArrowBack size={SCREEN_WIDTH_400 ? 26 : 32} />
+              <Text color={"$white"} fontSize={SCREEN_WIDTH_400 ? 18 : 22}>
                 Сегодня
               </Text>
             </XStack>
@@ -215,7 +214,7 @@ const styles = StyleSheet.create({
   },
   dayText: {
     color: "#fff",
-    fontSize: 18,
+    fontSize: SCREEN_WIDTH_400 ? 14 : 18,
   },
   weekDaysRow: {
     flexDirection: "row",
@@ -223,12 +222,12 @@ const styles = StyleSheet.create({
     marginHorizontal: 8,
   },
   weekDaysText: {
-    fontSize: 18,
+    fontSize: SCREEN_WIDTH_400 ? 16 : 18,
     color: "#fff",
   },
   dayContainer: {
     alignItems: "center",
-    padding: 14,
+    padding: SCREEN_WIDTH_400 ? 12 :  14,
     borderRadius: 8,
   },
   selectedDay: {
@@ -239,8 +238,8 @@ const styles = StyleSheet.create({
     backgroundColor: "#194A98",
     borderTopLeftRadius: 18,
     borderBottomLeftRadius: 18,
-    width: 145,
-    height: 50,
+    width: SCREEN_WIDTH_400 ? 125 : 145,
+    height: SCREEN_WIDTH_400 ? 45 : 50,
     alignItems: "center",
     justifyContent: "center",
   },
