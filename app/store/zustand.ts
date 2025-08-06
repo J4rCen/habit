@@ -35,6 +35,8 @@ export interface IHabitTask {
 interface IStore {
 	habitTask: Map<string, IHabitTask>
 	startDateUser: Dayjs | null
+	_hasHydrated: boolean
+	setHasHydrated: (state: boolean) => void
 	setStartDateUser: (date: Dayjs) => void
 	setHabitTask: (habitId: string, habitConfig: IHabitTask) => void
 	setIsCompleat: (habitId: string, date: string, habitStatic: staticConfig) => void,
@@ -49,6 +51,8 @@ const useStore = create<IStore>()(
 		(set, get) => ({
 			habitTask: new Map(),
 			startDateUser: null,
+			_hasHydrated: false,
+			setHasHydrated: (state) => set({ _hasHydrated: state }),
 			setStartDateUser: (date) => set(() => {
 				return {startDateUser: date}
 			}),
@@ -116,6 +120,9 @@ const useStore = create<IStore>()(
 				},
 			]),
 		}),
+		onRehydrateStorage: () => (state) => {
+				state?.setHasHydrated(true)
+			},
 		merge: (persistedState, currentState) => {
 			const state = persistedState as { habitTask: [string, any][] } | undefined
 			const habitTaskMap = new Map<string, IHabitTask>()
