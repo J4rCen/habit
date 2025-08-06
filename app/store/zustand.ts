@@ -4,140 +4,151 @@ import { create } from 'zustand'
 import { createJSONStorage, persist } from 'zustand/middleware'
 
 type staticConfig = {
-	isCompleat: number,
-	total?: number      // для reusable
-    value?: number      // для reusable
-    elapsed?: number    // для timer
-    duration?: number   // для timer
+  isCompleat: number,
+  total?: number
+  value?: number
+  elapsed?: number
+  duration?: number
 }
+
 export interface IHabitTask {
-	habitId: string
-	habitConfig: {
-		name: string
-		day_of_create: string,
-		type_of_habit: 'reusable' | 'onetime'
-		interval_execution: 'every_day' | 'certain_days' | 'gap' | null
-		days_of_week?: Array<string> | null
-		gap_interval?: {
-			days_in_row: number
-			skip_days: number
-		} | null
-		times_of_day: 'all' | 'morning' | 'day' | 'evening'
-		type_of_task: 'single_mark' | 'reusable_mark' | 'timer'
-		timer_time?: string | null
-		quantity?: number | null
-		reminder: boolean
-		reminder_time?: string | null
-	}
-  	habitStatic: Map<string, staticConfig> | null
+  habitId: string
+  habitConfig: {
+    name: string
+    day_of_create: string
+    type_of_habit: 'reusable' | 'onetime'
+    interval_execution: 'every_day' | 'certain_days' | 'gap' | null
+    days_of_week?: Array<string> | null
+    gap_interval?: {
+      days_in_row: number
+      skip_days: number
+    } | null
+    times_of_day: 'all' | 'morning' | 'day' | 'evening'
+    type_of_task: 'single_mark' | 'reusable_mark' | 'timer'
+    timer_time?: string | null
+    quantity?: number | null
+    reminder: boolean
+    reminder_time?: string | null
+  }
+  habitStatic: Record<string, staticConfig> | null
 }
 
 interface IStore {
-	habitTask: Map<string, IHabitTask>
-	startDateUser: Dayjs | null
-	setStartDateUser: (date: Dayjs) => void
-	setHabitTask: (habitId: string, habitConfig: IHabitTask) => void
-	setIsCompleat: (habitId: string, date: string, habitStatic: staticConfig) => void,
-	getIsCompleat: (habitId: string) => IHabitTask['habitStatic'] | null
-	getHabitTask: (habitId: string) => IHabitTask | null
-	updateHabitTask: (habitId: string, habitConfig: IHabitTask) => void
-	removeHabitTask: (habitId: string) => void
+  habitTask: Record<string, IHabitTask>
+  startDateUser: string | null
+  _hasHydrated: boolean
+  setHasHydrated: (state: boolean) => void
+  setStartDateUser: (date: Dayjs) => void
+  setHabitTask: (habitId: string, habitConfig: Omit<IHabitTask, 'habitId'>) => void
+  setIsCompleat: (habitId: string, date: string, habitStatic: staticConfig) => void
+  getIsCompleat: (habitId: string) => Record<string, staticConfig> | null
+  getHabitTask: (habitId: string) => IHabitTask | null
+  updateHabitTask: (habitId: string, habitConfig: Omit<IHabitTask, 'habitId'>) => void
+  removeHabitTask: (habitId: string) => void
 }
 
 const useStore = create<IStore>()(
 	persist(
 		(set, get) => ({
-			habitTask: new Map(),
+			habitTask: {},
 			startDateUser: null,
-			setStartDateUser: (date) => set(() => {
-				return {startDateUser: date}
-			}),
-			setHabitTask: (habitId: string, habitConfig: IHabitTask) =>
-				set(() => {
-					const map = new Map(get().habitTask)
-					map.set(habitId, habitConfig)
-					return { habitTask: map }
-				}
-			),
-			setIsCompleat: (habitId: string, date: string, habitStatic: staticConfig) => 
-				set((state) => {
-					const oldHabitTask = state.habitTask.get(habitId)
-					if (!oldHabitTask) return { habitTask: state.habitTask }
-
-					const newHabitStatic = new Map(oldHabitTask.habitStatic || [])
-					newHabitStatic.set(date, habitStatic)
-
-					const newHabitTask: IHabitTask = {
-						...oldHabitTask,
-						habitStatic: newHabitStatic,
+			_hasHydrated: false,
+			setHasHydrated: (state) => set({ _hasHydrated: state }),
+			setStartDateUser: (date) => set({ startDateUser: date.format() }),
+			setHabitTask: (habitId, habitConfig) => {
+				set((state) => ({
+					habitTask: { 
+						...state.habitTask, 
+						[habitId]: { 
+						...habitConfig, 
+						habitId 
+						} 
 					}
-
-					const newHabitTaskMap = new Map(state.habitTask)
-					newHabitTaskMap.set(habitId, newHabitTask)
-
-					return { habitTask: newHabitTaskMap }
-				}
-			),
-			getIsCompleat: (habitId: string) => {
-				const habitStatic = get().habitTask.get(habitId)?.habitStatic
-				return habitStatic ?? null
+				}))
 			},
-			getHabitTask: (habitId: string) => {
-				const habitTask = get().habitTask.get(habitId)
-				return habitTask ?? null
+			setIsCompleat: (habitId, date, habitStatic) => {
+				set((state) => {
+					const habit = state.habitTask[habitId]
+					if (!habit) return state
+					
+					return {
+						habitTask: {
+						...state.habitTask,
+						[habitId]: {
+							...habit,
+							habitStatic: {
+							...(habit.habitStatic || {}),
+							[date]: habitStatic
+							}
+						}
+						}
+					}
+				})
 			},
-			updateHabitTask: (habitId: string, habitConfig: IHabitTask) =>
-				set(() => {
-				const map = new Map(get().habitTask)
-				if (map.has(habitId)) {
-					map.set(habitId, habitConfig)
-				}
-				return { habitTask: map }
-			}),
-			removeHabitTask: (habitId: string) =>
-				set(() => {
-				const map = new Map(get().habitTask)
-				map.delete(habitId)
-				return { habitTask: map }
-			}),
+			getIsCompleat: (habitId) => {
+				return get().habitTask[habitId]?.habitStatic || null
+			},
+			getHabitTask: (habitId) => {
+				return get().habitTask[habitId] || null
+			},
+			updateHabitTask: (habitId, habitConfig) => {
+				set((state) => ({
+					habitTask: { 
+						...state.habitTask, 
+						[habitId]: { 
+						...habitConfig, 
+						habitId 
+						} 
+					}
+				}))
+			},
+			removeHabitTask: (habitId) => {
+				set((state) => {
+					const newHabitTask = { ...state.habitTask }
+					delete newHabitTask[habitId]
+					return { habitTask: newHabitTask }
+				})
+			},
 		}),
 		{
-		name: 'habit-storage',
-		storage: createJSONStorage(() => AsyncStorage),
-		partialize: (state) => ({
-			...state,
-			habitTask: Array.from(state.habitTask.entries()).map(([key, value]) => [
-				key,
-				{
-					...value,
-					habitStatic: value.habitStatic
-						? Array.from(value.habitStatic.entries())
-						: null,
+			name: 'habit-storage-v2', // Измененное имя хранилища
+			storage: createJSONStorage(() => ({
+				getItem: async (name) => {
+					const value = await AsyncStorage.getItem(name)
+					return value
 				},
-			]),
-		}),
-		merge: (persistedState, currentState) => {
-			const state = persistedState as { habitTask: [string, any][] } | undefined
-			const habitTaskMap = new Map<string, IHabitTask>()
-
-			state?.habitTask?.forEach(([key, value]) => {
-				const habitStaticMap = value.habitStatic
-					? new Map(value.habitStatic)
-					: null
-				habitTaskMap.set(key, {
-					...value,
-					habitStatic: habitStaticMap,
-				})
-			})
-
-			return {
-				...currentState,
-				...state,
-				habitTask: habitTaskMap,
+				setItem: async (name, value) => {
+					await AsyncStorage.setItem(name, value)
+				},
+				removeItem: async (name) => {
+					await AsyncStorage.removeItem(name)
+				},
+			})),
+			version: 2,
+			partialize: (state) => ({
+				habitTask: state.habitTask,
+				startDateUser: state.startDateUser
+			}),
+			onRehydrateStorage: () => (state) => {
+				state?.setHasHydrated(true)
+			},
+			migrate: (persistedState: any, version) => {
+				console.log('Migrating from version', version)
+				
+				if (persistedState && typeof persistedState.habitTask === 'number') {
+					return { 
+						habitTask: {}, 
+						startDateUser: persistedState.startDateUser,
+						_hasHydrated: false
+					}
+				}
+				
+				return {
+					...persistedState,
+					_hasHydrated: false
+				}
 			}
-		}
 		}
 	)
 )
-
 export default useStore

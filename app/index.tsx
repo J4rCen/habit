@@ -17,11 +17,12 @@ export default function Index() {
 
     const [selectDate, setSelectDate] = useState(dayjs().format('DD-MM-YYYY'))
     const [selectFilter, setSelectFilter] = useState('all')
-    const [habitsStore, setHabitStore] = useState<IHabitTask[]>((Array.from(store.values()) ?? []))
+    const [habitsStore, setHabitStore] = useState<IHabitTask[]>( Object.values(store) ?? [])
 
     useEffect(() => {
-        setHabitStore((Array.from(store.values()) ?? []))
+        setHabitStore(Object.values(store) ?? [])
     }, [store])
+    
 
     return (
         <View backgroundColor={'$dark'} maxHeight={SCREEN_HEIGHT}>

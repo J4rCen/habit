@@ -23,7 +23,7 @@ const Timer = () => {
     const duration = Number(timer);
 
     const isCompleatData = useMemo(
-        () => useStore.getState().getIsCompleat(habitIdStr)?.get(selectDateStr),
+        () => useStore.getState().getIsCompleat(habitIdStr)?.[`${selectDateStr}`],
         [habitIdStr, selectDateStr]
     );
 
