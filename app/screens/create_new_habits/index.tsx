@@ -9,7 +9,7 @@ import { PortalProvider } from '@tamagui/portal';
 import dayjs from 'dayjs';
 import { router, useLocalSearchParams } from 'expo-router';
 import { nanoid } from 'nanoid/non-secure';
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { Alert } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Button, ScrollView, Stack, Text, View, XStack, YStack } from "tamagui";
@@ -41,11 +41,36 @@ const CreateNewHabits = () => {
         }`
     )
     const [oneActive, setOneActive] = useState<number>(0)
+    const [alertShow, setAlertShow] = useState<boolean>(false)
+    const [alertMessage, setAlertMessage] = useState<string>('')
     const [isOpen, setIsOpen] = useState<boolean>(false)
 
     const store = useStore(state => state)
 
+    useEffect(() => {
+
+        if (!alertShow) return
+
+        const interval = setInterval(() => {
+            setAlertShow(false)
+        }, 3000)
+        
+        return () => clearInterval(interval)
+    }, [alertShow])
+
     const saveHabit = () => {
+
+        if (habitName.length === 0) {
+            setAlertMessage('Название привычке не может быть пустым')
+            setAlertShow(true)
+            return
+        }
+
+        if (intervalExecution === 'certain_days' && daysOfWeek.length === 0) {
+            setAlertMessage('Необходимо выбрать хотя бы один день недели')
+            setAlertShow(true)
+            return
+        }
 
         const newHabitData: IHabitTask = {
             habitId: habitId ? habitId as string : nanoid(),
@@ -195,7 +220,11 @@ const CreateNewHabits = () => {
                     height={50}
                     width={SCREEN_WIDTH / 2 - 20}
                     onChange={(e) => {
-                        if (typeof e === 'number') setQuantity(e);
+                        if (typeof e === 'number') {
+                            setQuantity(e)
+                        } else {
+                            setQuantity(0)
+                        }
                     }}
                     center={true}
                     numbersOnly={true}
@@ -359,6 +388,9 @@ const CreateNewHabits = () => {
 
                             </YStack>
                             <YStack gap={10} marginTop={50} marginBottom={50}>
+                                <View height={50} width={SCREEN_WIDTH - 20}>
+                                    {alertShow && <Text  fontSize={SCREEN_WIDTH_400 ? 14 : 16} color={'red'}>{`Ошибка сохранения: ${alertMessage}`}</Text>}
+                                </View>
                                 <Button 
                                     fontSize={16} 
                                     color={'white'} 
