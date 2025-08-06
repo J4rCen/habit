@@ -12,13 +12,12 @@ interface IHabitCard {
     selectDate: string
 }
 
-const round = (num: number, precision: number = 6) =>
-  Math.round(num * Math.pow(10, precision)) / Math.pow(10, precision)
+const round = (num: number, precision: number = 6) => Math.round(num * Math.pow(10, precision)) / Math.pow(10, precision)
 
 const HabitCard = ({habitId, habitConfig, selectDate}: IHabitCard) => {
 
     const setIsCompleat = useStore(store => store.setIsCompleat)
-    const getIsCompleat = useStore(store => store.getIsCompleat(habitId)?.get(selectDate))
+    const getIsCompleat = useStore(store => store.getIsCompleat(habitId)?.[`${selectDate}`])
     const [isOpen, setIsOpen] = useState(false);
 
     const [progress, setProgress] = useState<number>(0)
