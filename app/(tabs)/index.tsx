@@ -4,11 +4,11 @@ import { useEffect, useState } from "react";
 import { StyleSheet, TouchableOpacity } from "react-native";
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Text, View, YStack } from "tamagui";
-import FilteringButtonsTime from "./components/filtering_buttons_time/FilteringButtonsTime";
-import HabitsRender from './components/habits_render/HabitsRender';
-import SlidingCalendar from "./components/sliding_calendar/SlidingCalendar";
-import { SCREEN_HEIGHT, SCREEN_WIDTH, SCREEN_WIDTH_400 } from "./constants";
-import useStore, { IHabitTask } from "./store/zustand";
+import FilteringButtonsTime from "../components/filtering_buttons_time/FilteringButtonsTime";
+import HabitsRender from '../components/habits_render/HabitsRender';
+import SlidingCalendar from "../components/sliding_calendar/SlidingCalendar";
+import { SCREEN_HEIGHT, SCREEN_WIDTH, SCREEN_WIDTH_400 } from "../constants";
+import useStore, { IHabitTask } from "../store/zustand";
 
 
 export default function Index() {
