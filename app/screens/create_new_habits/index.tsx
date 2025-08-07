@@ -20,8 +20,10 @@ const CreateNewHabits = () => {
 
     const {habitId} = useLocalSearchParams()
     const habitConfig = habitId ? useStore(store => store.getHabitTask(habitId as string)?.habitConfig) : undefined
+    const habitStatic = habitId ? useStore(store => store.getHabitTask(habitId as string)?.habitStatic) : undefined
 
     const [habitName, setHabitName] = useState(habitConfig ? habitConfig.name : '')
+    const dayOfCreate = habitConfig?.day_of_create ? habitConfig?.day_of_create : dayjs().format('DD-MM-YYYY')
     const [typeOfHabit, setTypeOfHabit] = useState<'reusable' | 'onetime'>(habitConfig ? habitConfig.type_of_habit : 'reusable')
     const [intervalExecution, setIntervalExecution] = useState<string>(habitConfig && habitConfig.interval_execution ? habitConfig.interval_execution : "every_day")
     const [timesOfDay, setTimesOfDay] = useState<string>(habitConfig && habitConfig.times_of_day ? habitConfig.times_of_day : "all")
@@ -76,7 +78,7 @@ const CreateNewHabits = () => {
             habitId: habitId ? habitId as string : nanoid(),
             habitConfig: {
                 name: habitName,
-                day_of_create: dayjs().format('DD-MM-YYYY'),
+                day_of_create: dayOfCreate,
                 type_of_habit: typeOfHabit,
                 interval_execution: 
                     typeOfHabit === 'reusable' ? 
@@ -103,7 +105,7 @@ const CreateNewHabits = () => {
                 reminder: reminderOn,
                 reminder_time: reminderOn ? reminderTime : null
             },
-            habitStatic: null
+            habitStatic: habitStatic ? habitStatic : null
         }
 
         if (habitId) {
