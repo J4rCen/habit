@@ -17,7 +17,7 @@ export default function Index() {
 
     const [selectDate, setSelectDate] = useState(dayjs().format('DD-MM-YYYY'))
     const [selectFilter, setSelectFilter] = useState('all')
-    const [habitsStore, setHabitStore] = useState<IHabitTask[]>( Object.values(store) ?? [])
+    const [habitsStore, setHabitStore] = useState<IHabitTask[]>(Object.values(store) ?? [])
 
     useEffect(() => {
         setHabitStore(Object.values(store) ?? [])
