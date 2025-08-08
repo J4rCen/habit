@@ -69,9 +69,16 @@ const Statistics = () => {
                         </XStack>
                         <YStack height={SCREEN_HEIGHT / 2} width={SCREEN_WIDTH - 20} marginTop={20}>
                             <ScrollView>
-                                <View gap={10}>
+                                <View gap={10} alignContent="center">
                                     {
-                                        habitListTask.length !== 0 ? habitListTask : <Text color={'white'}>Данных нет</Text>
+                                        habitListTask.length !== 0 ? habitListTask : 
+                                        <Text color={'white'} textAlign="center" width={SCREEN_WIDTH - 20} fontSize={SCREEN_WIDTH_400 ? 16 : 18}>
+                                            {
+                                                store.length > 0 ? 
+                                                'Привычка с таким названием не найдена' : 
+                                                'Для отражения статистики создайте хотя бы одну привычку'
+                                            }
+                                        </Text>
                                     }
                                 </View>
                             </ScrollView>
