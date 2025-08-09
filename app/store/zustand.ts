@@ -54,7 +54,7 @@ const useStore = create<IStore>()(
 			startDateUser: null,
 			_hasHydrated: false,
 			setHasHydrated: (state) => set({ _hasHydrated: state }),
-			setStartDateUser: (date) => set({ startDateUser: date.format() }),
+			setStartDateUser: (date) => set({ startDateUser: date.format('YYYY-MM-DD') }),
 			setHabitTask: (habitId, habitConfig) => {
 				set((state) => ({
 					habitTask: { 
@@ -70,7 +70,6 @@ const useStore = create<IStore>()(
 				set((state) => {
 					const habit = state.habitTask[habitId]
 					if (!habit) return state
-					
 					return {
 						habitTask: {
 						...state.habitTask,
@@ -133,8 +132,6 @@ const useStore = create<IStore>()(
 				state?.setHasHydrated(true)
 			},
 			migrate: (persistedState: any, version) => {
-				console.log('Migrating from version', version)
-				
 				if (persistedState && typeof persistedState.habitTask === 'number') {
 					return { 
 						habitTask: {}, 

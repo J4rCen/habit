@@ -21,8 +21,8 @@ const HabitsRender = (props: IHabitRender) => {
     useEffect(() => {
         setHabitCards(props.habitsStore
         .filter((item) => {
-            const day = dayjs(item.habitConfig.day_of_create, 'DD-MM-YYYY')
-            const currentDay = dayjs(props.selectDate, 'DD-MM-YYYY')
+            const day = dayjs(item.habitConfig.day_of_create, 'YYYY-MM-DD')
+            const currentDay = dayjs(props.selectDate, 'YYYY-MM-DD')
             return currentDay.isAfter(day) || currentDay.isSame(day)
         })
         .filter((item) => 
@@ -56,13 +56,13 @@ const HabitsRender = (props: IHabitRender) => {
         }
 
         if (interval_execution === 'certain_days') {
-            return days_of_week?.includes(dayjs(props.selectDate, 'DD-MM-YYYY')
+            return days_of_week?.includes(dayjs(props.selectDate, 'YYYY-MM-DD')
             .format('dd')
             .replace(/^[п,в,с,ч]/, c => c.toUpperCase()))
         }
 
         if (interval_execution === 'gap') {
-            const diffDays = dayjs(props.selectDate, 'DD-MM-YYYY').diff(dayjs(day_of_create, 'DD-MM-YYYY'), 'day')
+            const diffDays = dayjs(props.selectDate, 'YYYY-MM-DD').diff(dayjs(day_of_create, 'YYYY-MM-DD'), 'day')
 
             if (diffDays < 0 || gap_interval?.days_in_row === undefined || gap_interval?.skip_days === undefined) return false;
 
@@ -73,7 +73,7 @@ const HabitsRender = (props: IHabitRender) => {
         }
 
         if (type_of_habit === 'onetime') {
-            return dayjs(props.selectDate, 'DD-MM-YYYY').isSame(dayjs(day_of_create, 'DD-MM-YYYY'))
+            return dayjs(props.selectDate, 'YYYY-MM-DD').isSame(dayjs(day_of_create, 'YYYY-MM-DD'))
         }
 
         return false

@@ -23,7 +23,7 @@ const CreateNewHabits = () => {
     const habitStatic = habitId ? useStore(store => store.getHabitTask(habitId as string)?.habitStatic) : undefined
 
     const [habitName, setHabitName] = useState(habitConfig ? habitConfig.name : '')
-    const dayOfCreate = habitConfig?.day_of_create ? habitConfig?.day_of_create : dayjs().format('DD-MM-YYYY')
+    const dayOfCreate = habitConfig?.day_of_create ? habitConfig?.day_of_create : dayjs().format('YYYY-MM-DD')
     const [typeOfHabit, setTypeOfHabit] = useState<'reusable' | 'onetime'>(habitConfig ? habitConfig.type_of_habit : 'reusable')
     const [intervalExecution, setIntervalExecution] = useState<string>(habitConfig && habitConfig.interval_execution ? habitConfig.interval_execution : "every_day")
     const [timesOfDay, setTimesOfDay] = useState<string>(habitConfig && habitConfig.times_of_day ? habitConfig.times_of_day : "all")

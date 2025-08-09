@@ -9,10 +9,10 @@ import isoWeek from "dayjs/plugin/isoWeek";
 import weekday from "dayjs/plugin/weekday";
 import React, { memo, useCallback, useMemo, useRef, useState } from "react";
 import {
-  FlatList,
-  ListRenderItem,
-  StyleSheet,
-  TouchableOpacity
+	FlatList,
+	ListRenderItem,
+	StyleSheet,
+	TouchableOpacity
 } from "react-native";
 import { Text, XStack, YStack } from "tamagui";
 
@@ -45,7 +45,7 @@ const generateInitialWeeks = (startDate: Dayjs, endDate: Dayjs = dayjs()): Dayjs
 type WeekItem = Dayjs[] | string;
 
 const keyConversion = (data: Dayjs) => {
-  return data.format('DD-MM-YYYY')
+  return data.format('YYYY-MM-DD')
 }
 
 const SlidingCalendar = memo(({ selectDate, setSelectDate }: ISlidingCalendar) => {
@@ -53,7 +53,7 @@ const SlidingCalendar = memo(({ selectDate, setSelectDate }: ISlidingCalendar) =
   const { startDateUser, setStartDateUser } = useStore(store => store);
   
   const initialStartDate = useMemo(() => startDateUser || dayjs(), [startDateUser]);
-  if (!startDateUser) setStartDateUser(initialStartDate);
+  if (!startDateUser) setStartDateUser(initialStartDate as Dayjs);
 
   const [weeks, setWeeks] = useState<WeekItem[]>(() => [
     'На прошлой неделе вы не пользовались приложением',
@@ -72,32 +72,32 @@ const SlidingCalendar = memo(({ selectDate, setSelectDate }: ISlidingCalendar) =
       if (typeof item === 'string') {
         return (
           <XStack width={SCREEN_WIDTH} style={styles.dayContainer} alignItems='center' justifyContent="center">
-            <Text textAlign="center" color={'$white'} fontSize={18}>
-              {item}
-            </Text>
+				<Text textAlign="center" color={'$white'} fontSize={18}>
+					{item}
+				</Text>
           </XStack>
         );
       }
 
       return (
         <XStack style={styles.dates}>
-          {item.map((day) => {
-            const dateStr = keyConversion(day);
-            const isSelected = dateStr === selectDate;
+			{item.map((day) => {
+					const dateStr = keyConversion(day);
+					const isSelected = dateStr === selectDate;
 
-            return (
-              <TouchableOpacity
-                key={dateStr}
-                style={[
-                  styles.dayContainer,
-                  isSelected && styles.selectedDay,
-                ]}
-                onPress={() => handleSelectDate(day)}
-              >
-                <Text style={styles.dayText}>{day.format("DD")}</Text>
-              </TouchableOpacity>
-            );
-          })}
+					return (
+					<TouchableOpacity
+						key={dateStr}
+						style={[
+						styles.dayContainer,
+						isSelected && styles.selectedDay,
+						]}
+						onPress={() => handleSelectDate(day)}
+					>
+						<Text style={styles.dayText}>{day.format("DD")}</Text>
+					</TouchableOpacity>
+					);
+			})}
         </XStack>
       );
     },
@@ -143,14 +143,14 @@ const SlidingCalendar = memo(({ selectDate, setSelectDate }: ISlidingCalendar) =
   }, [weeks]);
 
   const keyExtractor = useCallback((item: WeekItem, index: number) => {
-    return Array.isArray(item) ? item[0].format('DD-MM-YYYY') : `msg-${index}`;
+    return Array.isArray(item) ? item[0].format('YYYY-MM-DD') : `msg-${index}`;
   }, []);
 
   return (
     <YStack>
       <XStack style={styles.calendarHeader}>
         <Text marginLeft={10} color={"$white"} fontSize={SCREEN_WIDTH_400 ? 20 : 24}>
-          {dateConversion(dayjs(selectDate, 'DD-MM-YYYY'))}
+          {dateConversion(dayjs(selectDate, 'YYYY-MM-DD'))}
         </Text>
         {selectDate !== todayFormatted && (
           <TouchableOpacity 
@@ -168,39 +168,39 @@ const SlidingCalendar = memo(({ selectDate, setSelectDate }: ISlidingCalendar) =
       </XStack>
 
       <YStack>
-        <XStack style={styles.weekDaysRow}>
-          {WEEK_DAYS.map((day) => (
-            <Text style={styles.weekDaysText} key={day}>
-              {day}
-            </Text>
-          ))}
-        </XStack>
+			<XStack style={styles.weekDaysRow}>
+			{WEEK_DAYS.map((day) => (
+				<Text style={styles.weekDaysText} key={day}>
+				{day}
+				</Text>
+			))}
+			</XStack>
 
-        <FlatList
-          ref={flatListRef}
-          data={weeks}
-          renderItem={renderItem}
-          keyExtractor={keyExtractor}
-          onEndReached={handleEndReached}
-          onEndReachedThreshold={0.25}
-          horizontal
-          pagingEnabled
-          initialScrollIndex={weeks.length - 1}
-          getItemLayout={(_, index) => ({
-            length: SCREEN_WIDTH,
-            offset: SCREEN_WIDTH * index,
-            index,
-          })}
-          showsHorizontalScrollIndicator={false}
-          windowSize={3}
-          maxToRenderPerBatch={3}
-          updateCellsBatchingPeriod={50}
-          onScrollToIndexFailed={({ index }) => {
-            setTimeout(() => {
-              flatListRef.current?.scrollToIndex({ index, animated: true });
-            }, 300);
-          }}
-        />
+			<FlatList
+				ref={flatListRef}
+				data={weeks}
+				renderItem={renderItem}
+				keyExtractor={keyExtractor}
+				onEndReached={handleEndReached}
+				onEndReachedThreshold={0.25}
+				horizontal
+				pagingEnabled
+				initialScrollIndex={weeks.length - 1}
+				getItemLayout={(_, index) => ({
+					length: SCREEN_WIDTH,
+					offset: SCREEN_WIDTH * index,
+					index,
+				})}
+				showsHorizontalScrollIndicator={false}
+				windowSize={3}
+				maxToRenderPerBatch={3}
+				updateCellsBatchingPeriod={50}
+				onScrollToIndexFailed={({ index }) => {
+					setTimeout(() => {
+					flatListRef.current?.scrollToIndex({ index, animated: true });
+					}, 300);
+				}}
+			/>
       </YStack>
     </YStack>
   );
