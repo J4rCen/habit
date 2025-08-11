@@ -1,9 +1,10 @@
-import AsyncStorage from '@react-native-async-storage/async-storage'
-import { Dayjs } from 'dayjs'
-import { create } from 'zustand'
-import { createJSONStorage, persist } from 'zustand/middleware'
+import { DATE_FORMAT } from '@/app/constants';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { Dayjs } from 'dayjs';
+import { create } from 'zustand';
+import { createJSONStorage, persist } from 'zustand/middleware';
 
-type staticConfig = {
+export type StaticConfig = {
   isCompleat: number,
   total?: number
   value?: number
@@ -30,7 +31,7 @@ export interface IHabitTask {
     reminder: boolean
     reminder_time?: string | null
   }
-  habitStatic: Record<string, staticConfig> | null
+  habitStatic: Record<string, StaticConfig> | null
 }
 
 interface IStore {
@@ -40,8 +41,8 @@ interface IStore {
   setHasHydrated: (state: boolean) => void
   setStartDateUser: (date: Dayjs) => void
   setHabitTask: (habitId: string, habitConfig: Omit<IHabitTask, 'habitId'>) => void
-  setIsCompleat: (habitId: string, date: string, habitStatic: staticConfig) => void
-  getIsCompleat: (habitId: string) => Record<string, staticConfig> | null
+  setIsCompleat: (habitId: string, date: string, habitStatic: StaticConfig) => void
+  getIsCompleat: (habitId: string) => Record<string, StaticConfig> | null
   getHabitTask: (habitId: string) => IHabitTask | null
   updateHabitTask: (habitId: string, habitConfig: Omit<IHabitTask, 'habitId'>) => void
   removeHabitTask: (habitId: string) => void
@@ -54,7 +55,7 @@ const useStore = create<IStore>()(
 			startDateUser: null,
 			_hasHydrated: false,
 			setHasHydrated: (state) => set({ _hasHydrated: state }),
-			setStartDateUser: (date) => set({ startDateUser: date.format('YYYY-MM-DD') }),
+			setStartDateUser: (date) => set({ startDateUser: date.format(DATE_FORMAT) }),
 			setHabitTask: (habitId, habitConfig) => {
 				set((state) => ({
 					habitTask: { 

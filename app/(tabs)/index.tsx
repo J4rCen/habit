@@ -1,3 +1,4 @@
+import { DATE_FORMAT } from '@/app/constants';
 import dayjs from "dayjs";
 import { router } from "expo-router";
 import { useEffect, useState } from "react";
@@ -15,7 +16,7 @@ export default function Index() {
 
     const store = useStore(state => state.habitTask)
 
-    const [selectDate, setSelectDate] = useState(dayjs().format('YYYY-MM-DD'))
+    const [selectDate, setSelectDate] = useState(dayjs().format(DATE_FORMAT))
     const [selectFilter, setSelectFilter] = useState('all')
     const [habitsStore, setHabitStore] = useState<IHabitTask[]>(Object.values(store) ?? [])
 

@@ -1,4 +1,4 @@
-import { SCREEN_WIDTH, SCREEN_WIDTH_400, WEEK_DAYS } from "@/app/constants";
+import { DATE_FORMAT, SCREEN_WIDTH, SCREEN_WIDTH_400, WEEK_DAYS } from "@/app/constants";
 import useStore from "@/app/store/zustand";
 import ArrowBack from "@/app/svgs/arrowBack";
 import dateConversion from "@/app/utilities/dateConversion";
@@ -9,10 +9,10 @@ import isoWeek from "dayjs/plugin/isoWeek";
 import weekday from "dayjs/plugin/weekday";
 import React, { memo, useCallback, useMemo, useRef, useState } from "react";
 import {
-	FlatList,
-	ListRenderItem,
-	StyleSheet,
-	TouchableOpacity
+  FlatList,
+  ListRenderItem,
+  StyleSheet,
+  TouchableOpacity
 } from "react-native";
 import { Text, XStack, YStack } from "tamagui";
 
@@ -45,7 +45,7 @@ const generateInitialWeeks = (startDate: Dayjs, endDate: Dayjs = dayjs()): Dayjs
 type WeekItem = Dayjs[] | string;
 
 const keyConversion = (data: Dayjs) => {
-  return data.format('YYYY-MM-DD')
+  return data.format(DATE_FORMAT)
 }
 
 const SlidingCalendar = memo(({ selectDate, setSelectDate }: ISlidingCalendar) => {
@@ -143,14 +143,14 @@ const SlidingCalendar = memo(({ selectDate, setSelectDate }: ISlidingCalendar) =
   }, [weeks]);
 
   const keyExtractor = useCallback((item: WeekItem, index: number) => {
-    return Array.isArray(item) ? item[0].format('YYYY-MM-DD') : `msg-${index}`;
+    return Array.isArray(item) ? item[0].format(DATE_FORMAT) : `msg-${index}`;
   }, []);
 
   return (
     <YStack>
       <XStack style={styles.calendarHeader}>
         <Text marginLeft={10} color={"$white"} fontSize={SCREEN_WIDTH_400 ? 20 : 24}>
-          {dateConversion(dayjs(selectDate, 'YYYY-MM-DD'))}
+          {dateConversion(dayjs(selectDate, DATE_FORMAT))}
         </Text>
         {selectDate !== todayFormatted && (
           <TouchableOpacity 

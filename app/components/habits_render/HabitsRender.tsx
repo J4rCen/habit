@@ -1,4 +1,4 @@
-import { SCREEN_HEIGHT, SCREEN_WIDTH, SCREEN_WIDTH_400 } from "@/app/constants"
+import { DATE_FORMAT, SCREEN_HEIGHT, SCREEN_WIDTH, SCREEN_WIDTH_400 } from "@/app/constants"
 import { IHabitTask } from '@/app/store/zustand'
 import dayjs from 'dayjs'
 import customParseFormat from 'dayjs/plugin/customParseFormat'
@@ -21,8 +21,8 @@ const HabitsRender = (props: IHabitRender) => {
     useEffect(() => {
         setHabitCards(props.habitsStore
         .filter((item) => {
-            const day = dayjs(item.habitConfig.day_of_create, 'YYYY-MM-DD')
-            const currentDay = dayjs(props.selectDate, 'YYYY-MM-DD')
+            const day = dayjs(item.habitConfig.day_of_create, DATE_FORMAT)
+            const currentDay = dayjs(props.selectDate, DATE_FORMAT)
             return currentDay.isAfter(day) || currentDay.isSame(day)
         })
         .filter((item) => 
@@ -56,13 +56,13 @@ const HabitsRender = (props: IHabitRender) => {
         }
 
         if (interval_execution === 'certain_days') {
-            return days_of_week?.includes(dayjs(props.selectDate, 'YYYY-MM-DD')
+            return days_of_week?.includes(dayjs(props.selectDate, DATE_FORMAT)
             .format('dd')
             .replace(/^[п,в,с,ч]/, c => c.toUpperCase()))
         }
 
         if (interval_execution === 'gap') {
-            const diffDays = dayjs(props.selectDate, 'YYYY-MM-DD').diff(dayjs(day_of_create, 'YYYY-MM-DD'), 'day')
+            const diffDays = dayjs(props.selectDate, DATE_FORMAT).diff(dayjs(day_of_create, DATE_FORMAT), 'day')
 
             if (diffDays < 0 || gap_interval?.days_in_row === undefined || gap_interval?.skip_days === undefined) return false;
 
@@ -73,7 +73,7 @@ const HabitsRender = (props: IHabitRender) => {
         }
 
         if (type_of_habit === 'onetime') {
-            return dayjs(props.selectDate, 'YYYY-MM-DD').isSame(dayjs(day_of_create, 'YYYY-MM-DD'))
+            return dayjs(props.selectDate, DATE_FORMAT).isSame(dayjs(day_of_create, DATE_FORMAT))
         }
 
         return false
