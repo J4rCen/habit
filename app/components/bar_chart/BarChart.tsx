@@ -1,4 +1,4 @@
-import { SCREEN_WIDTH } from '@/app/constants'
+import { SCREEN_WIDTH, SCREEN_WIDTH_400 } from '@/app/constants'
 import { IHabitTask } from '@/app/store/zustand'
 import f from '@/assets/fonts/Inter_28pt-Regular.ttf'
 import { Text as SkiaText, useFont } from '@shopify/react-native-skia'
@@ -11,17 +11,16 @@ import { Bar, CartesianChart } from 'victory-native'
 
 interface IBarChart {
     habitStart: string
-    pastDays: number,
     statistics: IHabitTask['habitStatic']
 }
 
-const BarChart = ({ habitStart, pastDays, statistics }: IBarChart) => {
+const BarChart = ({ habitStart, statistics }: IBarChart) => {
 
     const font = useFont(f, 16)
     const [barTime, setBarTime] = useState<'month' | 'year'>('month')
     const [selectYear, setSelectYear] = useState<string>(dayjs().format('YYYY'))
     const [data, setData] = useState<{
-        label: number,
+        label: number | string,
         listenCount: number
     }[]>([
         {
@@ -31,67 +30,46 @@ const BarChart = ({ habitStart, pastDays, statistics }: IBarChart) => {
     ])
 
     useEffect(() => {
+        if (!statistics) return;
+
+        const s = (searchValue: string, byYear = false) => {
+            return Object.entries(statistics).reduce((sum, [date, stat]) => {
+                const match = byYear
+                    ? date.startsWith(searchValue)
+                    : date.startsWith(searchValue);
+
+                if (match && stat.isCompleat === 1) {
+                    return sum + 1;
+                }
+                return sum;
+            }, 0);
+        };
 
         if (barTime === 'month') {
-
-            const s = (searchValue: string) => {
-
-                if (statistics) {
-                    return Object.entries(statistics).reduce((sum, item) => {
-                        if (item[0].includes(searchValue)) {
-                            if (item[1].isCompleat && item[1].isCompleat == 1) {
-                                return sum + 1
-                            }
-                        }
-
-                        return sum
-                    }, 0)
-
-                }
-
-                return 0
-            }
-
-            setData(Array.from({length: 12}, (_, i) => ({
+            const monthData = Array.from({ length: 12 }, (_, i) => ({
                 label: i + 1,
                 listenCount: s(`${selectYear}-${String(i + 1).padStart(2, '0')}`)
-            })))
+            }));
+            setData(monthData);
         }
 
         if (barTime === 'year') {
+            const diffYear = dayjs().diff(dayjs(habitStart), 'year') + 1;
 
-            const diffYear = dayjs().diff(dayjs(habitStart), 'year') + 1
-
-            const s = (searchValue: string) => {
-
-                if (statistics) {
-                    return Object.entries(statistics).reduce((sum, item) => {
-                        if (item[0].includes(searchValue)) {
-                            if (item[1].isCompleat && item[1].isCompleat == 1) {
-                                return sum + 1
-                            }
-                        }
-
-                        return sum
-                    }, 0)
-
+            const yearData = Array.from({ length: 12 }, (_, i) => {
+                if (i < diffYear) {
+                    const year = dayjs(habitStart).add(i, 'year').year();
+                    return {
+                        label: year,
+                        listenCount: s(String(year), true)
+                    };
                 }
+                return { label: '', listenCount: 0 };
+            });
 
-                return 0
-            }
-
-            const d = Array.from({length: diffYear}, (_, i) => ({
-                label: dayjs(habitStart).add(i, 'year').year(),
-                listenCount: s(`${selectYear}`)
-
-            }))
-
-            console.log('d: ', d)
-
-            setData(d)
+            setData(yearData);
         }
-
-    }, [barTime, selectYear])
+    }, [barTime, selectYear, habitStart, statistics]);
 
     const changeYear = (typeSelect: string) => {
         if (typeSelect === 'next') {
@@ -116,13 +94,13 @@ const BarChart = ({ habitStart, pastDays, statistics }: IBarChart) => {
                             <TouchableOpacity style={{ padding: 5 }} onPress={() => changeYear('next')}>
                                 <Text color={'white'} fontSize={18}>{'>'}</Text>
                             </TouchableOpacity>
-                        </>:
-                    null
+                        </> :
+                        null
 
                 }
             </XStack>
             <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-                <YStack height={300} width={700} >
+                <YStack height={300} width={SCREEN_WIDTH_400 ? 600 : 700} left={-15}>
                     <CartesianChart
                         data={data}
                         xKey="label"
@@ -137,24 +115,20 @@ const BarChart = ({ habitStart, pastDays, statistics }: IBarChart) => {
                             },
                             font: font,
                             formatXLabel: (value) => {
-
-                                if (barTime === 'month')  {
-                                    const date = new Date(2023, value - 1);
+                                if (barTime === 'month') {
+                                    const date = new Date(Number(selectYear), value - 1);
                                     return date.toLocaleString("ru", { month: "short" });
                                 }
-
-                                if (barTime === 'year') return selectYear
-                                
-                                return ''
-                            },
+                                if (barTime === 'year') {
+                                    return value ? String(value) : '';
+                                }
+                                return '';
+                            }
                         }}
 
                     >
                         {({ points, chartBounds }) => {
-                            // console.log('points: ', points.listenCount)
-                            // console.log('chartBounds: ', chartBounds)
                             return <>
-                                {/* Сами бары */}
                                 <Bar
                                     color={"#194A98"}
                                     chartBounds={chartBounds}
@@ -167,16 +141,16 @@ const BarChart = ({ habitStart, pastDays, statistics }: IBarChart) => {
                                 {points.listenCount.map((point, i) => (
                                     <React.Fragment key={i}>
                                         {
-                                            String(data[i].listenCount) !== '0' ? 
-                                            <SkiaText
-                                                x={point.x - 6}
-                                                y={point.y - 10}
-                                                font={font}
-                                                text={String(data[i].listenCount)}
-                                                color={'#fff'}
-                                            />:
-                                            null
-                                            
+                                            String(data[i].listenCount) !== '0' ?
+                                                <SkiaText
+                                                    x={point.x - 6}
+                                                    y={point.y - 10}
+                                                    font={font}
+                                                    text={String(data[i].listenCount)}
+                                                    color={'#fff'}
+                                                /> :
+                                                null
+
                                         }
                                     </React.Fragment>
                                 ))}

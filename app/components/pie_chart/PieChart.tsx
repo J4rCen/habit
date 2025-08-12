@@ -1,3 +1,4 @@
+import { SCREEN_WIDTH_400 } from '@/app/constants';
 import { IHabitTask } from '@/app/store/zustand';
 import f from '@/assets/fonts/Inter_28pt-Regular.ttf';
 import { useFont } from "@shopify/react-native-skia";
@@ -51,7 +52,7 @@ const PieChart = ({pastDays, statistics}: IPieChart) => {
             <View>
                 <View height={300} alignContent="center" justifyContent="center">
                     <PolarChart data={data} valueKey="value" labelKey="label" colorKey="color">
-                        <Pie.Chart innerRadius={50} size={200} startAngle={270}>
+                        <Pie.Chart innerRadius={50} size={SCREEN_WIDTH_400 ? 180 : 200} startAngle={270}>
                             {({ slice }) => {
                                 const outer = slice.radius ?? 100;
                                 const inner = slice.innerRadius ?? 50;

@@ -57,7 +57,6 @@ const Statistics = () => {
 
                             <BarChart
                                 habitStart={habitStart as string}
-                                pastDays={pastDays}
                                 statistics={statistics}
                             />
 
