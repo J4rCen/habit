@@ -1,5 +1,5 @@
 import { router } from "expo-router"
-import React, { ReactNode, useEffect, useState } from "react"
+import React, { useCallback, useMemo, useState } from "react"
 import { TouchableOpacity } from "react-native"
 import { SafeAreaView } from "react-native-safe-area-context"
 import { ScrollView, Text, View, XStack, YStack } from "tamagui"
@@ -10,18 +10,17 @@ import useStore, { IHabitTask } from "../store/zustand"
 const Statistics = () => {
 
     const store: IHabitTask[] = Object.values(useStore(store => store.habitTask))
+    const dataStart = useStore(store => store.startDateUser)
     const [searchValue, setSearchValue] = useState<string>('')
-    const [habitListTask, SetHabitListTask] = useState<ReactNode[]>([])
 
-    useEffect(() => {
-        SetHabitListTask(store.filter((item) => {
+    const filteredHabits = useCallback(() => {
+        return store.filter((item) => {
             if (searchValue === '' || undefined) return true
             return item.habitConfig.name.toLowerCase().includes(searchValue.toLowerCase())
         }).map((item, index) => {
             return (
-                <TouchableOpacity onPress={() => router.navigate({pathname: '/', params: {habitId: item.habitId}})}>
+                <TouchableOpacity key={index} onPress={() => router.navigate({pathname: '/screens/statistics', params: {habitId: item.habitId, habitName: item.habitConfig.name, dataStart: dataStart, habitStart: item.habitConfig.day_of_create}})}>
                     <XStack 
-                        key={index} 
                         height={SCREEN_WIDTH_400 ? 50 : 60} 
                         width={'100%'} 
                         backgroundColor={'$gray'} 
@@ -38,8 +37,10 @@ const Statistics = () => {
                     </XStack>
                 </TouchableOpacity>
             )
-        }))
-    }, [searchValue])
+        });
+    }, [store, searchValue, dataStart]);
+
+    const habitListTask = useMemo(() => filteredHabits(), [filteredHabits]);
 
     return (
         <View height={SCREEN_HEIGHT} backgroundColor={'$dark'}>

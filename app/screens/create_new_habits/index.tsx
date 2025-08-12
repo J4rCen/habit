@@ -2,7 +2,7 @@ import CustomInput from '@/app/components/custom_input/CustomInput';
 import CustomSelect from '@/app/components/custom_select/CustomSelect';
 import ReminderToggle from '@/app/components/reminder_toggle/ReminderToggle';
 import CustomTimePicker from '@/app/components/timepicker/CustomTimePicker';
-import { SCREEN_HEIGHT, SCREEN_WIDTH, SCREEN_WIDTH_400, WEEK_DAYS } from '@/app/constants';
+import { DATE_FORMAT, SCREEN_HEIGHT, SCREEN_WIDTH, SCREEN_WIDTH_400, WEEK_DAYS } from '@/app/constants';
 import useStore, { IHabitTask } from '@/app/store/zustand';
 import ArrowBack from '@/app/svgs/arrowBack';
 import { PortalProvider } from '@tamagui/portal';
@@ -23,7 +23,7 @@ const CreateNewHabits = () => {
     const habitStatic = habitId ? useStore(store => store.getHabitTask(habitId as string)?.habitStatic) : undefined
 
     const [habitName, setHabitName] = useState(habitConfig ? habitConfig.name : '')
-    const dayOfCreate = habitConfig?.day_of_create ? habitConfig?.day_of_create : dayjs().format('DD-MM-YYYY')
+    const dayOfCreate = habitConfig?.day_of_create ? habitConfig?.day_of_create : dayjs().format(DATE_FORMAT)
     const [typeOfHabit, setTypeOfHabit] = useState<'reusable' | 'onetime'>(habitConfig ? habitConfig.type_of_habit : 'reusable')
     const [intervalExecution, setIntervalExecution] = useState<string>(habitConfig && habitConfig.interval_execution ? habitConfig.interval_execution : "every_day")
     const [timesOfDay, setTimesOfDay] = useState<string>(habitConfig && habitConfig.times_of_day ? habitConfig.times_of_day : "all")
