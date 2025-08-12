@@ -1,5 +1,5 @@
 import { router } from "expo-router"
-import React, { ReactNode, useEffect, useState } from "react"
+import React, { useCallback, useMemo, useState } from "react"
 import { TouchableOpacity } from "react-native"
 import { SafeAreaView } from "react-native-safe-area-context"
 import { ScrollView, Text, View, XStack, YStack } from "tamagui"
@@ -12,10 +12,9 @@ const Statistics = () => {
     const store: IHabitTask[] = Object.values(useStore(store => store.habitTask))
     const dataStart = useStore(store => store.startDateUser)
     const [searchValue, setSearchValue] = useState<string>('')
-    const [habitListTask, SetHabitListTask] = useState<ReactNode[]>([])
 
-    useEffect(() => {
-        SetHabitListTask(store.filter((item) => {
+    const filteredHabits = useCallback(() => {
+        return store.filter((item) => {
             if (searchValue === '' || undefined) return true
             return item.habitConfig.name.toLowerCase().includes(searchValue.toLowerCase())
         }).map((item, index) => {
@@ -38,8 +37,10 @@ const Statistics = () => {
                     </XStack>
                 </TouchableOpacity>
             )
-        }))
-    }, [searchValue])
+        });
+    }, [store, searchValue, dataStart]);
+
+    const habitListTask = useMemo(() => filteredHabits(), [filteredHabits]);
 
     return (
         <View height={SCREEN_HEIGHT} backgroundColor={'$dark'}>
