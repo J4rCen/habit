@@ -40,7 +40,7 @@ const Statistics = () => {
                     </Text>
                 </XStack>
                 <YStack alignItems="center" marginTop={10}>
-                    <ScrollView maxHeight={SCREEN_HEIGHT * 0.8} width={SCREEN_WIDTH - 20} showsVerticalScrollIndicator={false} >
+                    <ScrollView maxHeight={SCREEN_HEIGHT * 0.8} width={SCREEN_WIDTH - 20} showsVerticalScrollIndicator={false}>
                         <YStack gap={10}>
                             
                             <CalendarChart

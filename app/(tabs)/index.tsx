@@ -15,6 +15,7 @@ import useStore, { IHabitTask } from "../store/zustand";
 export default function Index() {
 
     const store = useStore(state => state.habitTask)
+    const startData = useStore(state => state.startDateUser)
 
     const [selectDate, setSelectDate] = useState(dayjs().format(DATE_FORMAT))
     const [selectFilter, setSelectFilter] = useState('all')
@@ -53,7 +54,7 @@ export default function Index() {
                         selectDate={selectDate}
                         selectFilter={selectFilter}
                     />
-
+                    <Text color={'white'} fontSize={16}>{startData}</Text>
                     </YStack>
                 </YStack>
             </SafeAreaView>
