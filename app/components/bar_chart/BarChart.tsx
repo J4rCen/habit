@@ -2,10 +2,12 @@ import { SCREEN_WIDTH } from '@/app/constants'
 import { IHabitTask } from '@/app/store/zustand'
 import f from '@/assets/fonts/Inter_28pt-Regular.ttf'
 import { Text as SkiaText, useFont } from '@shopify/react-native-skia'
-import React, { useState } from 'react'
+import dayjs from 'dayjs'
+import React, { useEffect, useState } from 'react'
 import { StyleSheet, TouchableOpacity } from 'react-native'
 import { ScrollView, Text, XStack, YStack } from 'tamagui'
 import { Bar, CartesianChart } from 'victory-native'
+
 
 interface IBarChart {
     habitStart: string
@@ -13,41 +15,145 @@ interface IBarChart {
     statistics: IHabitTask['habitStatic']
 }
 
-const BarChart = ({habitStart, pastDays, statistics}: IBarChart) => {
+const BarChart = ({ habitStart, pastDays, statistics }: IBarChart) => {
 
     const font = useFont(f, 16)
     const [barTime, setBarTime] = useState<'month' | 'year'>('month')
+    const [selectYear, setSelectYear] = useState<string>(dayjs().format('YYYY'))
+    const [data, setData] = useState<{
+        label: number,
+        listenCount: number
+    }[]>([
+        {
+            label: 0,
+            listenCount: 0
+        }
+    ])
 
+    useEffect(() => {
 
-    const data1 = Array.from({ length: 12 }, (_, index) => ({
-        // Starting at 1 for January
-        month: index + 1,
-        // Randomizing the listen count between 100 and 50
-        listenCount: Math.floor(Math.random() * (100 - 50 + 1)) + 50,
-    }))
+        if (barTime === 'month') {
+
+            const s = (searchValue: string) => {
+
+                if (statistics) {
+                    return Object.entries(statistics).reduce((sum, item) => {
+                        if (item[0].includes(searchValue)) {
+                            if (item[1].isCompleat && item[1].isCompleat == 1) {
+                                return sum + 1
+                            }
+                        }
+
+                        return sum
+                    }, 0)
+
+                }
+
+                return 0
+            }
+
+            setData(Array.from({length: 12}, (_, i) => ({
+                label: i + 1,
+                listenCount: s(`${selectYear}-${String(i + 1).padStart(2, '0')}`)
+            })))
+        }
+
+        if (barTime === 'year') {
+
+            const diffYear = dayjs().diff(dayjs(habitStart), 'year') + 1
+
+            const s = (searchValue: string) => {
+
+                if (statistics) {
+                    return Object.entries(statistics).reduce((sum, item) => {
+                        if (item[0].includes(searchValue)) {
+                            if (item[1].isCompleat && item[1].isCompleat == 1) {
+                                return sum + 1
+                            }
+                        }
+
+                        return sum
+                    }, 0)
+
+                }
+
+                return 0
+            }
+
+            const d = Array.from({length: diffYear}, (_, i) => ({
+                label: dayjs(habitStart).add(i, 'year').year(),
+                listenCount: s(`${selectYear}`)
+
+            }))
+
+            console.log('d: ', d)
+
+            setData(d)
+        }
+
+    }, [barTime, selectYear])
+
+    const changeYear = (typeSelect: string) => {
+        if (typeSelect === 'next') {
+            setSelectYear(dayjs(selectYear, 'YYYY').add(1, 'year').format('YYYY'))
+        }
+
+        if (typeSelect === 'back') {
+            setSelectYear(dayjs(selectYear, 'YYYY').subtract(1, 'year').format('YYYY'))
+        }
+    }
 
     return (
         <YStack backgroundColor={'$gray'} borderRadius={10} padding={10} >
-            <XStack marginBottom={20} justifyContent='space-around' >
-                <TouchableOpacity><Text>{'<'}</Text></TouchableOpacity>
-                <Text>Августа</Text>
-                <TouchableOpacity><Text>{'>'}</Text></TouchableOpacity>
+            <XStack marginBottom={20} justifyContent='space-around' height={30} alignItems='center'>
+                {
+                    barTime !== 'year' ?
+                        <>
+                            <TouchableOpacity style={{ padding: 5 }} onPress={() => changeYear('back')}>
+                                <Text color={'white'} fontSize={18}>{'<'}</Text>
+                            </TouchableOpacity>
+                            <Text color={'white'} fontSize={18}>{selectYear}</Text>
+                            <TouchableOpacity style={{ padding: 5 }} onPress={() => changeYear('next')}>
+                                <Text color={'white'} fontSize={18}>{'>'}</Text>
+                            </TouchableOpacity>
+                        </>:
+                    null
+
+                }
             </XStack>
             <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-                <YStack height={200} width={500}>
+                <YStack height={300} width={700} >
                     <CartesianChart
-                        data={data1}
-                        xKey="month"
+                        data={data}
+                        xKey="label"
                         yKeys={["listenCount"]}
                         domainPadding={{ left: 50, right: 50, top: 30 }}
                         axisOptions={{
-                            lineColor: "#fff", // скрыли линии Y
-                            labelColor: "#fff", // скрыли подписи Y
+                            tickCount: 12,
+                            lineColor: "#fff",
+                            labelColor: {
+                                x: "#fff",
+                                y: "rgba(255, 255, 255, 0)"
+                            },
                             font: font,
+                            formatXLabel: (value) => {
+
+                                if (barTime === 'month')  {
+                                    const date = new Date(2023, value - 1);
+                                    return date.toLocaleString("ru", { month: "short" });
+                                }
+
+                                if (barTime === 'year') return selectYear
+                                
+                                return ''
+                            },
                         }}
+
                     >
-                        {({ points, chartBounds }) => (
-                            <>
+                        {({ points, chartBounds }) => {
+                            // console.log('points: ', points.listenCount)
+                            // console.log('chartBounds: ', chartBounds)
+                            return <>
                                 {/* Сами бары */}
                                 <Bar
                                     color={"#194A98"}
@@ -55,33 +161,27 @@ const BarChart = ({habitStart, pastDays, statistics}: IBarChart) => {
                                     points={points.listenCount}
                                     barWidth={30}
                                     roundedCorners={{ topLeft: 5, topRight: 5 }}
+
                                 />
 
-                                {/* Цикл по точкам */}
                                 {points.listenCount.map((point, i) => (
                                     <React.Fragment key={i}>
-                                        {/* Значение на баре */}
-                                        <SkiaText
-                                            x={point.x}
-                                            // y={point.y - 8}
-                                            font={font}
-                                            text={String(data1[i].listenCount)}
-                                        />
-
-                                        {/* Подпись под баром */}
-                                        <SkiaText
-                                            x={point.x}
-                                            y={chartBounds.bottom + 14}
-                                            font={font}
-                                            text={new Date(2023, data1[i].month - 1).toLocaleString(
-                                                "ru",
-                                                { month: "short" }
-                                            )}
-                                        />
+                                        {
+                                            String(data[i].listenCount) !== '0' ? 
+                                            <SkiaText
+                                                x={point.x - 6}
+                                                y={point.y - 10}
+                                                font={font}
+                                                text={String(data[i].listenCount)}
+                                                color={'#fff'}
+                                            />:
+                                            null
+                                            
+                                        }
                                     </React.Fragment>
                                 ))}
                             </>
-                        )}
+                        }}
                     </CartesianChart>
                 </YStack>
             </ScrollView>

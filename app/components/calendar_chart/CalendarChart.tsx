@@ -53,7 +53,12 @@ const CalendarChart = ({ dataStart, statistics, pastDays, habitStart}: ICalendar
 
         Array.from({ length: pastDays }, (_, i) => {
             const day: string = dayjs(habitStart as string).add(i, 'day').format(DATE_FORMAT)
-            const status = statistics === null ? 'darkred' : statistics[`${day}`].isCompleat === 1 ? 'green' : 'darkred'
+            let status = 'darkred'
+
+            if (statistics !== null && statistics[`${day}`] && statistics[`${day}`].isCompleat === 1) {
+                status = 'green'
+            }
+
             statistic[`${day}`] = { selected: true, selectedColor: status }
         })
 
