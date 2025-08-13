@@ -1,9 +1,14 @@
-import { Tabs } from "expo-router"
-import React from "react"
-import { SCREEN_HEIGHT, SCREEN_WIDTH_400 } from "../constants"
-import { ClipboardIcon, Settings, Statistics } from "../svgs/navigation"
+import { Tabs } from "expo-router";
+import React from "react";
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { SCREEN_WIDTH_400 } from "../constants";
+import { ClipboardIcon, Settings, Statistics } from "../svgs/navigation";
+
 
 const TabLayout = () => {
+
+    const insets = useSafeAreaInsets()
+
     return (
         <Tabs
             screenOptions={{
@@ -13,7 +18,8 @@ const TabLayout = () => {
                     borderTopWidth: 0,
                     borderTopLeftRadius: 20,
                     borderTopRightRadius: 20,
-                    height: SCREEN_HEIGHT * 0.1
+                    paddingBottom: insets.bottom, 
+                    height: SCREEN_WIDTH_400 ? 70 + insets.bottom : 85 + insets.bottom,
                 },
                 tabBarIconStyle: {
                     marginTop: SCREEN_WIDTH_400 ? 10 : 15

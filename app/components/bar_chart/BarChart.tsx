@@ -20,7 +20,26 @@ const BarChart = ({ habitStart, statistics }: IBarChart) => {
     const [data, setData] = useState<{ label: number | string; listenCount: number }[]>([]);
 
     useEffect(() => {
-        if (!statistics) return;
+        const generateEmptyData = () => {
+            if (barTime === 'month') {
+                return Array.from({ length: 12 }, (_, i) => ({
+                    label: i + 1,
+                    listenCount: 0
+                }));
+            } else {
+                const diffYear = dayjs().diff(dayjs(habitStart), 'year') + 1;
+                return Array.from({ length: 12 }, (_, i) =>
+                    i < diffYear
+                        ? { label: dayjs(habitStart).add(i, 'year').year(), listenCount: 0 }
+                        : { label: '', listenCount: 0 }
+                );
+            }
+        };
+
+        if (!statistics) {
+            setData(generateEmptyData());
+            return;
+        }
 
         const countByDate = (prefix: string) =>
             Object.entries(statistics).reduce(
@@ -40,7 +59,10 @@ const BarChart = ({ habitStart, statistics }: IBarChart) => {
             setData(
                 Array.from({ length: 12 }, (_, i) =>
                     i < diffYear
-                        ? { label: dayjs(habitStart).add(i, 'year').year(), listenCount: countByDate(String(dayjs(habitStart).add(i, 'year').year())) }
+                        ? {
+                            label: dayjs(habitStart).add(i, 'year').year(),
+                            listenCount: countByDate(String(dayjs(habitStart).add(i, 'year').year()))
+                        }
                         : { label: '', listenCount: 0 }
                 )
             );
@@ -57,8 +79,8 @@ const BarChart = ({ habitStart, statistics }: IBarChart) => {
 
     return (
         <YStack backgroundColor={'$gray'} borderRadius={10} padding={10}>
-            
-                <XStack marginBottom={20} justifyContent='space-around' height={30} alignItems='center'>
+
+            <XStack marginBottom={20} justifyContent='space-around' height={30} alignItems='center'>
                 {barTime === 'month' && (
                     <>
                         <TouchableOpacity style={{ padding: 5 }} onPress={() => changeYear('back')}>
@@ -70,8 +92,8 @@ const BarChart = ({ habitStart, statistics }: IBarChart) => {
                         </TouchableOpacity>
                     </>
                 )}
-                </XStack>
-            
+            </XStack>
+
 
             <ScrollView horizontal showsHorizontalScrollIndicator={false}>
                 <YStack height={300} width={SCREEN_WIDTH_400 ? 600 : 700} left={-15}>

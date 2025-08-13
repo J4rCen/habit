@@ -43,9 +43,9 @@ const Statistics = () => {
     const habitListTask = useMemo(() => filteredHabits(), [filteredHabits]);
 
     return (
-        <View height={SCREEN_HEIGHT} backgroundColor={'$dark'}>
+        <View backgroundColor={'$dark'} maxHeight={SCREEN_HEIGHT}>
             <SafeAreaView>
-                <YStack>
+                <YStack height={SCREEN_HEIGHT} backgroundColor='$dark'>
                     <XStack>
                         <Text
                             color={'white'}
