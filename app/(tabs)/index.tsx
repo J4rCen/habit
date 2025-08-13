@@ -15,6 +15,7 @@ import useStore, { IHabitTask } from "../store/zustand";
 export default function Index() {
 
     const store = useStore(state => state.habitTask)
+    const initApp = useStore(state => state.initializeApp)
     const startData = useStore(state => state.startDateUser)
 
     const [selectDate, setSelectDate] = useState(dayjs().format(DATE_FORMAT))
@@ -22,9 +23,13 @@ export default function Index() {
     const [habitsStore, setHabitStore] = useState<IHabitTask[]>(Object.values(store) ?? [])
 
     useEffect(() => {
+        initApp()
+    }, [])
+
+    useEffect(() => {
         setHabitStore(Object.values(store) ?? [])
     }, [store])
-    
+
 
     return (
         <View backgroundColor={'$dark'} maxHeight={SCREEN_HEIGHT}>
@@ -35,26 +40,25 @@ export default function Index() {
                         setSelectDate={setSelectDate}
                     />
                     <YStack alignItems="center">
-                    <FilteringButtonsTime
-                        selectFilter={selectFilter}
-                        setSelectFilter={setSelectFilter}
-                    />
-                    <TouchableOpacity
-                        style={styles.buttonCreateNewHabit}
-                        onPress={() => router.navigate('/screens/create_new_habits')}
-                    >
-                        <Text
-                        color={'$white'}
-                        fontSize={18}
-                        >Добавить привычку</Text>
-                    </TouchableOpacity>
+                        <FilteringButtonsTime
+                            selectFilter={selectFilter}
+                            setSelectFilter={setSelectFilter}
+                        />
+                        <TouchableOpacity
+                            style={styles.buttonCreateNewHabit}
+                            onPress={() => router.navigate('/screens/create_new_habits')}
+                        >
+                            <Text
+                                color={'$white'}
+                                fontSize={18}
+                            >Добавить привычку</Text>
+                        </TouchableOpacity>
 
-                    <HabitsRender
-                        habitsStore={habitsStore}
-                        selectDate={selectDate}
-                        selectFilter={selectFilter}
-                    />
-                    <Text color={'white'} fontSize={16}>{startData}</Text>
+                        <HabitsRender
+                            habitsStore={habitsStore}
+                            selectDate={selectDate}
+                            selectFilter={selectFilter}
+                        />
                     </YStack>
                 </YStack>
             </SafeAreaView>
