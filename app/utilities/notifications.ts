@@ -1,6 +1,4 @@
 import * as Notifications from 'expo-notifications'
-// import dayjs from 'dayjs'
-// import { DATE_FORMAT } from '../constants'
 
 interface ISetNotifications {
     name: string,

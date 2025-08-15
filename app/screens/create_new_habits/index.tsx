@@ -86,7 +86,6 @@ const CreateNewHabits = () => {
             })
 
             notificationsId.current = id
-            console.log(notificationsId.current)
         }
 
         if (reminderOn === false && habitConfig?.notificationsId) {
