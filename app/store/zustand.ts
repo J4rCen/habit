@@ -30,6 +30,7 @@ export interface IHabitTask {
 		quantity?: number | null
 		reminder: boolean
 		reminder_time?: string | null
+		notificationsId?: string | null
 	}
 	habitStatic: Record<string, StaticConfig> | null
 }

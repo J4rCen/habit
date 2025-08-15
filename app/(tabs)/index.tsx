@@ -10,6 +10,7 @@ import HabitsRender from '../components/habits_render/HabitsRender';
 import SlidingCalendar from "../components/sliding_calendar/SlidingCalendar";
 import { SCREEN_HEIGHT, SCREEN_WIDTH, SCREEN_WIDTH_400 } from "../constants";
 import useStore, { IHabitTask } from "../store/zustand";
+import { GetPermissionAccess } from '../utilities/notifications';
 
 
 export default function Index() {
@@ -24,6 +25,7 @@ export default function Index() {
 
     useEffect(() => {
         initApp()
+        GetPermissionAccess()
     }, [])
 
     useEffect(() => {
