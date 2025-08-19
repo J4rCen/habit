@@ -5,3 +5,4 @@ export const SCREEN_WIDTH_400 = SCREEN_WIDTH < 400
 export const SCREEN_HEIGHT = Dimensions.get('window').height
 export const WEEK_DAYS = ["Пн", "Вт", "Ср", "Чт", "Пт", "Сб", "Вс"];
 export const DATE_FORMAT = 'YYYY-MM-DD'
+export const REFRESH_NOTIFICATION = 'REFRESH_NOTIFICATION'

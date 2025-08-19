@@ -5,11 +5,12 @@ import CustomTimePicker from '@/app/components/timepicker/CustomTimePicker';
 import { DATE_FORMAT, SCREEN_HEIGHT, SCREEN_WIDTH, SCREEN_WIDTH_400, WEEK_DAYS } from '@/app/constants';
 import useStore, { IHabitTask } from '@/app/store/zustand';
 import ArrowBack from '@/app/svgs/arrowBack';
+import SetNotifications, { CancelNotificationAsync } from '@/app/utilities/notifications';
 import { PortalProvider } from '@tamagui/portal';
 import dayjs from 'dayjs';
 import { router, useLocalSearchParams } from 'expo-router';
 import { nanoid } from 'nanoid/non-secure';
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Alert } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Button, ScrollView, Stack, Text, View, XStack, YStack } from "tamagui";
@@ -18,10 +19,9 @@ import { optionIntervalExecution, optionTimesOfDay, optionTypeOfTask } from './s
 
 const CreateNewHabits = () => {
 
-    const {habitId} = useLocalSearchParams()
+    const { habitId } = useLocalSearchParams()
     const habitConfig = habitId ? useStore(store => store.getHabitTask(habitId as string)?.habitConfig) : undefined
     const habitStatic = habitId ? useStore(store => store.getHabitTask(habitId as string)?.habitStatic) : undefined
-
     const [habitName, setHabitName] = useState(habitConfig ? habitConfig.name : '')
     const dayOfCreate = habitConfig?.day_of_create ? habitConfig?.day_of_create : dayjs().format(DATE_FORMAT)
     const [typeOfHabit, setTypeOfHabit] = useState<'reusable' | 'onetime'>(habitConfig ? habitConfig.type_of_habit : 'reusable')
@@ -32,20 +32,19 @@ const CreateNewHabits = () => {
     const [daysInRow, setDaysInRow] = useState<number>(habitConfig && habitConfig.gap_interval?.days_in_row ? habitConfig.gap_interval.days_in_row : 0)
     const [skipDays, setSkipDays] = useState<number>(habitConfig && habitConfig.gap_interval?.skip_days ? habitConfig.gap_interval.skip_days : 0)
     const [quantity, setQuantity] = useState<number>(habitConfig && habitConfig.quantity ? habitConfig.quantity : 0)
-    const [timerTime, setTimerTime] = useState( habitConfig && habitConfig.timer_time ? habitConfig.timer_time : '00:00')
-    const [reminderOn, setReminderOn] = useState( habitConfig && habitConfig.reminder ? habitConfig.reminder: false)
+    const [timerTime, setTimerTime] = useState(habitConfig && habitConfig.timer_time ? habitConfig.timer_time : '00:00')
+    const [reminderOn, setReminderOn] = useState(habitConfig && habitConfig.reminder ? habitConfig.reminder : false)
     const [reminderTime, setReminderTime] = useState(
         habitConfig && habitConfig.reminder_time ? habitConfig.reminder_time :
-        `${
-            new Date().getHours().toString().padStart(2, '0')
-        }:${
-            new Date().getMinutes().toString().padStart(2, '0')
-        }`
+            `${new Date().getHours().toString().padStart(2, '0')
+            }:${new Date().getMinutes().toString().padStart(2, '0')
+            }`
     )
     const [oneActive, setOneActive] = useState<number>(0)
     const [alertShow, setAlertShow] = useState<boolean>(false)
     const [alertMessage, setAlertMessage] = useState<string>('')
     const [isOpen, setIsOpen] = useState<boolean>(false)
+    const notificationsId = useRef(habitConfig && reminderOn ? habitConfig.notificationsId : null)
 
     const store = useStore(state => state)
 
@@ -56,17 +55,18 @@ const CreateNewHabits = () => {
         const interval = setInterval(() => {
             setAlertShow(false)
         }, 3000)
-        
+
         return () => clearInterval(interval)
     }, [alertShow])
 
-    const saveHabit = () => {
+    const saveHabit = async () => {
 
         if (habitName.length === 0) {
             setAlertMessage('Название привычке не может быть пустым')
             setAlertShow(true)
             return
         }
+        
 
         if (intervalExecution === 'certain_days' && daysOfWeek.length === 0) {
             setAlertMessage('Необходимо выбрать хотя бы один день недели')
@@ -74,36 +74,66 @@ const CreateNewHabits = () => {
             return
         }
 
+        const hid = habitId ? habitId as string : nanoid()
+
+        if (reminderOn) {
+            try {
+                const id = await SetNotifications(intervalExecution, reminderTime, {
+                    name: habitName,
+                    habitId: hid,
+                    notid: notificationsId.current,
+                    daysOfWeek,
+                    daysInRow,
+                    skipDays,
+                    dayOfCreate
+                })
+
+                notificationsId.current = id
+            } catch (error) {
+                console.log(error)
+            }
+        }
+
+        if (reminderOn === false && habitConfig?.notificationsId) {
+            try {
+                await CancelNotificationAsync(intervalExecution, habitConfig?.notificationsId, hid)
+                notificationsId.current = null
+            } catch (error) {
+                console.log(error)
+            }
+        }
+
         const newHabitData: IHabitTask = {
-            habitId: habitId ? habitId as string : nanoid(),
+            habitId: hid,
             habitConfig: {
                 name: habitName,
                 day_of_create: dayOfCreate,
                 type_of_habit: typeOfHabit,
-                interval_execution: 
-                    typeOfHabit === 'reusable' ? 
-                    intervalExecution as 'every_day' | 'certain_days' | 'gap' : 
-                    null,
-                days_of_week: 
-                    intervalExecution === 'certain_days' ? 
-                    daysOfWeek : 
-                    null,
-                gap_interval: 
-                    intervalExecution === 'gap' ? 
-                    {days_in_row: daysInRow, skip_days: skipDays} : 
-                    null,
+                interval_execution:
+                    typeOfHabit === 'reusable' ?
+                        intervalExecution as 'every_day' | 'certain_days' | 'gap' :
+                        null,
+                days_of_week:
+                    intervalExecution === 'certain_days' ?
+                        daysOfWeek :
+                        null,
+                gap_interval:
+                    intervalExecution === 'gap' ?
+                        { days_in_row: daysInRow, skip_days: skipDays } :
+                        null,
                 times_of_day: timesOfDay as 'all' | 'morning' | 'day' | 'evening',
                 type_of_task: typeOfTask as 'single_mark' | 'reusable_mark' | 'timer',
-                timer_time: 
-                    typeOfTask === 'timer' ? 
-                    timerTime :
-                    null,
-                quantity: 
-                    typeOfTask === 'reusable_mark' ? 
-                    quantity:
-                    null,
+                timer_time:
+                    typeOfTask === 'timer' ?
+                        timerTime :
+                        null,
+                quantity:
+                    typeOfTask === 'reusable_mark' ?
+                        quantity :
+                        null,
                 reminder: reminderOn,
-                reminder_time: reminderOn ? reminderTime : null
+                reminder_time: reminderOn ? reminderTime : null,
+                notificationsId: reminderOn ? notificationsId.current : null
             },
             habitStatic: habitStatic ? habitStatic : null
         }
@@ -126,7 +156,13 @@ const CreateNewHabits = () => {
                 {
                     text: "Удалить",
                     style: "destructive",
-                    onPress: () => {
+                    onPress: async () => {
+
+                        if (habitConfig?.notificationsId) {
+                            await CancelNotificationAsync(intervalExecution, habitConfig?.notificationsId, habitId as string)
+                            notificationsId.current = null
+                        }
+
                         store.removeHabitTask(habitId as string)
                         router.back()
                     },
@@ -135,11 +171,12 @@ const CreateNewHabits = () => {
         );
     }
 
+
     const toggleDay = (day: string) => {
         setDaysOfWeek((prev) =>
-        prev.includes(day)
-            ? prev.filter((d) => d !== day)
-            : [...prev, day]
+            prev.includes(day)
+                ? prev.filter((d) => d !== day)
+                : [...prev, day]
         )
     }
 
@@ -152,30 +189,30 @@ const CreateNewHabits = () => {
                 flexWrap="wrap"
             >
                 {WEEK_DAYS.map((day, index) => {
-                const isSelected = daysOfWeek.includes(day)
-                return (
-                    <Stack
-                        key={index}
-                        onPress={() => toggleDay(day)}
-                        padding={SCREEN_WIDTH_400 ? 10 :  12}
-                        borderRadius={10}
-                        backgroundColor={isSelected ? '#194A98' : '#393E46'}
-                        alignItems="center"
-                        justifyContent="center"
-                        marginVertical={5}
-                        marginHorizontal={4}
-                        hoverStyle={{
-                            opacity: 0.85,
-                        }}
-                        pressStyle={{
-                            scale: 0.96,
-                        }}
-                    >
-                        <Text color="white" fontSize={SCREEN_WIDTH_400 ? 14 : 16}>
-                            {day}
-                        </Text>
-                    </Stack>
-                )
+                    const isSelected = daysOfWeek.includes(day)
+                    return (
+                        <Stack
+                            key={index}
+                            onPress={() => toggleDay(day)}
+                            padding={SCREEN_WIDTH_400 ? 10 : 12}
+                            borderRadius={10}
+                            backgroundColor={isSelected ? '#194A98' : '#393E46'}
+                            alignItems="center"
+                            justifyContent="center"
+                            marginVertical={5}
+                            marginHorizontal={4}
+                            hoverStyle={{
+                                opacity: 0.85,
+                            }}
+                            pressStyle={{
+                                scale: 0.96,
+                            }}
+                        >
+                            <Text color="white" fontSize={SCREEN_WIDTH_400 ? 14 : 16}>
+                                {day}
+                            </Text>
+                        </Stack>
+                    )
                 })}
             </XStack>
         )
@@ -191,7 +228,7 @@ const CreateNewHabits = () => {
                         height={50}
                         width={SCREEN_WIDTH / 2 - 20}
                         onChange={(e) => {
-                            if (typeof e === 'number')setDaysInRow(e)
+                            if (typeof e === 'number') setDaysInRow(e)
                         }}
                         center={true}
                         numbersOnly={true}
@@ -234,205 +271,205 @@ const CreateNewHabits = () => {
             </YStack>
         )
     }, [quantity])
-    
+
     return (
         <View backgroundColor={'$dark'} maxHeight={SCREEN_HEIGHT}>
-        <SafeAreaView>
-            <PortalProvider>
-                <YStack style={{height: SCREEN_HEIGHT, width: SCREEN_WIDTH}}>
-                <ScrollView maxHeight={SCREEN_HEIGHT} style={{backgroundColor: '#222831'}} showsVerticalScrollIndicator={false}>
-                    <YStack width={SCREEN_WIDTH} position='relative' justifyContent='center'>
-                        <XStack alignItems='center' marginTop={10}>
-                            <View onPress={() => router.back()}>
-                                <ArrowBack size={36}/>
-                            </View>
-                            <Text
-                                marginLeft={5}
-                                color={"$white"}
-                                fontSize={26}
-                            >
-                                { habitId === undefined ? 'Добавить привычку' : 'Изменить привычку' }
-                            </Text>
-                        </XStack>
-
-                        <YStack 
-                            flex={1}
-                            alignItems="center"
-                            marginTop={20}
-                        >
-                            <CustomInput
-                                value={habitName}
-                                height={50}
-                                width={SCREEN_WIDTH - 20}
-                                placeholder='Название привычке'
-                                onChange={(e) => {
-                                    if (typeof e === 'string') setHabitName(e)
-                                }}
-                            />
-                            <XStack margin={10}justifyContent='center'>
-                                <Button
-                                    borderTopRightRadius={0}
-                                    borderBottomRightRadius={0}
-                                    backgroundColor={typeOfHabit === 'reusable' ? '$blue' : "$gray"}
-                                    onPress={() => setTypeOfHabit('reusable')}
-                                    width={SCREEN_WIDTH / 2 - 20}
-                                >
+            <SafeAreaView>
+                <PortalProvider>
+                    <YStack style={{ height: SCREEN_HEIGHT, width: SCREEN_WIDTH }}>
+                        <ScrollView maxHeight={SCREEN_HEIGHT} style={{ backgroundColor: '#222831' }} showsVerticalScrollIndicator={false}>
+                            <YStack width={SCREEN_WIDTH} position='relative' justifyContent='center'>
+                                <XStack alignItems='center' marginTop={10}>
+                                    <View onPress={() => router.back()}>
+                                        <ArrowBack size={36} />
+                                    </View>
                                     <Text
-                                        color={'$white'}
-                                        fontSize={16}
+                                        marginLeft={5}
+                                        color={"$white"}
+                                        fontSize={26}
                                     >
-                                        Регулярная
+                                        {habitId === undefined ? 'Добавить привычку' : 'Изменить привычку'}
                                     </Text>
-                                </Button>
-                                <Button
-                                    borderTopLeftRadius={0}
-                                    borderBottomLeftRadius={0}
-                                    backgroundColor={typeOfHabit === 'onetime' ? '$blue' : "$gray"}
-                                    onPress={() => {
-                                        setTypeOfHabit('onetime')
-                                    }}
-                                    width={SCREEN_WIDTH / 2 - 20}
+                                </XStack>
+
+                                <YStack
+                                    flex={1}
+                                    alignItems="center"
+                                    marginTop={20}
                                 >
-                                    <Text
-                                    color={'$white'}
-                                    fontSize={16}  
-                                    >
-                                        Одноразовая
-                                    </Text>
-                                </Button>
-                            </XStack>
-
-                            <YStack marginTop={10} gap={15}>
-                                {typeOfHabit === 'reusable' &&
-                                    <CustomSelect
-                                        id={1}
-                                        placeholder='Интервал выполнения' 
-                                        height={50} 
-                                        width={SCREEN_WIDTH - 20}
-                                        options={optionIntervalExecution}
-                                        value={intervalExecution}
-                                        onChange={(e) => setIntervalExecution(e)}
-                                        isOpen={oneActive === 1 ? isOpen : false}
-                                        setIsOpen={(e) => setIsOpen(e)}
-                                        setOneActive={(e) => setOneActive(e)}
-                                    />
-                                }
-
-                                {
-                                    typeOfHabit === 'reusable' && 
-                                    intervalExecution === 'certain_days' && 
-                                    choiceOfDays
-                                }
-
-                                {
-                                    typeOfHabit === 'reusable' && 
-                                    intervalExecution === 'gap' && 
-                                    choiceOfGapInterval
-                                }
-
-                                <CustomSelect
-                                    id={2}
-                                    placeholder='Время суток' 
-                                    height={50} 
-                                    width={SCREEN_WIDTH - 20}
-                                    options={optionTimesOfDay}
-                                    value={timesOfDay}
-                                    onChange={(e) => setTimesOfDay(e)}
-                                    isOpen={oneActive === 2 ? isOpen : false}
-                                    setIsOpen={(e) => setIsOpen(e)}
-                                    setOneActive={(e) => setOneActive(e)}
-                                />
-                                <CustomSelect
-                                    id={3}
-                                    placeholder='Тип задачи' 
-                                    height={50} 
-                                    width={SCREEN_WIDTH - 20}
-                                    options={optionTypeOfTask}
-                                    value={typeOfTask}
-                                    onChange={(e) => setTypeOfTask(e)}
-                                    isOpen={oneActive === 3 ? isOpen : false}
-                                    setIsOpen={(e) => setIsOpen(e)}
-                                    setOneActive={(e) => setOneActive(e)}
-                                />
-
-                                {
-                                    typeOfTask === 'reusable_mark' &&
-                                    choiceQuantity
-                                }
-
-                                {
-                                    typeOfTask === 'timer' &&
-                                    <CustomTimePicker 
-                                        width={SCREEN_WIDTH / 2}
+                                    <CustomInput
+                                        value={habitName}
                                         height={50}
-                                        value={timerTime}
-                                        onChange={setTimerTime}
-                                        placeholder='Время'
-                                    />
-                                }
-
-                                <ReminderToggle
-                                    value={reminderOn}
-                                    onChange={setReminderOn}
-                                />
-
-                                {
-                                    reminderOn &&
-                                    <CustomTimePicker
                                         width={SCREEN_WIDTH - 20}
-                                        height={50}
-                                        value={reminderTime}
-                                        onChange={setReminderTime}
-                                        placeholder='Укажите время'
-                                        
+                                        placeholder='Название привычке'
+                                        onChange={(e) => {
+                                            if (typeof e === 'string') setHabitName(e)
+                                        }}
                                     />
-                                }
+                                    <XStack margin={10} justifyContent='center'>
+                                        <Button
+                                            borderTopRightRadius={0}
+                                            borderBottomRightRadius={0}
+                                            backgroundColor={typeOfHabit === 'reusable' ? '$blue' : "$gray"}
+                                            onPress={() => setTypeOfHabit('reusable')}
+                                            width={SCREEN_WIDTH / 2 - 20}
+                                        >
+                                            <Text
+                                                color={'$white'}
+                                                fontSize={16}
+                                            >
+                                                Регулярная
+                                            </Text>
+                                        </Button>
+                                        <Button
+                                            borderTopLeftRadius={0}
+                                            borderBottomLeftRadius={0}
+                                            backgroundColor={typeOfHabit === 'onetime' ? '$blue' : "$gray"}
+                                            onPress={() => {
+                                                setTypeOfHabit('onetime')
+                                            }}
+                                            width={SCREEN_WIDTH / 2 - 20}
+                                        >
+                                            <Text
+                                                color={'$white'}
+                                                fontSize={16}
+                                            >
+                                                Одноразовая
+                                            </Text>
+                                        </Button>
+                                    </XStack>
 
+                                    <YStack marginTop={10} gap={15}>
+                                        {typeOfHabit === 'reusable' &&
+                                            <CustomSelect
+                                                id={1}
+                                                placeholder='Интервал выполнения'
+                                                height={50}
+                                                width={SCREEN_WIDTH - 20}
+                                                options={optionIntervalExecution}
+                                                value={intervalExecution}
+                                                onChange={(e) => setIntervalExecution(e)}
+                                                isOpen={oneActive === 1 ? isOpen : false}
+                                                setIsOpen={(e) => setIsOpen(e)}
+                                                setOneActive={(e) => setOneActive(e)}
+                                            />
+                                        }
+
+                                        {
+                                            typeOfHabit === 'reusable' &&
+                                            intervalExecution === 'certain_days' &&
+                                            choiceOfDays
+                                        }
+
+                                        {
+                                            typeOfHabit === 'reusable' &&
+                                            intervalExecution === 'gap' &&
+                                            choiceOfGapInterval
+                                        }
+
+                                        <CustomSelect
+                                            id={2}
+                                            placeholder='Время суток'
+                                            height={50}
+                                            width={SCREEN_WIDTH - 20}
+                                            options={optionTimesOfDay}
+                                            value={timesOfDay}
+                                            onChange={(e) => setTimesOfDay(e)}
+                                            isOpen={oneActive === 2 ? isOpen : false}
+                                            setIsOpen={(e) => setIsOpen(e)}
+                                            setOneActive={(e) => setOneActive(e)}
+                                        />
+                                        <CustomSelect
+                                            id={3}
+                                            placeholder='Тип задачи'
+                                            height={50}
+                                            width={SCREEN_WIDTH - 20}
+                                            options={optionTypeOfTask}
+                                            value={typeOfTask}
+                                            onChange={(e) => setTypeOfTask(e)}
+                                            isOpen={oneActive === 3 ? isOpen : false}
+                                            setIsOpen={(e) => setIsOpen(e)}
+                                            setOneActive={(e) => setOneActive(e)}
+                                        />
+
+                                        {
+                                            typeOfTask === 'reusable_mark' &&
+                                            choiceQuantity
+                                        }
+
+                                        {
+                                            typeOfTask === 'timer' &&
+                                            <CustomTimePicker
+                                                width={SCREEN_WIDTH / 2}
+                                                height={50}
+                                                value={timerTime}
+                                                onChange={setTimerTime}
+                                                placeholder='Время'
+                                            />
+                                        }
+
+                                        <ReminderToggle
+                                            value={reminderOn}
+                                            onChange={setReminderOn}
+                                        />
+
+                                        {
+                                            reminderOn &&
+                                            <CustomTimePicker
+                                                width={SCREEN_WIDTH - 20}
+                                                height={50}
+                                                value={reminderTime}
+                                                onChange={setReminderTime}
+                                                placeholder='Укажите время'
+
+                                            />
+                                        }
+
+                                    </YStack>
+                                    <YStack gap={10} marginTop={50} marginBottom={50}>
+                                        <View height={50} width={SCREEN_WIDTH - 20}>
+                                            {alertShow && <Text fontSize={SCREEN_WIDTH_400 ? 14 : 16} color={'red'}>{`Ошибка сохранения: ${alertMessage}`}</Text>}
+                                        </View>
+                                        <Button
+                                            fontSize={16}
+                                            color={'white'}
+                                            width={SCREEN_WIDTH - 20}
+                                            size={'$5'}
+                                            backgroundColor={'$blue'}
+                                            onPress={() => saveHabit()}
+                                        >
+                                            Сохранить
+                                        </Button>
+                                        <Button
+                                            fontSize={16}
+                                            color={'white'}
+                                            width={SCREEN_WIDTH - 20}
+                                            size={'$5'}
+                                            backgroundColor={'$gray'}
+                                            onPress={() => router.back()}
+                                        >
+                                            Отмена
+                                        </Button>
+                                        {
+                                            habitId &&
+                                            <Button
+                                                fontSize={16}
+                                                color={'white'}
+                                                width={SCREEN_WIDTH - 20}
+                                                size={'$5'}
+                                                backgroundColor={'red'}
+                                                onPress={() => deleteHabit()}
+                                            >
+                                                Удалить
+                                            </Button>
+                                        }
+                                    </YStack>
+                                </YStack>
                             </YStack>
-                            <YStack gap={10} marginTop={50} marginBottom={50}>
-                                <View height={50} width={SCREEN_WIDTH - 20}>
-                                    {alertShow && <Text  fontSize={SCREEN_WIDTH_400 ? 14 : 16} color={'red'}>{`Ошибка сохранения: ${alertMessage}`}</Text>}
-                                </View>
-                                <Button 
-                                    fontSize={16} 
-                                    color={'white'} 
-                                    width={SCREEN_WIDTH - 20}
-                                    size={'$5'}
-                                    backgroundColor={'$blue'}
-                                    onPress={() => saveHabit()}
-                                >
-                                    Сохранить
-                                </Button>
-                                <Button 
-                                    fontSize={16} 
-                                    color={'white'} 
-                                    width={SCREEN_WIDTH - 20}
-                                    size={'$5'}
-                                    backgroundColor={'$gray'} 
-                                    onPress={() => router.back()}
-                                >
-                                    Отмена
-                                </Button>
-                                {
-                                    habitId &&
-                                    <Button 
-                                        fontSize={16} 
-                                        color={'white'} 
-                                        width={SCREEN_WIDTH - 20}
-                                        size={'$5'}
-                                        backgroundColor={'red'} 
-                                        onPress={() => deleteHabit()}
-                                    >
-                                        Удалить
-                                    </Button>
-                                }
-                            </YStack>
-                        </YStack>
+                        </ScrollView>
                     </YStack>
-                </ScrollView>
-                </YStack>
-            </PortalProvider>
-        </SafeAreaView>
+                </PortalProvider>
+            </SafeAreaView>
         </View>
     )
 }

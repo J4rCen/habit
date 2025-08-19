@@ -30,6 +30,7 @@ export interface IHabitTask {
 		quantity?: number | null
 		reminder: boolean
 		reminder_time?: string | null
+		notificationsId?: string | null,
 	}
 	habitStatic: Record<string, StaticConfig> | null
 }
@@ -38,7 +39,7 @@ interface IStore {
 	habitTask: Record<string, IHabitTask>
 	startDateUser: string | null
 	_hasHydrated: boolean
-	_isFirstLaunch: boolean,
+	_isFirstLaunch: boolean
 	setHasHydrated: (state: boolean) => void
 	initializeApp: () => void
 	setStartDateUser: (date: Dayjs) => void
@@ -47,7 +48,7 @@ interface IStore {
 	getIsCompleat: (habitId: string) => Record<string, StaticConfig> | null
 	getHabitTask: (habitId: string) => IHabitTask | null
 	updateHabitTask: (habitId: string, habitConfig: Omit<IHabitTask, 'habitId'>) => void
-	removeHabitTask: (habitId: string) => void
+	removeHabitTask: (habitId: string) => void,
 }
 
 const useStore = create<IStore>()(
