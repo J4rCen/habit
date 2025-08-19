@@ -32,7 +32,7 @@ const getWeek = (startOfWeek: Dayjs): Dayjs[] => {
 	return Array.from({ length: 7 }, (_, i) => startOfWeek.add(i, "day"));
 };
 
-const generateInitialWeeks = (startDate: Dayjs, endDate: Dayjs = dayjs()): Dayjs[][] => {
+const generateInitialWeeks = (startDate: Dayjs, endDate: Dayjs = dayjs().add(1, 'week')): Dayjs[][] => {
 	const weeks: Dayjs[][] = [];
 
 	let currentWeekStart = startDate.startOf("isoWeek");
@@ -89,7 +89,8 @@ const SlidingCalendar = memo(({ selectDate, setSelectDate }: ISlidingCalendar) =
 		if (
 			!scrollTriggered.current &&
 			todayIndexRef.current !== null &&
-			flatListRef.current
+			flatListRef.current &&
+			todayIndexRef.current < weeks.length
 		) {
 			scrollTriggered.current = true;
 			flatListRef.current.scrollToIndex({

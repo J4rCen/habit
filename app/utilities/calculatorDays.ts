@@ -17,10 +17,9 @@ function getNextRenderBaseDate(
   const today = dayjs();
   const cycleLength = daysInRow + skipDays;
 
-  // начинаем считать с сегодняшнего дня
   let offset = today.diff(start, "day");
 
-  if (offset < 0) offset = 0; // если today раньше dayOfCreate
+  if (offset < 0) offset = 0;
 
   while (true) {
     const cycleDay = offset % cycleLength;
