@@ -66,6 +66,7 @@ const CreateNewHabits = () => {
             setAlertShow(true)
             return
         }
+        
 
         if (intervalExecution === 'certain_days' && daysOfWeek.length === 0) {
             setAlertMessage('Необходимо выбрать хотя бы один день недели')
@@ -76,21 +77,30 @@ const CreateNewHabits = () => {
         const hid = habitId ? habitId as string : nanoid()
 
         if (reminderOn) {
-            const id = await SetNotifications(intervalExecution, reminderTime, {
-                name: habitName,
-                habitId: hid,
-                daysOfWeek,
-                daysInRow,
-                skipDays,
-                dayOfCreate
-            })
+            try {
+                const id = await SetNotifications(intervalExecution, reminderTime, {
+                    name: habitName,
+                    habitId: hid,
+                    notid: notificationsId.current,
+                    daysOfWeek,
+                    daysInRow,
+                    skipDays,
+                    dayOfCreate
+                })
 
-            notificationsId.current = id
+                notificationsId.current = id
+            } catch (error) {
+                console.log(error)
+            }
         }
 
         if (reminderOn === false && habitConfig?.notificationsId) {
-            await CancelNotificationAsync(intervalExecution, habitConfig?.notificationsId, habitConfig.name)
-            notificationsId.current = null
+            try {
+                await CancelNotificationAsync(intervalExecution, habitConfig?.notificationsId, hid)
+                notificationsId.current = null
+            } catch (error) {
+                console.log(error)
+            }
         }
 
         const newHabitData: IHabitTask = {
@@ -146,7 +156,13 @@ const CreateNewHabits = () => {
                 {
                     text: "Удалить",
                     style: "destructive",
-                    onPress: () => {
+                    onPress: async () => {
+
+                        if (habitConfig?.notificationsId) {
+                            await CancelNotificationAsync(intervalExecution, habitConfig?.notificationsId, habitId as string)
+                            notificationsId.current = null
+                        }
+
                         store.removeHabitTask(habitId as string)
                         router.back()
                     },
@@ -154,6 +170,7 @@ const CreateNewHabits = () => {
             ]
         );
     }
+
 
     const toggleDay = (day: string) => {
         setDaysOfWeek((prev) =>
@@ -429,15 +446,7 @@ const CreateNewHabits = () => {
                                             width={SCREEN_WIDTH - 20}
                                             size={'$5'}
                                             backgroundColor={'$gray'}
-                                            onPress={ async () => {
-
-                                                if (reminderOn === false && habitConfig?.notificationsId) {
-                                                    await CancelNotificationAsync(intervalExecution, habitConfig?.notificationsId, habitConfig.name)
-                                                    notificationsId.current = null
-                                                }
-
-                                                router.back()
-                                            }}
+                                            onPress={() => router.back()}
                                         >
                                             Отмена
                                         </Button>
