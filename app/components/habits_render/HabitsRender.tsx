@@ -1,5 +1,5 @@
 import { DATE_FORMAT, SCREEN_HEIGHT, SCREEN_WIDTH, SCREEN_WIDTH_400 } from "@/app/constants"
-import { IHabitTask } from '@/app/store/zustand'
+import useStore, { IHabitTask } from '@/app/store/zustand'
 import dayjs from 'dayjs'
 import customParseFormat from 'dayjs/plugin/customParseFormat'
 import React, { useEffect, useState } from "react"
@@ -17,6 +17,7 @@ interface IHabitRender {
 const HabitsRender = (props: IHabitRender) => {
     
     const [HabitCards, setHabitCards] = useState<Array<React.ReactNode>>([])
+    const dataStart = useStore(store => store.startDateUser)
 
     useEffect(() => {
         setHabitCards(props.habitsStore
@@ -42,6 +43,7 @@ const HabitsRender = (props: IHabitRender) => {
                     habitId={item.habitId}
                     habitConfig={item.habitConfig}
                     selectDate={props.selectDate}
+                    dataStart={dataStart as string}
                 />
             )
         }))

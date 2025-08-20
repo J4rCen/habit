@@ -9,12 +9,13 @@ import CircularProgress from "./circularProgress"
 interface IHabitCard {
     habitId: string
     habitConfig: IHabitTask['habitConfig']
-    selectDate: string
+    selectDate: string,
+    dataStart: string
 }
 
 const round = (num: number, precision: number = 6) => Math.round(num * Math.pow(10, precision)) / Math.pow(10, precision)
 
-const HabitCard = ({habitId, habitConfig, selectDate}: IHabitCard) => {
+const HabitCard = ({ habitId, habitConfig, selectDate, dataStart }: IHabitCard) => {
 
     const setIsCompleat = useStore(store => store.setIsCompleat)
     const getIsCompleat = useStore(store => store.getIsCompleat(habitId)?.[`${selectDate}`])
@@ -29,7 +30,7 @@ const HabitCard = ({habitId, habitConfig, selectDate}: IHabitCard) => {
         } else {
             setProgress(0)
         }
-        }, [getIsCompleat, selectDate]
+    }, [getIsCompleat, selectDate]
     )
 
     const CircularProgressType = () => {
@@ -59,12 +60,12 @@ const HabitCard = ({habitId, habitConfig, selectDate}: IHabitCard) => {
 
             const times = habitConfig.timer_time?.split(":")
             const elapsed = getIsCompleat ? getIsCompleat.elapsed : 0
-            
+
             const hours = parseInt(times[0]) * 60 * 60
             const minutes = parseInt(times[1]) * 60
 
             return (
-                <View onPress={() => router.navigate({pathname: '../../screens/timer', params: {timer: hours + minutes, habitId, selectDate }})}>
+                <View onPress={() => router.navigate({ pathname: '../../screens/timer', params: { timer: hours + minutes, habitId, selectDate } })}>
                     <CircularProgress
                         goalType='timer'
                         duration={hours + minutes}
@@ -94,10 +95,10 @@ const HabitCard = ({habitId, habitConfig, selectDate}: IHabitCard) => {
             }
 
             setProgress(newProgress)
-            setIsCompleat(habitId, selectDate, { 
-                isCompleat: newProgress, 
-                total: max, 
-                value: newProgress 
+            setIsCompleat(habitId, selectDate, {
+                isCompleat: newProgress,
+                total: max,
+                value: newProgress
             })
         }
     }
@@ -105,12 +106,12 @@ const HabitCard = ({habitId, habitConfig, selectDate}: IHabitCard) => {
     return (
         <Select open={isOpen} onOpenChange={setIsOpen}>
             <YStack
-                height={70} 
+                height={70}
                 backgroundColor={'$gray'}
                 borderRadius={10}
                 zIndex={2}
             >
-                <XStack 
+                <XStack
                     flex={1}
                     alignItems="center"
                 >
@@ -130,28 +131,28 @@ const HabitCard = ({habitId, habitConfig, selectDate}: IHabitCard) => {
                         }}
                         borderWidth={0}
                         borderColor={'none'}
-                        
+
                     >
                         <Text
-                                color={'white'}
-                                fontSize={22}
-                                marginLeft={10}
-                            >
-                                {habitConfig.name}
-                            </Text>
+                            color={'white'}
+                            fontSize={22}
+                            marginLeft={10}
+                        >
+                            {habitConfig.name}
+                        </Text>
                     </Select.Trigger>
-                    <TouchableOpacity 
-                        style={{width: '30%', height: '100%', justifyContent: 'center', alignItems: 'center'}} 
+                    <TouchableOpacity
+                        style={{ width: '30%', height: '100%', justifyContent: 'center', alignItems: 'center' }}
                         onPress={() => progressUpdate()}
                     >
-                        <CircularProgressType/>
+                        <CircularProgressType />
                     </TouchableOpacity>
                 </XStack>
             </YStack>
             {isOpen &&
                 <Select.Content>
                     <Select.FocusScope focusOnIdle={true}>
-                        <YStack 
+                        <YStack
                             backgroundColor={'#2C2F35'}
                             width={'100%'}
                             padding={10}
@@ -164,9 +165,9 @@ const HabitCard = ({habitId, habitConfig, selectDate}: IHabitCard) => {
                             gap={10}
                         >
                             <XStack>
-                                <TouchableOpacity 
-                                    style={{width: '100%'}}
-                                    onPress={() => router.navigate({pathname: '/screens/create_new_habits', params: {habitId}})}    
+                                <TouchableOpacity
+                                    style={{ width: '100%' }}
+                                    onPress={() => router.navigate({ pathname: '/screens/create_new_habits', params: { habitId } })}
                                 >
                                     <Text
                                         color={'white'}
@@ -176,14 +177,23 @@ const HabitCard = ({habitId, habitConfig, selectDate}: IHabitCard) => {
                                     </Text>
                                 </TouchableOpacity>
                             </XStack>
-                            <XStack>
-                                <Text
-                                    color={'white'}
-                                    fontSize={'$4.5'}
-                                >
-                                    Статистика
-                                </Text>
-                            </XStack>
+                            {
+                                habitConfig.type_of_habit === 'reusable' ?
+                                    <XStack>
+                                        <TouchableOpacity
+                                            style={{ width: '100%' }}
+                                            onPress={() => router.navigate({ pathname: '/screens/statistics', params: { habitId: habitId, habitName: habitConfig.name, dataStart: dataStart, habitStart: habitConfig.day_of_create } })}
+                                        >
+                                            <Text
+                                                color={'white'}
+                                                fontSize={'$4.5'}
+                                            >
+                                                Статистика
+                                            </Text>
+                                        </TouchableOpacity>
+                                    </XStack> :
+                                    null
+                            }
                         </YStack>
                     </Select.FocusScope>
                 </Select.Content>

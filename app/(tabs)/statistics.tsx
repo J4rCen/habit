@@ -17,17 +17,24 @@ const Statistics = () => {
         return store.filter((item) => {
             if (searchValue === '' || undefined) return true
             return item.habitConfig.name.toLowerCase().includes(searchValue.toLowerCase())
+        }).filter((item) => {
+            if (item.habitConfig.type_of_habit === 'onetime') {
+                return false
+            }
+
+            return true
+            
         }).map((item, index) => {
             return (
-                <TouchableOpacity key={index} onPress={() => router.navigate({pathname: '/screens/statistics', params: {habitId: item.habitId, habitName: item.habitConfig.name, dataStart: dataStart, habitStart: item.habitConfig.day_of_create}})}>
-                    <XStack 
-                        height={SCREEN_WIDTH_400 ? 50 : 60} 
-                        width={'100%'} 
-                        backgroundColor={'$gray'} 
+                <TouchableOpacity key={index} onPress={() => router.navigate({ pathname: '/screens/statistics', params: { habitId: item.habitId, habitName: item.habitConfig.name, dataStart: dataStart, habitStart: item.habitConfig.day_of_create } })}>
+                    <XStack
+                        height={SCREEN_WIDTH_400 ? 50 : 60}
+                        width={'100%'}
+                        backgroundColor={'$gray'}
                         borderRadius={10}
                         alignItems="center"
                     >
-                        <Text 
+                        <Text
                             marginLeft={10}
                             color={'white'}
                             fontSize={18}
@@ -61,7 +68,7 @@ const Statistics = () => {
                                 value={searchValue}
                                 onChange={(e) => {
                                     if (typeof e === 'string')
-                                    setSearchValue(e)
+                                        setSearchValue(e)
                                 }}
                                 placeholder="Поиск"
                                 height={50}
@@ -72,19 +79,19 @@ const Statistics = () => {
                             <ScrollView>
                                 <View gap={10} alignContent="center">
                                     {
-                                        habitListTask.length !== 0 ? habitListTask : 
-                                        <Text color={'white'} textAlign="center" width={SCREEN_WIDTH - 20} fontSize={SCREEN_WIDTH_400 ? 16 : 18}>
-                                            {
-                                                store.length > 0 ? 
-                                                'Привычка с таким названием не найдена' : 
-                                                'Для отражения статистики создайте хотя бы одну привычку'
-                                            }
-                                        </Text>
+                                        habitListTask.length !== 0 ? habitListTask :
+                                            <Text color={'white'} textAlign="center" width={SCREEN_WIDTH - 20} fontSize={SCREEN_WIDTH_400 ? 16 : 18}>
+                                                {
+                                                    store.length > 0 ?
+                                                        'Привычка с таким названием не найдена' :
+                                                        'Для отражения статистики создайте хотя бы одну привычку'
+                                                }
+                                            </Text>
                                     }
                                 </View>
                             </ScrollView>
                         </YStack>
-                    </YStack>   
+                    </YStack>
                 </YStack>
             </SafeAreaView>
         </View>
