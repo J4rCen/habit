@@ -21,6 +21,7 @@ dayjs.locale(localeRu);
 
 const Statistics = () => {
     const {habitId, habitName, dataStart, habitStart} = useLocalSearchParams()
+    const habitConfig: IHabitTask['habitConfig'] | undefined = useStore(store => store.getHabitTask(habitId as string)?.habitConfig) 
     const statistics: IHabitTask['habitStatic'] = useStore(store => store.getIsCompleat(habitId as string))
     const pastDays = dayjs().diff(dayjs(habitStart as string), 'day') + 1
     
@@ -44,6 +45,7 @@ const Statistics = () => {
                         <YStack gap={10}>
                             
                             <CalendarChart
+                                habitConfig={habitConfig as IHabitTask['habitConfig']}
                                 dataStart={dataStart as string}
                                 statistics={statistics}
                                 pastDays={pastDays}
