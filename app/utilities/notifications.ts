@@ -16,6 +16,7 @@ interface ISetNotifications {
     dayOfCreate?: string,
     habitId: string
     notid?: string | null,
+    typeOfHabit?: string
 }
 
 Notifications.setNotificationHandler({
@@ -46,9 +47,6 @@ export const GetPermissionAccess = async () => {
 }
 
 export const CancelNotificationAsync = async (type: string, id: string, habitId: string) => {
-
-    console.log('Notid: ', id)
-
     try {
         if (type === 'every_day') {
             try {
@@ -89,6 +87,28 @@ export const CancelNotificationAsync = async (type: string, id: string, habitId:
 
 const SetNotifications = async (type: string, time: string, option: ISetNotifications) => {
     const [hour, minute] = time.split(':')
+
+    if (option.typeOfHabit === 'onetime') {
+
+        try {
+            const notificationId = await Notifications.scheduleNotificationAsync({
+                content: {
+                    title: 'Напоминание',
+                    body: `Пора выполнить ${option.name}`,
+                    data: { habitId: option.habitId }
+                },
+                trigger: {
+                    type: Notifications.SchedulableTriggerInputTypes.TIME_INTERVAL,
+                    repeats: false,
+                    seconds: 60 * (Number.isFinite(Number(minute)) ? Number(minute) : 1) * (Number.isFinite(Number(hour)) ? Number(hour) : 1)
+                }
+            })
+
+            return notificationId
+        } catch (error) {
+            console.log(error)
+        }
+    }
 
     if (type === 'every_day') {
 
