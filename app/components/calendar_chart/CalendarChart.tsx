@@ -1,10 +1,11 @@
 import { DATE_FORMAT } from "@/app/constants";
 import { IHabitTask } from "@/app/store/zustand";
+import { ArrowLeft, ArrowRight } from "@/app/svgs/arrowBarCart";
 import dayjs from "dayjs";
 import customParseFormat from 'dayjs/plugin/customParseFormat';
 import React, { useMemo, useState } from "react";
 import { Calendar, LocaleConfig } from "react-native-calendars";
-import { YStack } from "tamagui";
+import { View, YStack } from "tamagui";
 
 LocaleConfig.locales.ru = {
     monthNames: [
@@ -69,8 +70,6 @@ const CalendarChart = ({ dataStart, statistics, pastDays, habitStart, habitConfi
             const cycleDay = days_in_row + skip_days
             const diffDay = dayjs().diff(dayjs(habitConfig.day_of_create, DATE_FORMAT), 'day')
 
-            console.log('diffDay: ', diffDay)
-
             for (let i = 0; i <= diffDay; i++) {
                 const cycleLength = i % cycleDay
 
@@ -91,6 +90,11 @@ const CalendarChart = ({ dataStart, statistics, pastDays, habitStart, habitConfi
         <YStack>
             <Calendar
                 current={currentMonth}
+                renderArrow={(direction) => 
+                    direction === 'left' ?
+                    disableArrowLeft ? <View padding={10}/> : <ArrowLeft color='#fff' size={20}/> :
+                    <ArrowRight color='#fff' size={20}/>
+                }
                 onMonthChange={onMonthChange}
                 disableArrowLeft={disableArrowLeft}
                 firstDay={1}

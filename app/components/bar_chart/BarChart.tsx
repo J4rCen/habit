@@ -1,12 +1,17 @@
 import { SCREEN_WIDTH, SCREEN_WIDTH_400 } from '@/app/constants';
 import { IHabitTask } from '@/app/store/zustand';
+import { ArrowLeft, ArrowRight } from '@/app/svgs/arrowBarCart';
 import f from '@/assets/fonts/Inter_28pt-Regular.ttf';
 import { Text as SkiaText, useFont } from '@shopify/react-native-skia';
 import dayjs from 'dayjs';
+import customParserFormat from 'dayjs/plugin/customParseFormat';
 import React, { useEffect, useState } from 'react';
 import { StyleSheet, TouchableOpacity } from 'react-native';
-import { ScrollView, Text, XStack, YStack } from 'tamagui';
+import { ScrollView, Text, View, XStack, YStack } from 'tamagui';
 import { Bar, CartesianChart } from 'victory-native';
+
+
+dayjs.extend(customParserFormat)
 
 interface IBarChart {
     habitStart: string;
@@ -83,12 +88,17 @@ const BarChart = ({ habitStart, statistics }: IBarChart) => {
             <XStack marginBottom={20} justifyContent='space-around' height={30} alignItems='center'>
                 {barTime === 'month' && (
                     <>
-                        <TouchableOpacity style={{ padding: 5 }} onPress={() => changeYear('back')}>
-                            <Text color={'white'} fontSize={18}>{'<'}</Text>
-                        </TouchableOpacity>
+                        {   
+
+                            dayjs(selectYear, 'YYYY').isSameOrBefore(dayjs(habitStart).format('YYYY')) ?
+                                <View style={{ padding: 15 }}/>
+                            : <TouchableOpacity style={{ padding: 5 }} onPress={() => changeYear('back')}>
+                                <ArrowLeft color='#fff' size={20} />
+                            </TouchableOpacity>
+                        }
                         <Text color={'white'} fontSize={18}>{selectYear}</Text>
                         <TouchableOpacity style={{ padding: 5 }} onPress={() => changeYear('next')}>
-                            <Text color={'white'} fontSize={18}>{'>'}</Text>
+                            <ArrowRight color='#fff' size={20} />
                         </TouchableOpacity>
                     </>
                 )}
