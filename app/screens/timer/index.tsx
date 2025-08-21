@@ -28,6 +28,7 @@ const Timer = () => {
     );
 
     const [timerStart, setTimerStart] = useState(false);
+    const [startTime, setStartTime] = useState<number | null>(null);
     const [elapsed, setElapsed] = useState(isCompleatData?.elapsed ?? 0);
     const [isFinish, setIsFinish] = useState(isCompleatData?.isCompleat ?? 0);
 
@@ -67,9 +68,9 @@ const Timer = () => {
                         text: "Выйти",
                         style: "destructive",
                         onPress: () => {
-                        setTimerStart(false);
-                        updateCompletion(elapsedRef.current, false);
-                        navigation.dispatch(e.data.action);
+                            setTimerStart(false);
+                            updateCompletion(elapsedRef.current, false);
+                            navigation.dispatch(e.data.action);
                         },
                     },
                 ]
@@ -79,9 +80,19 @@ const Timer = () => {
         return navigation.addListener("beforeRemove", beforeRemove);
     }, [navigation, updateCompletion]);
 
+    const startTimer = () => {
+        setTimerStart(true)
+        setStartTime(Date.now() - elapsed * 1000);
+    };
+
     useEffect(() => {
         if (!timerStart) return;
-        const interval = setInterval(() => setElapsed((prev) => prev + 1), 1000);
+        if (!startTime) return 
+        const interval = setInterval(() => {
+            const diff = Math.floor((Date.now() - startTime) / 1000);
+            setElapsed(diff);
+        }, 1000);
+
         return () => clearInterval(interval);
     }, [timerStart]);
 
@@ -93,7 +104,6 @@ const Timer = () => {
         }
     }, [elapsed, duration, isFinish, updateCompletion]);
 
-    const startTimer = () => setTimerStart(true);
     const stopTimer = () => {
         setTimerStart(false);
         updateCompletion(elapsed, false);
@@ -137,24 +147,24 @@ const Timer = () => {
                         />
                         <YStack marginTop={20} gap={5} width={SCREEN_WIDTH - 40}>
                             {!timerStart && isFinish !== 1 && (
-                            <Button
-                                size="$5"
-                                onPress={startTimer}
-                                backgroundColor="$blue"
-                            >
-                                <Text color="white" fontSize={18}>Старт</Text>
-                            </Button>
+                                <Button
+                                    size="$5"
+                                    onPress={startTimer}
+                                    backgroundColor="$blue"
+                                >
+                                    <Text color="white" fontSize={18}>Старт</Text>
+                                </Button>
                             )}
 
                             {timerStart && isFinish !== 1 && (
-                            <>
-                                <Button size="$5" onPress={stopTimer} backgroundColor="$blue">
-                                    <Text color="white" fontSize={18}>Стоп</Text>
-                                </Button>
-                                <Button size="$5" onPress={resetTimer} backgroundColor="$gray">
-                                    <Text color="white" fontSize={18}>Сбросить таймер</Text>
-                                </Button>
-                            </>
+                                <>
+                                    <Button size="$5" onPress={stopTimer} backgroundColor="$blue">
+                                        <Text color="white" fontSize={18}>Стоп</Text>
+                                    </Button>
+                                    <Button size="$5" onPress={resetTimer} backgroundColor="$gray">
+                                        <Text color="white" fontSize={18}>Сбросить таймер</Text>
+                                    </Button>
+                                </>
                             )}
                         </YStack>
                     </YStack>
@@ -163,28 +173,28 @@ const Timer = () => {
                         width={SCREEN_WIDTH}
                         padding={10}
                         backgroundColor="$dark"
-                        
-                        
+
+
                     >
                         {isFinish !== 1 ? (
                             <Button
-                            width={SCREEN_WIDTH - 40}
-                            size="$5"
-                            alignSelf="center"
-                            backgroundColor="$green"
-                            onPress={completeTimer}
+                                width={SCREEN_WIDTH - 40}
+                                size="$5"
+                                alignSelf="center"
+                                backgroundColor="$green"
+                                onPress={completeTimer}
                             >
-                            <Text color="white" fontSize={18}>Завершить</Text>
+                                <Text color="white" fontSize={18}>Завершить</Text>
                             </Button>
                         ) : (
                             <Button
-                            width={SCREEN_WIDTH - 40}
-                            size="$5"
-                            alignSelf="center"
-                            backgroundColor="red"
-                            onPress={resetTimer}
+                                width={SCREEN_WIDTH - 40}
+                                size="$5"
+                                alignSelf="center"
+                                backgroundColor="red"
+                                onPress={resetTimer}
                             >
-                            <Text color="white" fontSize={18}>Сбросить результат</Text>
+                                <Text color="white" fontSize={18}>Сбросить результат</Text>
                             </Button>
                         )}
                     </YStack>

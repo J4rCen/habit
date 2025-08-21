@@ -48,7 +48,6 @@ const PieChart = ({pastDays, statistics}: IPieChart) => {
 
     return (
         <YStack backgroundColor={'$gray'} borderRadius={10}>
-
             <View>
                 <View height={300} alignContent="center" justifyContent="center">
                     <PolarChart data={data} valueKey="value" labelKey="label" colorKey="color">
@@ -58,9 +57,6 @@ const PieChart = ({pastDays, statistics}: IPieChart) => {
                                 const inner = slice.innerRadius ?? 50;
 
                                 let radiusOffset = ((outer + inner) / (2 * outer));
-
-                                
-
                                 const percent = total > 0 ? (slice.value / total) * 100 : 0;
                                 const text = `${Math.round(percent)}%`;
 
