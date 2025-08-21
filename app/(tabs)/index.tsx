@@ -17,7 +17,7 @@ import SlidingCalendar from "../components/sliding_calendar/SlidingCalendar";
 import { SCREEN_HEIGHT, SCREEN_WIDTH, SCREEN_WIDTH_400 } from "../constants";
 import useStore, { IHabitTask } from "../store/zustand";
 import getNextRenderBaseDate from '../utilities/calculatorDays';
-import SetNotifications, { GetPermissionAccess } from '../utilities/notifications';
+import SetNotifications from '../utilities/notifications';
 
 dayjs.extend(isoWeek);
 dayjs.extend(weekday);
@@ -34,7 +34,6 @@ export default function Index() {
 
     useEffect(() => {
         initApp()
-        GetPermissionAccess()
         const registerBackgroundTask = async () => {
             try {
                 await BackgroundTask.registerTaskAsync(REFRESH_NOTIFICATION, {

@@ -5,7 +5,7 @@ import CustomTimePicker from '@/app/components/timepicker/CustomTimePicker';
 import { DATE_FORMAT, SCREEN_HEIGHT, SCREEN_WIDTH, SCREEN_WIDTH_400, WEEK_DAYS } from '@/app/constants';
 import useStore, { IHabitTask } from '@/app/store/zustand';
 import ArrowBack from '@/app/svgs/arrowBack';
-import SetNotifications, { CancelNotificationAsync } from '@/app/utilities/notifications';
+import SetNotifications, { CancelNotificationAsync, GetPermissionAccess } from '@/app/utilities/notifications';
 import { PortalProvider } from '@tamagui/portal';
 import dayjs from 'dayjs';
 import { router, useLocalSearchParams } from 'expo-router';
@@ -29,9 +29,9 @@ const CreateNewHabits = () => {
     const [timesOfDay, setTimesOfDay] = useState<string>(habitConfig && habitConfig.times_of_day ? habitConfig.times_of_day : "all")
     const [typeOfTask, setTypeOfTask] = useState<string>(habitConfig && habitConfig.type_of_task ? habitConfig.type_of_task : "single_mark")
     const [daysOfWeek, setDaysOfWeek] = useState<string[]>(habitConfig && habitConfig.days_of_week ? habitConfig.days_of_week : [])
-    const [daysInRow, setDaysInRow] = useState<number>(habitConfig && habitConfig.gap_interval?.days_in_row ? habitConfig.gap_interval.days_in_row : 0)
-    const [skipDays, setSkipDays] = useState<number>(habitConfig && habitConfig.gap_interval?.skip_days ? habitConfig.gap_interval.skip_days : 0)
-    const [quantity, setQuantity] = useState<number>(habitConfig && habitConfig.quantity ? habitConfig.quantity : 0)
+    const [daysInRow, setDaysInRow] = useState<number | string>(habitConfig && habitConfig.gap_interval?.days_in_row ? habitConfig.gap_interval.days_in_row : '')
+    const [skipDays, setSkipDays] = useState<number | string>(habitConfig && habitConfig.gap_interval?.skip_days ? habitConfig.gap_interval.skip_days : '')
+    const [quantity, setQuantity] = useState<number | string>(habitConfig && habitConfig.quantity ? habitConfig.quantity : '')
     const [timerTime, setTimerTime] = useState(habitConfig && habitConfig.timer_time ? habitConfig.timer_time : '00:00')
     const [reminderOn, setReminderOn] = useState(habitConfig && habitConfig.reminder ? habitConfig.reminder : false)
     const [reminderTime, setReminderTime] = useState(
@@ -59,17 +59,70 @@ const CreateNewHabits = () => {
         return () => clearInterval(interval)
     }, [alertShow])
 
+    const reminder = async () => {
+
+        const permission = await GetPermissionAccess()
+
+        if (permission === 'granted' && !reminderOn) {
+            setReminderOn(true)
+        } else {
+
+            if (permission === 'denied') {
+                setAlertMessage('Для работы напоминаний необходимо разрешить уведомления')
+                setAlertShow(true)
+            }
+
+            setReminderOn(false)
+        }
+
+    }
+
     const saveHabit = async () => {
 
         if (habitName.length === 0) {
-            setAlertMessage('Название привычке не может быть пустым')
+            setAlertMessage('Ошибка сохранения: Название привычке не может быть пустым')
             setAlertShow(true)
             return
         }
-        
 
         if (intervalExecution === 'certain_days' && daysOfWeek.length === 0) {
-            setAlertMessage('Необходимо выбрать хотя бы один день недели')
+            setAlertMessage('Ошибка сохранения: Необходимо выбрать хотя бы один день недели')
+            setAlertShow(true)
+            return
+        }
+
+        if (intervalExecution === 'gap' && typeof daysInRow === 'string') {
+            setAlertMessage('Ошибка сохранения: Количество дней активности должно быть числом')
+            setAlertShow(true)
+            return
+        }
+
+        if (intervalExecution === 'gap' && Number(daysInRow) === 0) {
+            setAlertMessage('Ошибка сохранения: Количество дней активности не должны быть равны нулю')
+            setAlertShow(true)
+            return
+        }
+
+        if (intervalExecution === 'gap' && typeof skipDays === 'string') {
+            setAlertMessage('Ошибка сохранения: Значение для отдыха должно быть числом')
+            setAlertShow(true)
+            return
+        }
+
+        if (intervalExecution === 'gap' && Number(skipDays) === 0) {
+            setAlertMessage('Ошибка сохранения: Количество дней отдыха не должны быть равны нулю')
+            setAlertShow(true)
+            return
+        }
+
+        if (typeOfTask === 'reusable_mark' && typeof quantity === 'string') {
+            setAlertMessage('Ошибка сохранения: Количество должно быть числом')
+            setAlertShow(true)
+            return
+        }
+
+        if (typeOfTask === 'reusable_mark' && Number(quantity) === 0) {
+            setAlertMessage('Ошибка сохранения: Количество не должны быть равны нулю')
             setAlertShow(true)
             return
         }
@@ -83,8 +136,8 @@ const CreateNewHabits = () => {
                     habitId: hid,
                     notid: notificationsId.current,
                     daysOfWeek,
-                    daysInRow,
-                    skipDays,
+                    daysInRow: Number(daysInRow),
+                    skipDays: Number(skipDays),
                     dayOfCreate
                 })
 
@@ -119,7 +172,7 @@ const CreateNewHabits = () => {
                         null,
                 gap_interval:
                     intervalExecution === 'gap' ?
-                        { days_in_row: daysInRow, skip_days: skipDays } :
+                        { days_in_row: Number(daysInRow), skip_days: Number(skipDays) } :
                         null,
                 times_of_day: timesOfDay as 'all' | 'morning' | 'day' | 'evening',
                 type_of_task: typeOfTask as 'single_mark' | 'reusable_mark' | 'timer',
@@ -129,7 +182,7 @@ const CreateNewHabits = () => {
                         null,
                 quantity:
                     typeOfTask === 'reusable_mark' ?
-                        quantity :
+                        Number(quantity) :
                         null,
                 reminder: reminderOn,
                 reminder_time: reminderOn ? reminderTime : null,
@@ -228,7 +281,7 @@ const CreateNewHabits = () => {
                         height={50}
                         width={SCREEN_WIDTH / 2 - 20}
                         onChange={(e) => {
-                            if (typeof e === 'number') setDaysInRow(e)
+                            setDaysInRow(e)
                         }}
                         center={true}
                         numbersOnly={true}
@@ -239,7 +292,7 @@ const CreateNewHabits = () => {
                         height={50}
                         width={SCREEN_WIDTH / 2 - 20}
                         onChange={(e) => {
-                            if (typeof e === 'number') setSkipDays(e)
+                            setSkipDays(e)
                         }}
                         center={true}
                         numbersOnly={true}
@@ -259,11 +312,7 @@ const CreateNewHabits = () => {
                     height={50}
                     width={SCREEN_WIDTH / 2 - 20}
                     onChange={(e) => {
-                        if (typeof e === 'number') {
-                            setQuantity(e)
-                        } else {
-                            setQuantity(0)
-                        }
+                        setQuantity(e)
                     }}
                     center={true}
                     numbersOnly={true}
@@ -410,7 +459,7 @@ const CreateNewHabits = () => {
 
                                         <ReminderToggle
                                             value={reminderOn}
-                                            onChange={setReminderOn}
+                                            onChange={reminder}
                                         />
 
                                         {
@@ -428,7 +477,7 @@ const CreateNewHabits = () => {
                                     </YStack>
                                     <YStack gap={10} marginTop={50} marginBottom={50}>
                                         <View height={50} width={SCREEN_WIDTH - 20}>
-                                            {alertShow && <Text fontSize={SCREEN_WIDTH_400 ? 14 : 16} color={'red'}>{`Ошибка сохранения: ${alertMessage}`}</Text>}
+                                            {alertShow && <Text fontSize={SCREEN_WIDTH_400 ? 14 : 16} color={'red'}>{`${alertMessage}`}</Text>}
                                         </View>
                                         <Button
                                             fontSize={16}
