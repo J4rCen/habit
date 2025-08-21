@@ -41,8 +41,6 @@ const listWeek: Record<string, number> = {
 export const GetPermissionAccess = async () => {
     const { status: existingStatus } = await Notifications.getPermissionsAsync()
 
-    console.log(existingStatus)
-
     if (existingStatus !== 'granted') {
         await Notifications.requestPermissionsAsync()
     }
