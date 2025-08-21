@@ -1,4 +1,8 @@
+import { DATE_FORMAT } from "@/app/constants"
 import useStore, { IHabitTask } from "@/app/store/zustand"
+import { Statistics } from "@/app/svgs/navigation"
+import Pencil from "@/app/svgs/pencil."
+import dayjs from "dayjs"
 import { router } from "expo-router"
 import React, { useEffect, useState } from "react"
 import { TouchableOpacity } from "react-native"
@@ -141,12 +145,16 @@ const HabitCard = ({ habitId, habitConfig, selectDate, dataStart }: IHabitCard) 
                             {habitConfig.name}
                         </Text>
                     </Select.Trigger>
-                    <TouchableOpacity
-                        style={{ width: '30%', height: '100%', justifyContent: 'center', alignItems: 'center' }}
-                        onPress={() => progressUpdate()}
-                    >
-                        <CircularProgressType />
-                    </TouchableOpacity>
+                    {
+                        dayjs(selectDate, DATE_FORMAT).isSameOrBefore(dayjs()) ?
+                            <TouchableOpacity
+                                style={{ width: '30%', height: '100%', justifyContent: 'center', alignItems: 'center' }}
+                                onPress={() => progressUpdate()}
+                            >
+                                <CircularProgressType />
+                            </TouchableOpacity> :
+                            <View style={{ width: '30%', height: '100%' }} />
+                    }
                 </XStack>
             </YStack>
             {isOpen &&
@@ -169,12 +177,17 @@ const HabitCard = ({ habitId, habitConfig, selectDate, dataStart }: IHabitCard) 
                                     style={{ width: '100%' }}
                                     onPress={() => router.navigate({ pathname: '/screens/create_new_habits', params: { habitId } })}
                                 >
-                                    <Text
-                                        color={'white'}
-                                        fontSize={'$4.5'}
-                                    >
-                                        Изменить
-                                    </Text>
+                                    <XStack alignItems="center">
+                                        <Pencil color={'#fff'} size="24" />
+                                        <Text
+                                            marginLeft={5}
+                                            color={'white'}
+                                            fontSize={'$4.5'}
+                                        >
+                                            Изменить
+                                        </Text>
+                                    </XStack>
+
                                 </TouchableOpacity>
                             </XStack>
                             {
@@ -184,12 +197,16 @@ const HabitCard = ({ habitId, habitConfig, selectDate, dataStart }: IHabitCard) 
                                             style={{ width: '100%' }}
                                             onPress={() => router.navigate({ pathname: '/screens/statistics', params: { habitId: habitId, habitName: habitConfig.name, dataStart: dataStart, habitStart: habitConfig.day_of_create } })}
                                         >
-                                            <Text
-                                                color={'white'}
-                                                fontSize={'$4.5'}
-                                            >
-                                                Статистика
-                                            </Text>
+                                            <XStack alignItems="center">
+                                                <Statistics color={'#fff'} size="24" />
+                                                <Text
+                                                    marginLeft={5}
+                                                    color={'white'}
+                                                    fontSize={'$4.5'}
+                                                >
+                                                    Статистика
+                                                </Text>
+                                            </XStack>
                                         </TouchableOpacity>
                                     </XStack> :
                                     null

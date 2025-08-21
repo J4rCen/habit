@@ -39,7 +39,6 @@ interface IStore {
 	habitTask: Record<string, IHabitTask>
 	startDateUser: string | null
 	_hasHydrated: boolean
-	_isFirstLaunch: boolean
 	setHasHydrated: (state: boolean) => void
 	initializeApp: () => void
 	setStartDateUser: (date: Dayjs) => void
@@ -57,18 +56,14 @@ const useStore = create<IStore>()(
 			habitTask: {},
 			startDateUser: null,
 			_hasHydrated: false,
-			_isFirstLaunch: true,
 			setHasHydrated: (state) => set({ _hasHydrated: state }),
-			initializeApp: () => {
-				const alreadyLaunched = get()._isFirstLaunch === false ? true : false;
+			initializeApp: async () => {
+				const alreadyLaunched = await AsyncStorage.getItem('_isFirstLaunch')
+
 				if (!alreadyLaunched) {
 					const startDateUser = dayjs().format(DATE_FORMAT);
-					set({
-						_isFirstLaunch: true,
-						startDateUser
-					});
-				} else {
-					set({ _isFirstLaunch: false });
+					set({ startDateUser });
+					await AsyncStorage.setItem('_isFirstLaunch', 'true')
 				}
 			},
 			setStartDateUser: (date) => set({ startDateUser: date.format(DATE_FORMAT) }),
