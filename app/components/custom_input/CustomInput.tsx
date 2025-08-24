@@ -1,6 +1,6 @@
 import { SCREEN_WIDTH } from "@/app/constants";
 import PlaceholderWrap from "@/app/utilities/placeholderWrap";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { StyleSheet } from "react-native";
 import { Input } from "tamagui";
 
@@ -18,11 +18,6 @@ interface IInput {
 
 const CustomInput = (props: IInput) => {
     const [isActive, setIsActive] = useState<boolean>(false);
-
-    useEffect(() => {
-        if (props.value !== '') setIsActive(true);
-        else setIsActive(false);
-    }, [props.value]);
 
     const onChangeText = (value: string | number) => {
         if (props.numbersOnly) {
