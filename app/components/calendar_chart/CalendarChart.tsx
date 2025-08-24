@@ -20,11 +20,11 @@ LocaleConfig.locales.ru = {
 LocaleConfig.defaultLocale = 'ru';
 
 interface ICalendarChart {
-    dataStart: string;
+    dataStart: string
     habitConfig: IHabitTask['habitConfig']
-    statistics: IHabitTask['habitStatic'];
-    pastDays: number;
-    habitStart: string | undefined;
+    statistics: IHabitTask['habitStatic']
+    pastDays: number
+    habitStart: string | undefined
 }
 
 dayjs.extend(customParseFormat)

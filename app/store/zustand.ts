@@ -61,8 +61,8 @@ const useStore = create<IStore>()(
 				const alreadyLaunched = await AsyncStorage.getItem('_isFirstLaunch')
 
 				if (!alreadyLaunched) {
-					const startDateUser = dayjs().format(DATE_FORMAT);
-					set({ startDateUser });
+					const startDateUser = dayjs().format(DATE_FORMAT)
+					set({ startDateUser })
 					await AsyncStorage.setItem('_isFirstLaunch', 'true')
 				}
 			},
