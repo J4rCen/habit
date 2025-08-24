@@ -39,13 +39,13 @@ const listWeek: Record<string, number> = {
 }
 
 export const GetPermissionAccess = async () => {
-    const { status: existingStatus } = await Notifications.getPermissionsAsync()
+    let existingStatus = await Notifications.getPermissionsAsync()
 
-    if (existingStatus !== 'granted') {
-        await Notifications.requestPermissionsAsync()
+    if (existingStatus.status !== 'granted') {
+        existingStatus = await Notifications.requestPermissionsAsync()
     }
 
-    return existingStatus
+    return existingStatus.status
 }
 
 export const CancelNotificationAsync = async (type: string, id: string, habitId: string) => {
