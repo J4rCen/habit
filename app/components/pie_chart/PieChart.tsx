@@ -94,8 +94,6 @@ const PieChart = ({ pastDays, statistics, habitConfig, habitStart }: IPieChart) 
                             {({ slice }) => {
                                 const outer = slice.radius ?? 100;
                                 const inner = slice.innerRadius ?? 50;
-
-                                console.log('slice: ', slice)
                                 
                                 let radiusOffset = ((outer + inner) / (2 * outer));
                                 const percent = total > 0 ? (slice.value / total) * 100 : 0;
