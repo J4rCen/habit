@@ -53,15 +53,15 @@ const Statistics = () => {
                             />
 
                             <PieChart
+                                habitConfig={habitConfig as IHabitTask['habitConfig']}
+                                habitStart={habitStart as string}
                                 pastDays={pastDays}
                                 statistics={statistics}
                             />
-
                             <BarChart
                                 habitStart={habitStart as string}
                                 statistics={statistics}
                             />
-
                         </YStack>
                     </ScrollView>
                 </YStack>

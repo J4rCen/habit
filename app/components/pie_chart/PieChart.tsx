@@ -1,7 +1,8 @@
-import { SCREEN_WIDTH_400 } from '@/app/constants';
+import { DATE_FORMAT, SCREEN_WIDTH_400 } from '@/app/constants';
 import { IHabitTask } from '@/app/store/zustand';
 import f from '@/assets/fonts/Inter_28pt-Regular.ttf';
 import { useFont } from "@shopify/react-native-skia";
+import dayjs from 'dayjs';
 import React, { useEffect, useMemo, useState } from "react";
 import { StyleSheet } from "react-native";
 import { Text, View, YStack } from "tamagui";
@@ -9,10 +10,12 @@ import { Pie, PolarChart } from "victory-native";
 
 interface IPieChart {
     pastDays: number
+    habitStart: string
+    habitConfig: IHabitTask['habitConfig']
     statistics: IHabitTask['habitStatic']
 }
 
-const PieChart = ({pastDays, statistics}: IPieChart) => {
+const PieChart = ({ pastDays, statistics, habitConfig, habitStart }: IPieChart) => {
 
     const font = useFont(f, 18)
 
@@ -22,17 +25,53 @@ const PieChart = ({pastDays, statistics}: IPieChart) => {
 
     useEffect(() => {
         let c = 0
+        let p = 0
         if (statistics !== null) {
-            c = Object.values(statistics).reduce((sum, item) => {
-                if (item.isCompleat === 1) {
-                    return sum + 1
-                } 
-                return sum
-            }, 0)
+            if (habitConfig.interval_execution === 'every_day') {
+                p = pastDays
+                c = Object.values(statistics).reduce((sum, item) => {
+                    if (item.isCompleat === 1) {
+                        return sum + 1
+                    }
+                    return sum
+                }, 0)
+            }
+
+            if (habitConfig.interval_execution === 'certain_days') {
+                for (let i = 0; i < pastDays; i++) {
+                    const day = dayjs(habitStart).add(i, 'day');
+
+                    if (habitConfig.days_of_week?.includes(day.format('dd').replace(/^[п,в,с,ч]/, c => c.toUpperCase()))) {
+                        p += 1
+                        if (statistics?.[day.format(DATE_FORMAT)]?.isCompleat === 1) {
+                            c += 1
+                        }
+                    }
+                }
+            }
+
+            if (habitConfig.interval_execution === 'gap') {
+                const { days_in_row, skip_days } = habitConfig.gap_interval as { days_in_row: number, skip_days: number }
+                const cycleDay = days_in_row + skip_days
+                const diffDay = dayjs().diff(dayjs(habitConfig.day_of_create, DATE_FORMAT), 'day')
+
+                for (let i = 0; i <= diffDay; i++) {
+                    const cycleLength = i % cycleDay
+
+                    if (cycleLength < days_in_row) {
+                        const day = dayjs(habitStart).add(i, 'day').format(DATE_FORMAT);
+                        p += 1
+                        if (statistics?.[day]?.isCompleat === 1) {
+                            c += 1
+                        }
+                    }
+                }
+
+            }
         }
 
         setCompleted(c)
-        setMissed(pastDays - c)
+        setMissed(p - c)
     }, [])
 
 
@@ -56,6 +95,8 @@ const PieChart = ({pastDays, statistics}: IPieChart) => {
                                 const outer = slice.radius ?? 100;
                                 const inner = slice.innerRadius ?? 50;
 
+                                console.log('slice: ', slice)
+                                
                                 let radiusOffset = ((outer + inner) / (2 * outer));
                                 const percent = total > 0 ? (slice.value / total) * 100 : 0;
                                 const text = `${Math.round(percent)}%`;
