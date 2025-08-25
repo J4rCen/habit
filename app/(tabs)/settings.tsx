@@ -3,7 +3,7 @@ import { StyleSheet, TouchableOpacity } from "react-native"
 import { SafeAreaView } from "react-native-safe-area-context"
 import { ScrollView, Text, View, XStack, YStack } from "tamagui"
 import { SCREEN_HEIGHT, SCREEN_WIDTH, SCREEN_WIDTH_400 } from "../constants"
-import { Crown, LoadInCloud, Logout, SaveInCloud, UserAccount } from "../svgs/settings"
+import { Bell, Brush, Crown, FileSvg, Language, LoadInCloud, Logout, Message, SaveInCloud, Star, UserAccount, Watch } from "../svgs/settings"
 
 const Settings = () => {
     return (
@@ -28,7 +28,7 @@ const Settings = () => {
                                             <YStack>
                                                 <TouchableOpacity style={styles.button}>
                                                     <XStack gap={10} justifyContent="center">
-                                                        <SaveInCloud size={26}/>
+                                                        <SaveInCloud size={26} />
                                                         <Text style={styles.buttonLabel}>Резервное копирование</Text>
                                                     </XStack>
                                                 </TouchableOpacity>
@@ -36,7 +36,7 @@ const Settings = () => {
                                             <YStack>
                                                 <TouchableOpacity style={styles.button}>
                                                     <XStack gap={10} justifyContent="center">
-                                                        <LoadInCloud size={26}/>
+                                                        <LoadInCloud size={26} />
                                                         <Text style={styles.buttonLabel}>Восстановление данных</Text>
                                                     </XStack>
                                                 </TouchableOpacity>
@@ -44,7 +44,7 @@ const Settings = () => {
                                             <YStack>
                                                 <TouchableOpacity style={[styles.button, { backgroundColor: '#791113' }]}>
                                                     <XStack gap={10} justifyContent="center">
-                                                        <Logout size={26}/>
+                                                        <Logout size={26} />
                                                         <Text style={styles.buttonLabel}>Выйти из аккаунта</Text>
                                                     </XStack>
                                                 </TouchableOpacity>
@@ -65,16 +65,28 @@ const Settings = () => {
                                 <Text style={styles.title_block}>Настройки</Text>
                                 <YStack gap={10}>
                                     <TouchableOpacity style={styles.button}>
-                                        <Text style={styles.buttonLabel}>Языковые параметры</Text>
+                                        <XStack gap={10} justifyContent="center">
+                                            <Language size={24} />
+                                            <Text style={styles.buttonLabel}>Языковые параметры</Text>
+                                        </XStack>
                                     </TouchableOpacity>
                                     <TouchableOpacity style={styles.button}>
-                                        <Text style={styles.buttonLabel}>Стиль</Text>
+                                        <XStack gap={10} justifyContent="center">
+                                            <Brush size={26} />
+                                            <Text style={styles.buttonLabel}>Стиль</Text>
+                                        </XStack>
                                     </TouchableOpacity>
                                     <TouchableOpacity style={styles.button}>
-                                        <Text style={styles.buttonLabel}>Интервал времени</Text>
+                                        <XStack gap={10} justifyContent="center">
+                                            <Watch size={28} />
+                                            <Text style={styles.buttonLabel}>Интервал времени</Text>
+                                        </XStack>
                                     </TouchableOpacity>
                                     <TouchableOpacity style={styles.button}>
-                                        <Text style={styles.buttonLabel}>Уведомления</Text>
+                                        <XStack gap={10} justifyContent="center">
+                                            <Bell size={24} />
+                                            <Text style={styles.buttonLabel}>Уведомления</Text>
+                                        </XStack>
                                     </TouchableOpacity>
                                 </YStack>
                             </YStack>
@@ -83,10 +95,16 @@ const Settings = () => {
                                 <Text style={styles.title_block}>Медиа</Text>
                                 <YStack gap={10}>
                                     <TouchableOpacity style={styles.button}>
-                                        <Text style={styles.buttonLabel}>Оставить отзыв</Text>
+                                        <XStack gap={10} justifyContent="center">
+                                            <Star size={24} />
+                                            <Text style={styles.buttonLabel}>Оставить отзыв</Text>
+                                        </XStack>
                                     </TouchableOpacity>
                                     <TouchableOpacity style={styles.button}>
-                                        <Text style={styles.buttonLabel}>Обратная связь</Text>
+                                        <XStack gap={10} justifyContent="center">
+                                            <Message size={26} />
+                                            <Text style={styles.buttonLabel}>Обратная связь</Text>
+                                        </XStack>
                                     </TouchableOpacity>
                                 </YStack>
                             </YStack>
@@ -95,10 +113,16 @@ const Settings = () => {
                                 <Text style={styles.title_block}>Документация</Text>
                                 <YStack gap={10}>
                                     <TouchableOpacity style={styles.button}>
-                                        <Text style={styles.buttonLabel}>Политика конфиденциальности</Text>
+                                        <XStack gap={10} justifyContent="center">
+                                            <FileSvg size={26} />
+                                            <Text style={styles.buttonLabel}>Политика конфиденциальности</Text>
+                                        </XStack>
                                     </TouchableOpacity>
                                     <TouchableOpacity style={styles.button}>
-                                        <Text style={styles.buttonLabel}>Условия использования</Text>
+                                        <XStack gap={10} justifyContent="center">
+                                            <FileSvg size={26} />
+                                            <Text style={styles.buttonLabel}>Условия использования</Text>
+                                        </XStack>
                                     </TouchableOpacity>
                                 </YStack>
                             </YStack>
