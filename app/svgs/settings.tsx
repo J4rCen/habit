@@ -1,6 +1,6 @@
 import Svg, { Circle, G, Line, Path } from "react-native-svg"
 
-interface ISvgSettings {
+export interface ISvgSettings {
     color?: string,
     size: number
 }

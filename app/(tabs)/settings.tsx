@@ -1,3 +1,4 @@
+import { router } from "expo-router"
 import React from "react"
 import { StyleSheet, TouchableOpacity } from "react-native"
 import { SafeAreaView } from "react-native-safe-area-context"
@@ -15,7 +16,7 @@ const Settings = () => {
                             <YStack marginBottom={20}>
                                 <Text style={styles.title_block}>Аккаунт</Text>
                                 {
-                                    true ?
+                                    false ?
                                         <View gap={10}>
                                             <YStack>
                                                 <TouchableOpacity style={[styles.button, { backgroundColor: '#194A98' }]}>
@@ -51,7 +52,7 @@ const Settings = () => {
                                             </YStack>
                                         </View> :
                                         <YStack>
-                                            <TouchableOpacity style={[styles.button, { backgroundColor: '#194A98' }]}>
+                                            <TouchableOpacity style={[styles.button, { backgroundColor: '#194A98' }]} onPress={(() => router.navigate('/screens/authorization/' as any))}>
                                                 <XStack gap={10} justifyContent="center">
                                                     <UserAccount size={26} />
                                                     <Text style={styles.buttonLabel}>Войти / создать аккаунт</Text>
