@@ -4,9 +4,26 @@ import { StyleSheet, TouchableOpacity } from "react-native"
 import { SafeAreaView } from "react-native-safe-area-context"
 import { ScrollView, Text, View, XStack, YStack } from "tamagui"
 import { SCREEN_HEIGHT, SCREEN_WIDTH, SCREEN_WIDTH_400 } from "../constants"
+import useStore from "../store/zustand"
 import { Bell, Brush, Crown, FileSvg, Language, LoadInCloud, Logout, Message, SaveInCloud, Star, UserAccount, Watch } from "../svgs/settings"
+import { deleteToken, getToken } from "../utilities/secureStore"
+
 
 const Settings = () => {
+
+    const isLogin = useStore(state => state.email)
+    const setApiData = useStore(state => state.setApiData)
+
+    getToken().then(data => console.log(data))
+
+    const logout = async () => {
+        setApiData({
+            email: null,
+            premium: false
+        })
+        await deleteToken()
+    } 
+
     return (
         <View backgroundColor={'$dark'} maxHeight={SCREEN_HEIGHT}>
             <SafeAreaView>
@@ -16,7 +33,7 @@ const Settings = () => {
                             <YStack marginBottom={20}>
                                 <Text style={styles.title_block}>Аккаунт</Text>
                                 {
-                                    false ?
+                                    isLogin !== null ?
                                         <View gap={10}>
                                             <YStack>
                                                 <TouchableOpacity style={[styles.button, { backgroundColor: '#194A98' }]}>
@@ -43,7 +60,7 @@ const Settings = () => {
                                                 </TouchableOpacity>
                                             </YStack>
                                             <YStack>
-                                                <TouchableOpacity style={[styles.button, { backgroundColor: '#791113' }]}>
+                                                <TouchableOpacity style={[styles.button, { backgroundColor: '#791113' }]} onPress={() => logout()}>
                                                     <XStack gap={10} justifyContent="center">
                                                         <Logout size={26} />
                                                         <Text style={styles.buttonLabel}>Выйти из аккаунта</Text>
@@ -52,7 +69,7 @@ const Settings = () => {
                                             </YStack>
                                         </View> :
                                         <YStack>
-                                            <TouchableOpacity style={[styles.button, { backgroundColor: '#194A98' }]} onPress={(() => router.navigate('/screens/authorization/' as any))}>
+                                            <TouchableOpacity style={[styles.button, { backgroundColor: '#194A98' }]} onPress={(() => router.navigate('/screens/auth/' as any))}>
                                                 <XStack gap={10} justifyContent="center">
                                                     <UserAccount size={26} />
                                                     <Text style={styles.buttonLabel}>Войти / создать аккаунт</Text>

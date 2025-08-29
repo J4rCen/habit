@@ -38,6 +38,8 @@ export interface IHabitTask {
 interface IStore {
 	habitTask: Record<string, IHabitTask>
 	startDateUser: string | null
+	email: string | null,
+	premium: boolean,
 	_hasHydrated: boolean
 	setHasHydrated: (state: boolean) => void
 	initializeApp: () => void
@@ -48,6 +50,7 @@ interface IStore {
 	getHabitTask: (habitId: string) => IHabitTask | null
 	updateHabitTask: (habitId: string, habitConfig: Omit<IHabitTask, 'habitId'>) => void
 	removeHabitTask: (habitId: string) => void,
+	setApiData: (data: {email: string | null, premium: false}) => void
 }
 
 const useStore = create<IStore>()(
@@ -55,6 +58,8 @@ const useStore = create<IStore>()(
 		(set, get) => ({
 			habitTask: {},
 			startDateUser: null,
+			email: null,
+			premium: false,
 			_hasHydrated: false,
 			setHasHydrated: (state) => set({ _hasHydrated: state }),
 			initializeApp: async () => {
@@ -120,6 +125,17 @@ const useStore = create<IStore>()(
 					return { habitTask: newHabitTask }
 				})
 			},
+			setApiData: (data) => {
+
+				console.log("data: ", data)
+
+				set(() => {
+					return {
+						email: data.email,
+						premium: data.premium
+					}
+				})
+			}
 		}),
 		{
 			name: 'habit-storage-v2',
@@ -138,7 +154,9 @@ const useStore = create<IStore>()(
 			version: 2,
 			partialize: (state) => ({
 				habitTask: state.habitTask,
-				startDateUser: state.startDateUser
+				startDateUser: state.startDateUser,
+				email: state.email,
+				premium: state.premium,
 			}),
 			onRehydrateStorage: () => (state) => {
 				state?.setHasHydrated(true)

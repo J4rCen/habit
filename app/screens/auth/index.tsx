@@ -1,20 +1,131 @@
+import api from "@/app/api/api"
 import CustomInput from "@/app/components/custom_input/CustomInput"
 import { SCREEN_HEIGHT, SCREEN_WIDTH, SCREEN_WIDTH_400 } from "@/app/constants"
+import useStore from "@/app/store/zustand"
 import ArrowBack from "@/app/svgs/arrowBack"
 import { GoogleSvg, YandexSvg } from "@/app/svgs/authorization"
+import { setToken } from "@/app/utilities/secureStore"
 import { router } from "expo-router"
-import React, { useState } from "react"
+import React, { useEffect, useState } from "react"
 import { StyleSheet, TouchableOpacity } from "react-native"
 import { SafeAreaView } from "react-native-safe-area-context"
 import { Text, View, XStack, YStack } from "tamagui"
 
-const Authorization = () => {
+const Auth = () => {
 
+    const setApiData = useStore(state => state.setApiData)
     const [typeEntrance, setTypeEntrance] = useState<'authorization' | 'registration'>('authorization')
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
     const [repeatPassword, setRepeatPassword] = useState('')
+    const [alertShow, setAlertShow] = useState<boolean>(false)
+    const [alertMessage, setAlertMessage] = useState<string>('')
 
+    useEffect(() => {
+
+        if (!alertShow) return
+
+        const interval = setInterval(() => {
+            setAlertShow(false)
+        }, 3000)
+
+        return () => clearInterval(interval)
+    }, [alertShow])
+
+
+    const registration = async () => {
+        if (email.length === 0) {
+            setAlertMessage("Почта не должна быть пустой")
+            setAlertShow(true)
+            return
+        }
+
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+            setAlertMessage("Почта указанна не верно")
+            setAlertShow(true)
+            return
+        }
+
+        if (password.length === 0) {
+            setAlertMessage("Пароль не должен быть пустой")
+            setAlertShow(true)
+            return
+        }
+
+        if (password.length < 6) {
+            setAlertMessage("Пароль должен быть больше шести символам")
+            setAlertShow(true)
+            return
+        }
+
+        if (password !== repeatPassword) {
+            setAlertMessage("Пароли не совпадают")
+            setAlertShow(true)
+            return
+        }
+
+        const res = await api.registration({ email, password })
+
+        if (res.data.statusCode === 409) {
+            setAlertMessage(res.data.message)
+            setAlertShow(true)
+            return
+        }
+        
+
+        if (res.data) {
+            const { access_token, payload } = res.data
+
+            console.log(access_token)
+            console.log(payload)
+
+            setApiData(payload)
+            await setToken(access_token)
+
+            router.navigate('/(tabs)/settings')
+        }
+    }
+
+    const authorization = async () => {
+        if (email.length === 0) {
+            setAlertMessage("Почта не должна быть пустой")
+            setAlertShow(true)
+            return
+        }
+
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+            setAlertMessage("Почта указанна не верно")
+            setAlertShow(true)
+            return
+        }
+
+        if (password.length === 0) {
+            setAlertMessage("Пароль не должен быть пустой")
+            setAlertShow(true)
+            return
+        }
+
+        const res = await api.authorization({ email, password })
+        console.log(res.data)
+
+        if (res.data.statusCode === 404) {
+            setAlertMessage(res.data.message)
+            setAlertShow(true)
+            return
+        }
+
+        if (res.data) {
+            const { access_token, payload } = res.data
+
+            console.log(access_token)
+            console.log(payload)
+
+            setApiData(payload)
+            await setToken(access_token)
+
+            router.navigate('/(tabs)/settings')
+        }
+    }
 
     return (
         <View backgroundColor={'$dark'} maxHeight={SCREEN_HEIGHT}>
@@ -66,11 +177,18 @@ const Authorization = () => {
                         }
                     </YStack>
 
+                    {
+                        alertShow &&
+                        <XStack height={50} width={SCREEN_WIDTH - 20}>
+                            <Text fontSize={SCREEN_WIDTH_400 ? 14 : 16} color={'red'}>{`${alertMessage}`}</Text>
+                        </XStack>
+                    }
+
                     <YStack alignItems="center" gap={15} marginBottom={20}>
                         {
                             typeEntrance === 'authorization' ?
                                 <>
-                                    <TouchableOpacity style={styles.button}>
+                                    <TouchableOpacity style={styles.button} onPress={() => authorization()}>
                                         <Text style={styles.buttonLabel}>Войти</Text>
                                     </TouchableOpacity>
                                     <TouchableOpacity style={styles.button} onPress={() => setTypeEntrance('registration')}>
@@ -78,7 +196,7 @@ const Authorization = () => {
                                     </TouchableOpacity>
                                 </> :
                                 <>
-                                    <TouchableOpacity style={styles.button}>
+                                    <TouchableOpacity style={styles.button} onPress={() => registration()}>
                                         <Text style={styles.buttonLabel}>Зарегистрироваться</Text>
                                     </TouchableOpacity>
                                     <TouchableOpacity style={styles.button} onPress={() => setTypeEntrance('authorization')}>
@@ -111,17 +229,17 @@ const Authorization = () => {
                     </XStack>
 
                     <YStack gap={15} >
-                        <TouchableOpacity style={[styles.button, {backgroundColor: '#194A98'}]}>
+                        <TouchableOpacity style={[styles.button, { backgroundColor: '#194A98' }]}>
                             <XStack gap={10} justifyContent="center">
-                                <GoogleSvg size={26}/>
+                                <GoogleSvg size={26} />
                                 <Text style={styles.buttonLabel}>Войти с помощью Google</Text>
                             </XStack>
                         </TouchableOpacity>
-                        <TouchableOpacity style={[styles.button, {backgroundColor: '#791113'}]}>
+                        <TouchableOpacity style={[styles.button, { backgroundColor: '#791113' }]}>
                             <XStack gap={10} justifyContent="center">
-                                <YandexSvg size={26}/>
+                                <YandexSvg size={26} />
                                 <Text style={styles.buttonLabel}>Войти с помощью Яндекс</Text>
-                             </XStack>
+                            </XStack>
                         </TouchableOpacity>
                     </YStack>
 
@@ -146,4 +264,4 @@ const styles = StyleSheet.create({
     }
 })
 
-export default React.memo(Authorization)
+export default React.memo(Auth)
