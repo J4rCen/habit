@@ -1,4 +1,4 @@
-import api from "@/app/api/api"
+import { apiAuthorization, apiRegistration } from "@/app/api/api"
 import CustomInput from "@/app/components/custom_input/CustomInput"
 import { SCREEN_HEIGHT, SCREEN_WIDTH, SCREEN_WIDTH_400 } from "@/app/constants"
 import useStore from "@/app/store/zustand"
@@ -64,20 +64,16 @@ const Auth = () => {
             return
         }
 
-        const res = await api.registration({ email, password })
-
-        if (res.data.statusCode === 409) {
-            setAlertMessage(res.data.message)
+        const res = await apiRegistration({ email, password })
+       
+        if (res?.data.statusCode >= 400) {
+            setAlertMessage(res?.data.message)
             setAlertShow(true)
             return
         }
-        
 
-        if (res.data) {
-            const { access_token, payload } = res.data
-
-            console.log(access_token)
-            console.log(payload)
+        if (res?.data) {
+            const { access_token, payload } = res?.data
 
             setApiData(payload)
             await setToken(access_token)
@@ -105,10 +101,9 @@ const Auth = () => {
             return
         }
 
-        const res = await api.authorization({ email, password })
-        console.log(res.data)
-
-        if (res.data.statusCode === 404) {
+        const res = await apiAuthorization({ email, password })
+    
+        if (res.data.statusCode >= 400) {
             setAlertMessage(res.data.message)
             setAlertShow(true)
             return
@@ -116,9 +111,6 @@ const Auth = () => {
 
         if (res.data) {
             const { access_token, payload } = res.data
-
-            console.log(access_token)
-            console.log(payload)
 
             setApiData(payload)
             await setToken(access_token)

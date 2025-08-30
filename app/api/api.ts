@@ -1,38 +1,29 @@
-import axios from 'axios'
+import axios, { AxiosError } from 'axios'
 
-class Api {
-    private readonly baseUrl: string
-    constructor() {
-        this.baseUrl = 'http://192.168.0.28:3000/api/'
+const api = axios.create({
+    baseURL: 'https://habit-backend-lhq9.onrender.com/api/',
+    headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
     }
+})
 
-    async registration(data: {email: string, password: string}) {
-        try {
-            return axios.post(this.baseUrl + 'auth/registration', {...data})
-            .then(data => {
-                return data
-            })
-            .catch(err => {
-                return err.response
-            })
-        } catch (error) {
-            console.log(error)
-        }
-    }
-
-    async authorization(data: {email: string, password: string}) {
-        try {
-            return axios.post(this.baseUrl + 'auth/authorization', {...data})
-            .then(data => {
-                return data
-            })
-            .catch(err => {
-                return err.response
-            })
-        } catch (error) {
-            console.log(error)
-        }
-    }
+export const apiRegistration = async (data: { email: string, password: string }) => {
+    return await api.post('auth/registration', data)
+        .then(data => {
+            return data
+        })
+        .catch((err: AxiosError) => {
+            return err.response
+        })
 }
 
-export default new Api()
+export const apiAuthorization = async (data: { email: string, password: string }) => {
+    return await api.post('auth/authorization', data)
+        .then(data => {
+            return data
+        })
+        .catch(err => {
+            return err.response
+        })
+}
