@@ -6,3 +6,4 @@ export const SCREEN_HEIGHT = Dimensions.get('window').height
 export const WEEK_DAYS = ["Пн", "Вт", "Ср", "Чт", "Пт", "Сб", "Вс"];
 export const DATE_FORMAT = 'YYYY-MM-DD'
 export const REFRESH_NOTIFICATION = 'REFRESH_NOTIFICATION'
+export const ACCESS_TOKEN = 'access_token'
