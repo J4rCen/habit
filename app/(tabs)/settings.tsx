@@ -3,6 +3,7 @@ import React from "react"
 import { StyleSheet, TouchableOpacity } from "react-native"
 import { SafeAreaView } from "react-native-safe-area-context"
 import { ScrollView, Text, View, XStack, YStack } from "tamagui"
+import { apiLoadInCloud, apiSaveInCloud } from "../api/api"
 import { SCREEN_HEIGHT, SCREEN_WIDTH, SCREEN_WIDTH_400 } from "../constants"
 import useStore from "../store/zustand"
 import { Bell, Brush, Crown, FileSvg, Language, LoadInCloud, Logout, Message, SaveInCloud, Star, UserAccount, Watch } from "../svgs/settings"
@@ -12,9 +13,8 @@ import { deleteToken, getToken } from "../utilities/secureStore"
 const Settings = () => {
 
     const isLogin = useStore(state => state.email)
+    const premium = useStore(state => state.premium)
     const setApiData = useStore(state => state.setApiData)
-
-    getToken().then(data => console.log(data))
 
     const logout = async () => {
         setApiData({
@@ -22,7 +22,44 @@ const Settings = () => {
             premium: false
         })
         await deleteToken()
-    } 
+    }
+
+    const saveInCloud = async () => {
+        const token = await getToken().then(token => {return token})
+        const email = useStore.getState().email
+
+        if (premium && token && email) {
+            const habitTasks = useStore.getState().habitTask
+            const startDateUser = useStore.getState().startDateUser
+
+            const data = {
+                email: email,
+                dateOfStart: startDateUser,
+                userHabits: habitTasks
+            }
+
+            await apiSaveInCloud(data)
+        } else {
+
+        }
+    }
+
+    const loadInCloud = async () => {
+        const token = await getToken().then(token => {return token})
+        const email = useStore.getState().email
+
+        if (premium && token) {
+            const data = await apiLoadInCloud(email)
+            
+            if (!!data.dateOfStart && !!data.userHabits) {
+                useStore.getState().initializeStartDateUser(data.dateOfStart)
+                useStore.getState().initializeHabits(data.userHabits)
+            }
+
+        } else {
+            
+        }
+    }
 
     return (
         <View backgroundColor={'$dark'} maxHeight={SCREEN_HEIGHT}>
@@ -44,7 +81,7 @@ const Settings = () => {
                                                 </TouchableOpacity>
                                             </YStack>
                                             <YStack>
-                                                <TouchableOpacity style={styles.button}>
+                                                <TouchableOpacity style={styles.button} onPress={() => saveInCloud()}>
                                                     <XStack gap={10} justifyContent="center">
                                                         <SaveInCloud size={26} />
                                                         <Text style={styles.buttonLabel}>Резервное копирование</Text>
@@ -52,7 +89,7 @@ const Settings = () => {
                                                 </TouchableOpacity>
                                             </YStack>
                                             <YStack>
-                                                <TouchableOpacity style={styles.button}>
+                                                <TouchableOpacity style={styles.button} onPress={() => loadInCloud()}>
                                                     <XStack gap={10} justifyContent="center">
                                                         <LoadInCloud size={26} />
                                                         <Text style={styles.buttonLabel}>Восстановление данных</Text>
