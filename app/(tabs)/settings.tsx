@@ -5,8 +5,9 @@ import { SafeAreaView } from "react-native-safe-area-context"
 import { ScrollView, Text, View, XStack, YStack } from "tamagui"
 import { apiLoadInCloud, apiSaveInCloud } from "../api/api"
 import { SCREEN_HEIGHT, SCREEN_WIDTH, SCREEN_WIDTH_400 } from "../constants"
-import useStore from "../store/zustand"
+import useStore, { IHabitTask } from "../store/zustand"
 import { Bell, Brush, Crown, FileSvg, Language, LoadInCloud, Logout, Message, SaveInCloud, Star, UserAccount, Watch } from "../svgs/settings"
+import SetNotifications, { GetPermissionAccess } from "../utilities/notifications"
 import { deleteToken, getToken } from "../utilities/secureStore"
 
 
@@ -25,7 +26,7 @@ const Settings = () => {
     }
 
     const saveInCloud = async () => {
-        const token = await getToken().then(token => {return token})
+        const token = await getToken().then(token => { return token })
         const email = useStore.getState().email
 
         if (premium && token && email) {
@@ -45,19 +46,39 @@ const Settings = () => {
     }
 
     const loadInCloud = async () => {
-        const token = await getToken().then(token => {return token})
+        const token = await getToken().then(token => { return token })
         const email = useStore.getState().email
 
         if (premium && token) {
             const data = await apiLoadInCloud(email)
-            
+
             if (!!data.dateOfStart && !!data.userHabits) {
                 useStore.getState().initializeStartDateUser(data.dateOfStart)
                 useStore.getState().initializeHabits(data.userHabits)
+
+                const permission = await GetPermissionAccess()
+
+                if (permission === 'granted') {
+                    Object.values(data.userHabits as IHabitTask).forEach((item: IHabitTask) => {
+
+                        const habitConfig = item.habitConfig
+
+                        if (habitConfig.reminder && habitConfig.interval_execution && habitConfig.reminder_time) {
+                            SetNotifications(habitConfig.interval_execution, habitConfig.reminder_time, {
+                                name: habitConfig.name,
+                                daysOfWeek: habitConfig.days_of_week && null,
+                                daysInRow: habitConfig.gap_interval?.days_in_row,
+                                skipDays: habitConfig.gap_interval?.skip_days,
+                                dayOfCreate: habitConfig.day_of_create,
+                                habitId: item.habitId,
+                                notid: habitConfig.notificationsId,
+                                typeOfHabit: habitConfig.type_of_habit
+                            })
+                        }
+                    })
+                }
             }
 
-        } else {
-            
         }
     }
 

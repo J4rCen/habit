@@ -9,14 +9,14 @@ dayjs.extend(isoWeek);
 dayjs.extend(weekday);
 dayjs.extend(customParseFormat)
 interface ISetNotifications {
-    name: string,
-    daysOfWeek?: Array<string>,
-    daysInRow?: number,
-    skipDays?: number,
-    dayOfCreate?: string,
+    name: string | null,
+    daysOfWeek?: Array<string> | null,
+    daysInRow?: number | null,
+    skipDays?: number | null,
+    dayOfCreate?: string | null,
     habitId: string
     notid?: string | null,
-    typeOfHabit?: string
+    typeOfHabit?: string | null
 }
 
 Notifications.setNotificationHandler({

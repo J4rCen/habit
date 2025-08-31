@@ -140,9 +140,6 @@ const useStore = create<IStore>()(
 				})
 			},
 			setApiData: (data) => {
-
-				console.log("data: ", data)
-
 				set(() => {
 					return {
 						email: data.email,
