@@ -38,7 +38,6 @@ const Auth = () => {
         return () => clearInterval(interval)
     }, [alertShow])
 
-
     const registration = async () => {
         if (email.length === 0) {
             setAlertMessage("Почта не должна быть пустой")
