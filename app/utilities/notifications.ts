@@ -9,14 +9,14 @@ dayjs.extend(isoWeek);
 dayjs.extend(weekday);
 dayjs.extend(customParseFormat)
 interface ISetNotifications {
-    name: string | null,
-    daysOfWeek?: Array<string> | null,
-    daysInRow?: number | null,
-    skipDays?: number | null,
-    dayOfCreate?: string | null,
+    name: string,
+    daysOfWeek?: Array<string>,
+    daysInRow?: number,
+    skipDays?: number,
+    dayOfCreate?: string,
     habitId: string
     notid?: string | null,
-    typeOfHabit?: string | null
+    typeOfHabit?: string
 }
 
 Notifications.setNotificationHandler({
@@ -83,7 +83,7 @@ export const CancelNotificationAsync = async (type: string, id: string, habitId:
             }
         }
     } catch (error) {
-        console.error(error)
+        console.log(error)
     }
 }
 
@@ -108,7 +108,7 @@ const SetNotifications = async (type: string, time: string, option: ISetNotifica
 
             return notificationId
         } catch (error) {
-            console.error(error)
+            console.log(error)
         }
     }
 
@@ -134,7 +134,7 @@ const SetNotifications = async (type: string, time: string, option: ISetNotifica
 
             return notificationId
         } catch (error) {
-            console.error(error)
+            console.log(error)
         }
     }
 
@@ -167,7 +167,7 @@ const SetNotifications = async (type: string, time: string, option: ISetNotifica
 
             return JSON.stringify(notificationId)
         } catch (error) {
-            console.error(error)
+            console.log(error)
         }
     }
 
@@ -215,7 +215,7 @@ const SetNotifications = async (type: string, time: string, option: ISetNotifica
 
             return jsonData
         } catch (error) {
-            console.error(error)
+            console.log(error)
         }
 
     }
