@@ -43,6 +43,8 @@ interface IStore {
 	_hasHydrated: boolean
 	setHasHydrated: (state: boolean) => void
 	initializeApp: () => void
+	initializeStartDateUser: (data: string) => void
+	initializeHabits: (data: any) => void
 	setStartDateUser: (date: Dayjs) => void
 	setHabitTask: (habitId: string, habitConfig: Omit<IHabitTask, 'habitId'>) => void
 	setIsCompleat: (habitId: string, date: string, habitStatic: StaticConfig) => void
@@ -50,7 +52,7 @@ interface IStore {
 	getHabitTask: (habitId: string) => IHabitTask | null
 	updateHabitTask: (habitId: string, habitConfig: Omit<IHabitTask, 'habitId'>) => void
 	removeHabitTask: (habitId: string) => void,
-	setApiData: (data: {email: string | null, premium: false}) => void
+	setApiData: (data: { email: string | null, premium: false }) => void
 }
 
 const useStore = create<IStore>()(
@@ -81,6 +83,18 @@ const useStore = create<IStore>()(
 							habitId
 						}
 					}
+				}))
+			},
+			initializeStartDateUser: (date: string) => set(() => {
+				return { startDateUser: date }
+			}
+			),
+			initializeHabits: (data) => {
+				set((state) => ({
+					habitTask: {
+						...state.habitTask,
+						...data,
+					},
 				}))
 			},
 			setIsCompleat: (habitId, date, habitStatic) => {
@@ -126,9 +140,6 @@ const useStore = create<IStore>()(
 				})
 			},
 			setApiData: (data) => {
-
-				console.log("data: ", data)
-
 				set(() => {
 					return {
 						email: data.email,
