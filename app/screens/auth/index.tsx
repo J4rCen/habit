@@ -75,9 +75,17 @@ const Auth = () => {
             setIsLoading(true)
             const res = await apiRegistration({ email, password })
 
-            if (res?.data.statusCode >= 400) {
+            if (res?.status as number >= 400) {
                 setTitle('Ошибка')
                 setMessage(res?.data.message)
+                setIsLoading(false)
+
+                return
+            }
+
+            if (res?.status as number == 0) {
+                setTitle('Ошибка')
+                setMessage('Превышено время ожидания, попробуйте позже ещё раз, если ошибка повториться обратитесь в службу поддержки')
                 setIsLoading(false)
 
                 return
@@ -124,7 +132,7 @@ const Auth = () => {
             setIsLoading(true)
             const res = await apiAuthorization({ email, password })
 
-            if (res.data.statusCode >= 400) {
+            if (res?.status as number >= 400) {
                 setTitle('Ошибка')
                 setMessage(res?.data.message)
                 setIsLoading(false)
@@ -132,7 +140,15 @@ const Auth = () => {
                 return
             }
 
-            if (res.data) {
+            if (res?.status as number == 0) {
+                setTitle('Ошибка')
+                setMessage('Превышено время ожидания, попробуйте позже ещё раз, если ошибка повториться обратитесь в службу поддержки')
+                setIsLoading(false)
+
+                return
+            }
+
+            if (res?.data) {
                 const { access_token, payload } = res.data
 
                 setApiData(payload)

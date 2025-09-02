@@ -81,21 +81,29 @@ const LoaderPopup = (props: {
 			if (props.type === 'save') {
 				const res = await saveInCloud()
 
-				if (res.status === 200) {
+				if (res?.status as number == 0) {
+					setTitle('Ошибка')
+					setMessage('Превышено время ожидания, попробуйте позже ещё раз, если ошибка повториться обратитесь в службу поддержки')
+					setIsLoading(false)
+
+					return
+				}
+	
+				if (res?.data.status == 200) {
 					setTitle('Успешно')
-					setMessage(res.message)
+					setMessage(res.data.message)
 				} else {
 					setTitle('Ошибка')
-					setMessage(res.message)
+					setMessage(res?.data.message)
 				}
 			}
 
 			if (props.type === 'load') {
 				const res = await loadInCloud()
 
-				if (res?.status === 200) {
+				if (res?.status == 200) {
 					setTitle('Успешно')
-					setMessage(res.message)
+					setMessage(res?.message)
 				} else {
 					setTitle('Ошибка')
 					setMessage(res?.message)

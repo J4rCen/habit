@@ -3,14 +3,12 @@ import useStore, { IHabitTask } from "../store/zustand"
 import SetNotifications, { GetPermissionAccess } from "./notifications"
 import { getToken } from "./secureStore"
 
-const premium = useStore.getState().premium
-
 export const saveInCloud = async () => {
     try {
         const token = await getToken().then(token => { return token })
         const email = useStore.getState().email
 
-        if (premium && token && email) {
+        if (token && email) {
             const habitTasks = useStore.getState().habitTask
             const startDateUser = useStore.getState().startDateUser
 
@@ -33,10 +31,14 @@ export const loadInCloud = async () => {
         const token = await getToken().then(token => { return token })
         const email = useStore.getState().email
 
-        if (premium && token) {
+        if (email && token) {
             const data = await apiLoadInCloud(email)
 
-            if (!!data.data.dateOfStart && !!data.data.userHabits && data.status === 200) {
+            if (data?.status as number == 0) {
+                return {message: 'Превышено время ожидания, попробуйте позже ещё раз, если ошибка повториться обратитесь в службу поддержки', status: data.status }
+            }
+
+            if (!!data?.data.dateOfStart && !!data.data.userHabits && data.status >= 200) {
 
                 useStore.getState().initializeStartDateUser(data.data.dateOfStart)
                 useStore.getState().initializeHabits(data.data.userHabits)
@@ -63,11 +65,11 @@ export const loadInCloud = async () => {
                     })
                 }
 
-                return {message: data.message, status: data.status }
+                return {message: data.data.message, status: data.data.status }
 
             }
 
-            return {message: data.message, status: data.status }
+            return {message: data?.data.message, status: data?.data.status }
             
         }
     } catch (error) {
