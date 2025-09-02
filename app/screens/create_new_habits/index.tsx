@@ -143,7 +143,7 @@ const CreateNewHabits = () => {
 
                 notificationsId.current = id
             } catch (error) {
-                console.error(error)
+                console.log(error)
             }
         }
 
@@ -152,7 +152,7 @@ const CreateNewHabits = () => {
                 await CancelNotificationAsync(intervalExecution, habitConfig?.notificationsId, hid)
                 notificationsId.current = null
             } catch (error) {
-                console.error(error)
+                console.log(error)
             }
         }
 

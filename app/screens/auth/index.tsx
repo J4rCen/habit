@@ -1,5 +1,4 @@
 import { apiAuthorization, apiRegistration } from "@/app/api/api"
-import AuthLoader from "@/app/components/auth_loader/authLoader"
 import CustomInput from "@/app/components/custom_input/CustomInput"
 import { SCREEN_HEIGHT, SCREEN_WIDTH, SCREEN_WIDTH_400 } from "@/app/constants"
 import useStore from "@/app/store/zustand"
@@ -21,11 +20,6 @@ const Auth = () => {
     const [repeatPassword, setRepeatPassword] = useState('')
     const [alertShow, setAlertShow] = useState<boolean>(false)
     const [alertMessage, setAlertMessage] = useState<string>('')
-
-    const [title, setTitle] = useState<string>('')
-    const [message, setMessage] = useState<string>('')
-    const [openPopup, setOpenPopup] = useState<boolean>(false)
-    const [isLoading, setIsLoading] = useState<boolean>(false)
 
     useEffect(() => {
 
@@ -70,33 +64,21 @@ const Auth = () => {
             return
         }
 
-        try {
-            setOpenPopup(true)
-            setIsLoading(true)
-            const res = await apiRegistration({ email, password })
+        const res = await apiRegistration({ email, password })
+       
+        if (res?.data.statusCode >= 400) {
+            setAlertMessage(res?.data.message)
+            setAlertShow(true)
+            return
+        }
 
-            if (res?.data.statusCode >= 400) {
-                setTitle('Ошибка')
-                setMessage(res?.data.message)
-                setIsLoading(false)
+        if (res?.data) {
+            const { access_token, payload } = res?.data
 
-                return
-            }
+            setApiData(payload)
+            await setToken(access_token)
 
-            if (res?.data) {
-                const { access_token, payload } = res?.data
-
-                setApiData(payload)
-                await setToken(access_token)
-
-                setOpenPopup(false)
-
-                router.navigate('/(tabs)/settings')
-            }
-        } catch (error) {
-            console.error(error)
-        } finally {
-            setIsLoading(false)
+            router.navigate('/(tabs)/settings')
         }
     }
 
@@ -119,42 +101,27 @@ const Auth = () => {
             return
         }
 
-        try {
-            setOpenPopup(true)
-            setIsLoading(true)
-            const res = await apiAuthorization({ email, password })
+        const res = await apiAuthorization({ email, password })
+    
+        if (res.data.statusCode >= 400) {
+            setAlertMessage(res.data.message)
+            setAlertShow(true)
+            return
+        }
 
-            if (res.data.statusCode >= 400) {
-                setTitle('Ошибка')
-                setMessage(res?.data.message)
-                setIsLoading(false)
+        if (res.data) {
+            const { access_token, payload } = res.data
 
-                return
-            }
+            setApiData(payload)
+            await setToken(access_token)
 
-            if (res.data) {
-                const { access_token, payload } = res.data
-
-                setApiData(payload)
-                await setToken(access_token)
-
-                setOpenPopup(false)
-
-                router.navigate('/(tabs)/settings')
-            }
-        } catch (error) {
-            console.error(error)
-        } finally {
-            setIsLoading(false)
+            router.navigate('/(tabs)/settings')
         }
     }
 
     return (
         <View backgroundColor={'$dark'} maxHeight={SCREEN_HEIGHT}>
             <SafeAreaView>
-                {
-                    openPopup && <AuthLoader open={openPopup} setOpenPopup={setOpenPopup} title={title} message={message} isLoading={isLoading} />
-                }
                 <XStack alignItems='center' marginTop={10} marginBottom={20}>
                     <View onPress={() => router.back()}>
                         <ArrowBack size={36} />
