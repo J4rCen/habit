@@ -5,7 +5,7 @@ import { TouchableOpacity, View } from "react-native"
 import Animated, { Easing, useAnimatedStyle, useSharedValue, withRepeat, withTiming } from "react-native-reanimated"
 import { AlertDialog, Text, XStack, YStack } from "tamagui"
 
-const LoadingScreen: React.FC = () => {
+export const LoadingScreen: React.FC = () => {
 	const progress = useSharedValue(0)
 
 	useEffect(() => {
@@ -103,7 +103,7 @@ const LoaderPopup = (props: {
 			}
 
 		} catch (error) {
-			console.log(error)
+			console.error(error)
 		} finally {
 			setIsLoadingFinished(true)
 			setIsLoading(false)

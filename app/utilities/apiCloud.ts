@@ -24,7 +24,7 @@ export const saveInCloud = async () => {
         }
 
     } catch (error) {
-        console.log(error)
+        console.error(error)
     }
 }
 
@@ -71,6 +71,6 @@ export const loadInCloud = async () => {
             
         }
     } catch (error) {
-        console.log(error)
+        console.error(error)
     }
 }

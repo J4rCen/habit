@@ -83,7 +83,7 @@ export const CancelNotificationAsync = async (type: string, id: string, habitId:
             }
         }
     } catch (error) {
-        console.log(error)
+        console.error(error)
     }
 }
 
@@ -108,7 +108,7 @@ const SetNotifications = async (type: string, time: string, option: ISetNotifica
 
             return notificationId
         } catch (error) {
-            console.log(error)
+            console.error(error)
         }
     }
 
@@ -134,7 +134,7 @@ const SetNotifications = async (type: string, time: string, option: ISetNotifica
 
             return notificationId
         } catch (error) {
-            console.log(error)
+            console.error(error)
         }
     }
 
@@ -167,7 +167,7 @@ const SetNotifications = async (type: string, time: string, option: ISetNotifica
 
             return JSON.stringify(notificationId)
         } catch (error) {
-            console.log(error)
+            console.error(error)
         }
     }
 
@@ -215,7 +215,7 @@ const SetNotifications = async (type: string, time: string, option: ISetNotifica
 
             return jsonData
         } catch (error) {
-            console.log(error)
+            console.error(error)
         }
 
     }

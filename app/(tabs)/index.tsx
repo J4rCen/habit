@@ -106,7 +106,7 @@ export default function Index() {
 
             return BackgroundTask.BackgroundTaskResult.Success
         } catch (error) {
-            console.log(error)
+            console.error(error)
             return BackgroundTask.BackgroundTaskResult.Failed
         }
     })
