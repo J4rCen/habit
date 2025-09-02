@@ -1,12 +1,13 @@
 import { router } from "expo-router"
-import React from "react"
+import React, { useState } from "react"
 import { StyleSheet, TouchableOpacity } from "react-native"
 import { SafeAreaView } from "react-native-safe-area-context"
-import { ScrollView, Text, View, XStack, YStack } from "tamagui"
+import { PortalProvider, ScrollView, Text, View, XStack, YStack } from "tamagui"
+import LoaderPopup from "../components/loader_popup/loaderPopup"
 import { SCREEN_HEIGHT, SCREEN_WIDTH, SCREEN_WIDTH_400 } from "../constants"
 import useStore from "../store/zustand"
-import { Bell, Brush, Crown, FileSvg, Language, LoadInCloud, Logout, Message, SaveInCloud, Star, UserAccount, Watch } from "../svgs/settings"
-import { deleteToken, getToken } from "../utilities/secureStore"
+import { Crown, Language, LoadInCloud, Logout, Message, SaveInCloud, Star, UserAccount, Watch } from "../svgs/settings"
+import { deleteToken } from "../utilities/secureStore"
 
 
 const Settings = () => {
@@ -14,120 +15,131 @@ const Settings = () => {
     const isLogin = useStore(state => state.email)
     const setApiData = useStore(state => state.setApiData)
 
-    getToken().then(data => console.log(data))
-
+    const [openPopup, setOpenPopup] = useState<boolean>(false)
+	const [typePopup, setTypePopup] = useState<'save' | 'load'>('save')
+	
     const logout = async () => {
         setApiData({
             email: null,
             premium: false
         })
         await deleteToken()
-    } 
+    }
 
     return (
         <View backgroundColor={'$dark'} maxHeight={SCREEN_HEIGHT}>
             <SafeAreaView>
-                <YStack height={SCREEN_HEIGHT} backgroundColor='$dark'>
-                    <YStack alignItems="center" height={SCREEN_HEIGHT * 0.8}>
-                        <ScrollView width={SCREEN_WIDTH - 20} showsVerticalScrollIndicator={false} >
-                            <YStack marginBottom={20}>
-                                <Text style={styles.title_block}>Аккаунт</Text>
-                                {
-                                    isLogin !== null ?
-                                        <View gap={10}>
+                <PortalProvider>
+                    <YStack height={SCREEN_HEIGHT} backgroundColor='$dark'>
+                        <YStack alignItems="center" height={SCREEN_HEIGHT * 0.8}>
+                            {
+                                openPopup && <LoaderPopup open={openPopup} type={typePopup} setOpenPopup={setOpenPopup}/>
+                            }
+                            <ScrollView width={SCREEN_WIDTH - 20} showsVerticalScrollIndicator={false} >
+                                <YStack marginBottom={20}>
+                                    <Text style={styles.title_block}>Аккаунт</Text>
+                                    {
+                                        isLogin !== null ?
+                                            <View gap={10}>
+                                                <YStack>
+                                                    <TouchableOpacity style={[styles.button, { backgroundColor: '#194A98' }]}>
+                                                        <XStack gap={10} justifyContent="center">
+                                                            <Crown size={26} />
+                                                            <Text style={styles.buttonLabel}>Оформить подписку</Text>
+                                                        </XStack>
+                                                    </TouchableOpacity>
+                                                </YStack>
+                                                <YStack>
+                                                    <TouchableOpacity style={styles.button} onPress={() => {
+														setTypePopup('save')
+														setOpenPopup(true)
+													}}>
+                                                        <XStack gap={10} justifyContent="center">
+                                                            <SaveInCloud size={26} />
+                                                            <Text style={styles.buttonLabel}>Резервное копирование</Text>
+                                                        </XStack>
+                                                    </TouchableOpacity>
+                                                </YStack>
+                                                <YStack>
+                                                    <TouchableOpacity style={styles.button} onPress={() => {
+														setTypePopup('load')
+														setOpenPopup(true)
+													}}>
+                                                        <XStack gap={10} justifyContent="center">
+                                                            <LoadInCloud size={26} />
+                                                            <Text style={styles.buttonLabel}>Восстановление данных</Text>
+                                                        </XStack>
+                                                    </TouchableOpacity>
+                                                </YStack>
+                                                <YStack>
+                                                    <TouchableOpacity style={[styles.button, { backgroundColor: '#791113' }]} onPress={() => logout()}>
+                                                        <XStack gap={10} justifyContent="center">
+                                                            <Logout size={26} />
+                                                            <Text style={styles.buttonLabel}>Выйти из аккаунта</Text>
+                                                        </XStack>
+                                                    </TouchableOpacity>
+                                                </YStack>
+                                            </View> :
                                             <YStack>
-                                                <TouchableOpacity style={[styles.button, { backgroundColor: '#194A98' }]}>
+                                                <TouchableOpacity style={[styles.button, { backgroundColor: '#194A98' }]} onPress={(() => router.navigate('/screens/auth/' as any))}>
                                                     <XStack gap={10} justifyContent="center">
-                                                        <Crown size={26} />
-                                                        <Text style={styles.buttonLabel}>Оформить подписку</Text>
+                                                        <UserAccount size={26} />
+                                                        <Text style={styles.buttonLabel}>Войти / создать аккаунт</Text>
                                                     </XStack>
                                                 </TouchableOpacity>
                                             </YStack>
-                                            <YStack>
-                                                <TouchableOpacity style={styles.button}>
-                                                    <XStack gap={10} justifyContent="center">
-                                                        <SaveInCloud size={26} />
-                                                        <Text style={styles.buttonLabel}>Резервное копирование</Text>
-                                                    </XStack>
-                                                </TouchableOpacity>
-                                            </YStack>
-                                            <YStack>
-                                                <TouchableOpacity style={styles.button}>
-                                                    <XStack gap={10} justifyContent="center">
-                                                        <LoadInCloud size={26} />
-                                                        <Text style={styles.buttonLabel}>Восстановление данных</Text>
-                                                    </XStack>
-                                                </TouchableOpacity>
-                                            </YStack>
-                                            <YStack>
-                                                <TouchableOpacity style={[styles.button, { backgroundColor: '#791113' }]} onPress={() => logout()}>
-                                                    <XStack gap={10} justifyContent="center">
-                                                        <Logout size={26} />
-                                                        <Text style={styles.buttonLabel}>Выйти из аккаунта</Text>
-                                                    </XStack>
-                                                </TouchableOpacity>
-                                            </YStack>
-                                        </View> :
-                                        <YStack>
-                                            <TouchableOpacity style={[styles.button, { backgroundColor: '#194A98' }]} onPress={(() => router.navigate('/screens/auth/' as any))}>
-                                                <XStack gap={10} justifyContent="center">
-                                                    <UserAccount size={26} />
-                                                    <Text style={styles.buttonLabel}>Войти / создать аккаунт</Text>
-                                                </XStack>
-                                            </TouchableOpacity>
-                                        </YStack>
-                                }
-                            </YStack>
+                                    }
+                                </YStack>
 
-                            <YStack marginBottom={20}>
-                                <Text style={styles.title_block}>Настройки</Text>
-                                <YStack gap={10}>
-                                    <TouchableOpacity style={styles.button}>
-                                        <XStack gap={10} justifyContent="center">
-                                            <Language size={24} />
-                                            <Text style={styles.buttonLabel}>Языковые параметры</Text>
-                                        </XStack>
-                                    </TouchableOpacity>
-                                    <TouchableOpacity style={styles.button}>
+                                <YStack marginBottom={20}>
+                                    <Text style={styles.title_block}>Настройки</Text>
+                                    <YStack gap={10}>
+                                        <TouchableOpacity style={styles.button}>
+                                            <XStack gap={10} justifyContent="center">
+                                                <Language size={24} />
+                                                <Text style={styles.buttonLabel}>Языковые параметры</Text>
+                                            </XStack>
+                                        </TouchableOpacity>
+                                        {/* <TouchableOpacity style={styles.button}>
                                         <XStack gap={10} justifyContent="center">
                                             <Brush size={26} />
                                             <Text style={styles.buttonLabel}>Стиль</Text>
                                         </XStack>
-                                    </TouchableOpacity>
-                                    <TouchableOpacity style={styles.button}>
-                                        <XStack gap={10} justifyContent="center">
-                                            <Watch size={28} />
-                                            <Text style={styles.buttonLabel}>Интервал времени</Text>
-                                        </XStack>
-                                    </TouchableOpacity>
-                                    <TouchableOpacity style={styles.button}>
+                                    </TouchableOpacity> */}
+                                        <TouchableOpacity style={styles.button}>
+                                            <XStack gap={10} justifyContent="center">
+                                                <Watch size={28} />
+                                                <Text style={styles.buttonLabel}>Интервал времени</Text>
+                                            </XStack>
+                                        </TouchableOpacity>
+                                        {/* <TouchableOpacity style={styles.button}>
                                         <XStack gap={10} justifyContent="center">
                                             <Bell size={24} />
                                             <Text style={styles.buttonLabel}>Уведомления</Text>
                                         </XStack>
-                                    </TouchableOpacity>
+                                    </TouchableOpacity> */}
+                                    </YStack>
                                 </YStack>
-                            </YStack>
 
-                            <YStack marginBottom={20}>
-                                <Text style={styles.title_block}>Медиа</Text>
-                                <YStack gap={10}>
-                                    <TouchableOpacity style={styles.button}>
-                                        <XStack gap={10} justifyContent="center">
-                                            <Star size={24} />
-                                            <Text style={styles.buttonLabel}>Оставить отзыв</Text>
-                                        </XStack>
-                                    </TouchableOpacity>
-                                    <TouchableOpacity style={styles.button}>
-                                        <XStack gap={10} justifyContent="center">
-                                            <Message size={26} />
-                                            <Text style={styles.buttonLabel}>Обратная связь</Text>
-                                        </XStack>
-                                    </TouchableOpacity>
+                                <YStack marginBottom={20}>
+                                    <Text style={styles.title_block}>Медиа</Text>
+                                    <YStack gap={10}>
+                                        <TouchableOpacity style={styles.button}>
+                                            <XStack gap={10} justifyContent="center">
+                                                <Star size={24} />
+                                                <Text style={styles.buttonLabel}>Оставить отзыв</Text>
+                                            </XStack>
+                                        </TouchableOpacity>
+                                        <TouchableOpacity style={styles.button}>
+                                            <XStack gap={10} justifyContent="center">
+                                                <Message size={26} />
+                                                <Text style={styles.buttonLabel}>Обратная связь</Text>
+                                            </XStack>
+                                        </TouchableOpacity>
+                                    </YStack>
                                 </YStack>
-                            </YStack>
 
-                            <YStack marginBottom={20}>
+                                {/* <YStack marginBottom={20}>
                                 <Text style={styles.title_block}>Документация</Text>
                                 <YStack gap={10}>
                                     <TouchableOpacity style={styles.button}>
@@ -143,11 +155,12 @@ const Settings = () => {
                                         </XStack>
                                     </TouchableOpacity>
                                 </YStack>
-                            </YStack>
+                            </YStack> */}
 
-                        </ScrollView>
+                            </ScrollView>
+                        </YStack>
                     </YStack>
-                </YStack>
+                </PortalProvider>
             </SafeAreaView>
         </View>
     )
@@ -172,4 +185,4 @@ const styles = StyleSheet.create({
     }
 })
 
-export default React.memo(Settings)
+export default Settings

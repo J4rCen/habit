@@ -7,7 +7,7 @@ export const setToken = async (token: string) => {
             keychainAccessible: SecureStore.WHEN_UNLOCKED,
         });
     } catch (error) {
-        console.log('Ошибка при сохранение токена: ', error)
+        console.error('Ошибка при сохранение токена: ', error)
     }
 }
 
@@ -16,7 +16,7 @@ export const getToken = async () => {
         const token = SecureStore.getItemAsync(ACCESS_TOKEN);
         return await token;
     } catch (error) {
-        console.log('Ошибка при получение токена: ', error)
+        console.error('Ошибка при получение токена: ', error)
     }
 }
 
