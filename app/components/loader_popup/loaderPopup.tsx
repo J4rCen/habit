@@ -1,5 +1,6 @@
 import { SCREEN_WIDTH } from "@/app/constants"
-import React, { useEffect } from "react"
+import { loadInCloud, saveInCloud } from "@/app/utilities/apiCloud"
+import React, { useEffect, useState } from "react"
 import { TouchableOpacity, View } from "react-native"
 import Animated, { Easing, useAnimatedStyle, useSharedValue, withRepeat, withTiming } from "react-native-reanimated"
 import { AlertDialog, Text, XStack, YStack } from "tamagui"
@@ -50,19 +51,67 @@ const LoadingScreen: React.FC = () => {
 	)
 }
 
-interface ILoaderPopup {
-	title: string
-	message: string
-	isLoader: boolean
-	openPopup: boolean,
+const LoaderPopup = (props: {
+	open: boolean,
+	type: 'save' | 'load',
 	setOpenPopup: React.Dispatch<React.SetStateAction<boolean>>
-	startLoader: boolean,
-	setStartLoader: React.Dispatch<React.SetStateAction<boolean>>
-}
+}) => {
 
-const LoaderPopup = (title: string, message: string, isLoader: boolean, openPopup: boolean, setOpenPopup: React.Dispatch<React.SetStateAction<boolean>>) => {
+	const [title, setTitle] = useState<string>('')
+	const [message, setMessage] = useState<string>('')
+	const [isLoading, setIsLoading] = useState<boolean>(false)
+	const [isLoadingFinished, setIsLoadingFinished] = useState<boolean>(false)
+
+	useEffect(() => {
+		if (props.type === 'save') {
+			setTitle('Сохранение данных')
+			setMessage('При сохранение данных в облако, данные будут перезаписаны')
+		} else {
+			setTitle('Восстановление')
+			setMessage('При восстановление данных они будут добавлены к уже созданным')
+		}
+	}, [props.type])
+
+
+	const loadingControl = async () => {
+
+		setIsLoading(true)
+
+		try {
+			if (props.type === 'save') {
+				const res = await saveInCloud()
+
+				if (res.status === 200) {
+					setTitle('Успешно')
+					setMessage(res.message)
+				} else {
+					setTitle('Ошибка')
+					setMessage(res.message)
+				}
+			}
+
+			if (props.type === 'load') {
+				const res = await loadInCloud()
+
+				if (res?.status === 200) {
+					setTitle('Успешно')
+					setMessage(res.message)
+				} else {
+					setTitle('Ошибка')
+					setMessage(res?.message)
+				}
+			}
+
+		} catch (error) {
+			console.log(error)
+		} finally {
+			setIsLoadingFinished(true)
+			setIsLoading(false)
+		}
+	}
+
 	return (
-		<AlertDialog open={openPopup}>
+		<AlertDialog open={props.open}>
 			<AlertDialog.Overlay
 				key="overlay"
 				opacity={0}
@@ -82,71 +131,78 @@ const LoaderPopup = (title: string, message: string, isLoader: boolean, openPopu
 				}}
 			>
 				{
-					isLoader ?
+					isLoading ?
 						<LoadingScreen /> :
 						<YStack gap={'$4'}>
-							<AlertDialog.Title fontSize={22} color={'white'}>{title}</AlertDialog.Title>
+							<AlertDialog.Title fontSize={22} color={'white'}>
+								{
+									title
+								}
+							</AlertDialog.Title>
+
 							<AlertDialog.Description fontSize={18} color={'white'}>
-								{message}
+								{
+									message
+								}
 							</AlertDialog.Description>
+
 							<YStack
 								alignItems="center"
 								justifyContent="center"
 							>
-
-								
-								<AlertDialog.Cancel asChild onPress={() => setOpenPopup(false)}>
-									<TouchableOpacity
-										style={{
-											height: 40,
-											width: '70%',
-											backgroundColor: '#194A98',
-											borderRadius: 10,
-											justifyContent: 'center',
-											alignItems: 'center'
-										}}
-									>
-										<Text color={'white'} fontSize={16}>
-											Закрыть
-										</Text>
-									</TouchableOpacity>
-								</AlertDialog.Cancel>
-
-								<XStack gap={10}>
-									<AlertDialog.Cancel asChild onPress={() => setOpenPopup(false)}>
-										<TouchableOpacity
-											style={{
-												height: 40,
-												width: '40%',
-												backgroundColor: '#393E46',
-												borderRadius: 10,
-												justifyContent: 'center',
-												alignItems: 'center'
-											}}
-										>
-											<Text color={'white'} fontSize={16}>
-												Закрыть
-											</Text>
-										</TouchableOpacity>
-									</AlertDialog.Cancel>
-									<AlertDialog.Action asChild>
-										<TouchableOpacity
-											style={{
-												height: 40,
-												width: '40%',
-												backgroundColor: '#194A98',
-												borderRadius: 10,
-												justifyContent: 'center',
-												alignItems: 'center'
-											}}
-										>
-											<Text color={'white'} fontSize={16}>
-												Ок
-											</Text>
-										</TouchableOpacity>
-									</AlertDialog.Action>
-								</XStack>
-
+								{
+									isLoadingFinished ?
+										<AlertDialog.Cancel asChild onPress={() => props.setOpenPopup(false)}>
+											<TouchableOpacity
+												style={{
+													height: 40,
+													width: '70%',
+													backgroundColor: '#194A98',
+													borderRadius: 10,
+													justifyContent: 'center',
+													alignItems: 'center'
+												}}
+											>
+												<Text color={'white'} fontSize={16}>
+													Закрыть
+												</Text>
+											</TouchableOpacity>
+										</AlertDialog.Cancel> :
+										<XStack gap={10}>
+											<AlertDialog.Cancel asChild onPress={() => props.setOpenPopup(false)}>
+												<TouchableOpacity
+													style={{
+														height: 40,
+														width: '40%',
+														backgroundColor: '#393E46',
+														borderRadius: 10,
+														justifyContent: 'center',
+														alignItems: 'center'
+													}}
+												>
+													<Text color={'white'} fontSize={16}>
+														Отмена
+													</Text>
+												</TouchableOpacity>
+											</AlertDialog.Cancel>
+											<AlertDialog.Action asChild onPress={() => loadingControl()}>
+												<TouchableOpacity
+													style={{
+														height: 40,
+														width: '40%',
+														backgroundColor: '#194A98',
+														borderRadius: 10,
+														justifyContent: 'center',
+														alignItems: 'center'
+													}}
+												>
+													<Text color={'white'} fontSize={16}>
+														Ок
+													</Text>
+												</TouchableOpacity>
+											</AlertDialog.Action>
+										</XStack>
+								}
 							</YStack>
 						</YStack>
 				}
@@ -155,4 +211,4 @@ const LoaderPopup = (title: string, message: string, isLoader: boolean, openPopu
 	)
 }
 
-export default LoaderPopup
+export default React.memo(LoaderPopup)

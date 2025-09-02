@@ -33,7 +33,7 @@ export const apiAuthorization = async (data: { email: string, password: string }
 export const apiSaveInCloud = async (data: any) => {
     return await api.post('habit/save', data)
         .then(data => {
-            return data
+            return data.data
         })
         .catch(err => {
             return err.response
