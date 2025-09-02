@@ -103,7 +103,6 @@ export default function Index() {
                     }
                 }
             }
-
             return BackgroundTask.BackgroundTaskResult.Success
         } catch (error) {
             console.error(error)
