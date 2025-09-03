@@ -4,7 +4,6 @@ import CustomInput from "@/app/components/custom_input/CustomInput"
 import { SCREEN_HEIGHT, SCREEN_WIDTH, SCREEN_WIDTH_400 } from "@/app/constants"
 import useStore from "@/app/store/zustand"
 import ArrowBack from "@/app/svgs/arrowBack"
-import { GoogleSvg, YandexSvg } from "@/app/svgs/authorization"
 import { setToken } from "@/app/utilities/secureStore"
 import { router } from "expo-router"
 import React, { useEffect, useState } from "react"
@@ -245,7 +244,7 @@ const Auth = () => {
                                 </>
                         }
                     </YStack>
-
+                        {/*
                     <XStack width={SCREEN_WIDTH - 20} justifyContent="center" alignItems="center" marginBottom={20}>
                         <View
                             backgroundColor={'white'}
@@ -267,21 +266,22 @@ const Auth = () => {
                             width={SCREEN_WIDTH / 2.5}
                         />
                     </XStack>
-
-                    <YStack gap={15} >
-                        <TouchableOpacity style={[styles.button, { backgroundColor: '#194A98' }]}>
-                            <XStack gap={10} justifyContent="center">
-                                <GoogleSvg size={26} />
-                                <Text style={styles.buttonLabel}>Войти с помощью Google</Text>
-                            </XStack>
-                        </TouchableOpacity>
-                        <TouchableOpacity style={[styles.button, { backgroundColor: '#791113' }]}>
-                            <XStack gap={10} justifyContent="center">
-                                <YandexSvg size={26} />
-                                <Text style={styles.buttonLabel}>Войти с помощью Яндекс</Text>
-                            </XStack>
-                        </TouchableOpacity>
-                    </YStack>
+                     
+                        <YStack gap={15} >
+                            <TouchableOpacity style={[styles.button, { backgroundColor: '#194A98' }]}>
+                                <XStack gap={10} justifyContent="center">
+                                    <GoogleSvg size={26} />
+                                    <Text style={styles.buttonLabel}>Войти с помощью Google</Text>
+                                </XStack>
+                            </TouchableOpacity>
+                            <TouchableOpacity style={[styles.button, { backgroundColor: '#791113' }]}>
+                                <XStack gap={10} justifyContent="center">
+                                    <YandexSvg size={26} />
+                                    <Text style={styles.buttonLabel}>Войти с помощью Яндекс</Text>
+                                </XStack>
+                            </TouchableOpacity>
+                        </YStack> 
+                    */}
 
                 </YStack>
             </SafeAreaView>

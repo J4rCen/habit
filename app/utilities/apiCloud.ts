@@ -32,21 +32,22 @@ export const loadInCloud = async () => {
         const email = useStore.getState().email
 
         if (email && token) {
-            const data = await apiLoadInCloud(email)
+            const response = await apiLoadInCloud(email)
+            const {data, status, message} = response.data
 
-            if (data?.status as number == 0) {
-                return {message: 'Превышено время ожидания, попробуйте позже ещё раз, если ошибка повториться обратитесь в службу поддержки', status: data.status }
+            if (response?.status as number == 0) {
+                return {message: 'Превышено время ожидания, попробуйте позже ещё раз, если ошибка повториться обратитесь в службу поддержки', status: status }
             }
 
-            if (!!data?.data.dateOfStart && !!data.data.userHabits && data.status >= 200) {
+            if (!!data.dateOfStart && !!data.userHabits && status >= 200) {
 
-                useStore.getState().initializeStartDateUser(data.data.dateOfStart)
-                useStore.getState().initializeHabits(data.data.userHabits)
+                useStore.getState().initializeStartDateUser(data.dateOfStart)
+                useStore.getState().initializeHabits(data.userHabits)
 
                 const permission = await GetPermissionAccess()
 
                 if (permission === 'granted') {
-                    Object.values(data.data.userHabits as IHabitTask).forEach((item: IHabitTask) => {
+                    Object.values(data.userHabits as IHabitTask).forEach((item: IHabitTask) => {
 
                         const habitConfig = item.habitConfig
 
@@ -65,11 +66,11 @@ export const loadInCloud = async () => {
                     })
                 }
 
-                return {message: data.data.message, status: data.data.status }
+                return {message: message, status: status }
 
             }
 
-            return {message: data?.data.message, status: data?.data.status }
+            return {message: message, status: status }
             
         }
     } catch (error) {
