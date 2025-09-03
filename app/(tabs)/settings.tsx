@@ -94,7 +94,7 @@ const Settings = () => {
                                 <YStack marginBottom={20}>
                                     <Text style={styles.title_block}>Настройки</Text>
                                     <YStack gap={10}>
-                                        <TouchableOpacity style={styles.button}>
+                                        <TouchableOpacity style={styles.button} onPress={(() => router.navigate('/screens/languagePage/' as any))}>
                                             <XStack gap={10} justifyContent="center">
                                                 <Language size={24} />
                                                 <Text style={styles.buttonLabel}>Языковые параметры</Text>
