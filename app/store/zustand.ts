@@ -12,6 +12,12 @@ export type StaticConfig = {
 	duration?: number
 }
 
+export type TDayInterval = {
+	morningTime: string,
+	dayTime: string,
+	eveningTime: string
+}
+
 export interface IHabitTask {
 	habitId: string
 	habitConfig: {
@@ -38,6 +44,7 @@ export interface IHabitTask {
 interface IStore {
 	habitTask: Record<string, IHabitTask>
 	startDateUser: string | null
+	dayInterval: TDayInterval,
 	email: string | null,
 	premium: boolean,
 	_hasHydrated: boolean
@@ -52,7 +59,8 @@ interface IStore {
 	getHabitTask: (habitId: string) => IHabitTask | null
 	updateHabitTask: (habitId: string, habitConfig: Omit<IHabitTask, 'habitId'>) => void
 	removeHabitTask: (habitId: string) => void,
-	setApiData: (data: { email: string | null, premium: false }) => void
+	setApiData: (data: { email: string | null, premium: false }) => void,
+	setDayInterval: (data: TDayInterval) => void
 }
 
 const useStore = create<IStore>()(
@@ -60,6 +68,11 @@ const useStore = create<IStore>()(
 		(set, get) => ({
 			habitTask: {},
 			startDateUser: null,
+			dayInterval: {
+				morningTime: '08:00',
+				dayTime: '12:00',
+				eveningTime: '18:00',
+			},
 			email: null,
 			premium: false,
 			_hasHydrated: false,
@@ -95,6 +108,14 @@ const useStore = create<IStore>()(
 						...state.habitTask,
 						...data,
 					},
+				}))
+			},
+			setDayInterval: (data: TDayInterval) => {
+				set((state) => ({
+					dayInterval: {
+						...state.dayInterval,
+						...data
+					}
 				}))
 			},
 			setIsCompleat: (habitId, date, habitStatic) => {
@@ -166,13 +187,14 @@ const useStore = create<IStore>()(
 			partialize: (state) => ({
 				habitTask: state.habitTask,
 				startDateUser: state.startDateUser,
+				dayInterval: state.dayInterval,
 				email: state.email,
 				premium: state.premium,
 			}),
 			onRehydrateStorage: () => (state) => {
 				state?.setHasHydrated(true)
 			},
-			migrate: (persistedState: any, version) => {
+			migrate: (persistedState: any) => {
 				if (persistedState && typeof persistedState.habitTask === 'number') {
 					return {
 						habitTask: {},

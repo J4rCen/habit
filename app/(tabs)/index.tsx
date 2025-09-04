@@ -23,136 +23,166 @@ dayjs.extend(isoWeek);
 dayjs.extend(weekday);
 dayjs.extend(customParseFormat)
 
+const timeToSeconds = (timeStr: string): number => {
+	const [hours, minutes] = timeStr.split(':').map(Number);
+	return hours * 3600 + minutes * 60;
+};
+
+const getCurrentTimeInSeconds = (): number => {
+	const now = new Date();
+	return now.getHours() * 3600 + now.getMinutes() * 60 + now.getSeconds();
+};
+
 export default function Index() {
 
-    const store = useStore(state => state.habitTask)
-    const initApp = useStore(state => state.initializeApp)
+	const store = useStore(state => state.habitTask)
+	const initApp = useStore(state => state.initializeApp)
+	const dayInterval = useStore(state => state.dayInterval)
 
-    const [selectDate, setSelectDate] = useState(dayjs().format(DATE_FORMAT))
-    const [selectFilter, setSelectFilter] = useState('all')
-    const [habitsStore, setHabitStore] = useState<IHabitTask[]>(Object.values(store) ?? [])
+	const [selectDate, setSelectDate] = useState(dayjs().format(DATE_FORMAT))
+	const [selectFilter, setSelectFilter] = useState('all')
+	const [habitsStore, setHabitStore] = useState<IHabitTask[]>(Object.values(store) ?? [])
 
-    useEffect(() => {
-        initApp()
-        const registerBackgroundTask = async () => {
-            try {
-                await BackgroundTask.registerTaskAsync(REFRESH_NOTIFICATION, {
-                    minimumInterval: 60 * 60 * 24
-                })
-            } catch (error) { }
-        }
+	const morningStart = timeToSeconds(dayInterval.morningTime);
+	const dayStart = timeToSeconds(dayInterval.dayTime);
+	const eveningStart = timeToSeconds(dayInterval.eveningTime);
+	const nowSec = getCurrentTimeInSeconds();
 
-        registerBackgroundTask()
+	useEffect(() => {
+		if (nowSec >= morningStart && nowSec < dayStart) {
+			setSelectFilter("morning")
+		} else if (nowSec >= dayStart && nowSec < eveningStart) {
+			setSelectFilter("day")
+		} else {
+			if (nowSec >= eveningStart || nowSec < morningStart) {
+				setSelectFilter('evening')
+			} else {
+				setSelectFilter('all')
+			}
+		}
+	}, [])
 
-    }, [])
+	useEffect(() => {
+		initApp()
+		const registerBackgroundTask = async () => {
+			try {
+				await BackgroundTask.registerTaskAsync(REFRESH_NOTIFICATION, {
+					minimumInterval: 60 * 60 * 24
+				})
+			} catch (error) { }
+		}
 
-    useEffect(() => {
-        setHabitStore(Object.values(store) ?? [])
-    }, [store])
+		registerBackgroundTask()
 
-    TaskManager.defineTask(REFRESH_NOTIFICATION, async () => {
-        try {
+	}, [])
 
-            const scheduled = await Notifications.getAllScheduledNotificationsAsync()
-            const updateHabitTask = useStore.getState().updateHabitTask
+	useEffect(() => {
+		setHabitStore(Object.values(store) ?? [])
+	}, [store])
 
-            const habitNotif = scheduled.reduce<Record<string, string | null>>((acc, item) => {
-                const data = item.content.data as any
-                const untilDay = data['untilDay'] as string | undefined
+	TaskManager.defineTask(REFRESH_NOTIFICATION, async () => {
+		try {
 
-                if (!untilDay) return acc
+			const scheduled = await Notifications.getAllScheduledNotificationsAsync()
+			const updateHabitTask = useStore.getState().updateHabitTask
 
-                if (data['habitId']) {
-                    if (
-                        !acc[data.habitId] ||
-                        dayjs(untilDay, DATE_FORMAT).isAfter(dayjs(acc[data.habitId]))
-                    ) {
-                        acc[data.habitId] = untilDay
-                    }
-                }
+			const habitNotif = scheduled.reduce<Record<string, string | null>>((acc, item) => {
+				const data = item.content.data as any
+				const untilDay = data['untilDay'] as string | undefined
 
-                return acc
+				if (!untilDay) return acc
 
-            }, {})
+				if (data['habitId']) {
+					if (
+						!acc[data.habitId] ||
+						dayjs(untilDay, DATE_FORMAT).isAfter(dayjs(acc[data.habitId]))
+					) {
+						acc[data.habitId] = untilDay
+					}
+				}
 
-            for (const [key, value] of Object.entries(habitNotif)) {
-                if (dayjs(value, DATE_FORMAT).diff(dayjs(), 'day') <= 10) {
-                    const habit = useStore.getState().getHabitTask(key)
-                    if (habit && habit.habitConfig.reminder) {
-                        const { skip_days, days_in_row } = habit.habitConfig.gap_interval as { skip_days: number, days_in_row: number }
-                        const newDataOfCreate = getNextRenderBaseDate(habit.habitConfig.day_of_create, days_in_row, skip_days)
-                        const notid = await SetNotifications('gap', habit?.habitConfig.reminder && habit.habitConfig.reminder_time ? habit?.habitConfig.reminder_time : '00:00', {
-                            name: habit?.habitConfig.name,
-                            habitId: key,
-                            notid: habit.habitConfig.notificationsId,
-                            skipDays: skip_days,
-                            daysInRow: days_in_row,
-                            dayOfCreate: newDataOfCreate
-                        })
+				return acc
 
-                        if (notid) {
-                            const updateConfig: IHabitTask = {
-                                ...habit,
-                                habitConfig: {
-                                    ...habit.habitConfig,
-                                    notificationsId: notid
-                                }
-                            }
-                            updateHabitTask(key, updateConfig)
-                        }
-                    }
-                }
-            }
-            return BackgroundTask.BackgroundTaskResult.Success
-        } catch (error) {
-            console.error(error)
-            return BackgroundTask.BackgroundTaskResult.Failed
-        }
-    })
+			}, {})
 
-    return (
-        <View backgroundColor={'$dark'} maxHeight={SCREEN_HEIGHT}>
-            <SafeAreaView>
-                <YStack height={SCREEN_HEIGHT} backgroundColor='$dark'>
-                    <SlidingCalendar
-                        selectDate={selectDate}
-                        setSelectDate={setSelectDate}
-                    />
-                    <YStack alignItems="center">
-                        <FilteringButtonsTime
-                            selectFilter={selectFilter}
-                            setSelectFilter={setSelectFilter}
-                        />
-                        <TouchableOpacity
-                            style={styles.buttonCreateNewHabit}
-                            onPress={() => router.navigate('/screens/create_new_habits')}
-                        >
-                            <Text
-                                color={'$white'}
-                                fontSize={18}
-                            >Добавить привычку</Text>
-                        </TouchableOpacity>
+			for (const [key, value] of Object.entries(habitNotif)) {
+				if (dayjs(value, DATE_FORMAT).diff(dayjs(), 'day') <= 10) {
+					const habit = useStore.getState().getHabitTask(key)
+					if (habit && habit.habitConfig.reminder) {
+						const { skip_days, days_in_row } = habit.habitConfig.gap_interval as { skip_days: number, days_in_row: number }
+						const newDataOfCreate = getNextRenderBaseDate(habit.habitConfig.day_of_create, days_in_row, skip_days)
+						const notid = await SetNotifications('gap', habit?.habitConfig.reminder && habit.habitConfig.reminder_time ? habit?.habitConfig.reminder_time : '00:00', {
+							name: habit?.habitConfig.name,
+							habitId: key,
+							notid: habit.habitConfig.notificationsId,
+							skipDays: skip_days,
+							daysInRow: days_in_row,
+							dayOfCreate: newDataOfCreate
+						})
 
-                        <HabitsRender
-                            habitsStore={habitsStore}
-                            selectDate={selectDate}
-                            selectFilter={selectFilter}
-                        />
-                    </YStack>
-                </YStack>
-            </SafeAreaView>
-        </View>
-    );
+						if (notid) {
+							const updateConfig: IHabitTask = {
+								...habit,
+								habitConfig: {
+									...habit.habitConfig,
+									notificationsId: notid
+								}
+							}
+							updateHabitTask(key, updateConfig)
+						}
+					}
+				}
+			}
+			return BackgroundTask.BackgroundTaskResult.Success
+		} catch (error) {
+			console.error(error)
+			return BackgroundTask.BackgroundTaskResult.Failed
+		}
+	})
+
+	return (
+		<View backgroundColor={'$dark'} maxHeight={SCREEN_HEIGHT}>
+			<SafeAreaView>
+				<YStack height={SCREEN_HEIGHT} backgroundColor='$dark'>
+					<SlidingCalendar
+						selectDate={selectDate}
+						setSelectDate={setSelectDate}
+					/>
+					<YStack alignItems="center">
+						<FilteringButtonsTime
+							selectFilter={selectFilter}
+							setSelectFilter={setSelectFilter}
+						/>
+						<TouchableOpacity
+							style={styles.buttonCreateNewHabit}
+							onPress={() => router.navigate('/screens/create_new_habits')}
+						>
+							<Text
+								color={'$white'}
+								fontSize={18}
+							>Добавить привычку</Text>
+						</TouchableOpacity>
+
+						<HabitsRender
+							habitsStore={habitsStore}
+							selectDate={selectDate}
+							selectFilter={selectFilter}
+						/>
+					</YStack>
+				</YStack>
+			</SafeAreaView>
+		</View>
+	);
 }
 
 const styles = StyleSheet.create({
-    buttonCreateNewHabit: {
-        borderRadius: 10,
-        backgroundColor: '#194A98',
-        width: SCREEN_WIDTH - 40,
-        height: SCREEN_WIDTH_400 ? 40 : 45,
-        alignItems: 'center',
-        justifyContent: 'center',
-        marginTop: 10
-    }
+	buttonCreateNewHabit: {
+		borderRadius: 10,
+		backgroundColor: '#194A98',
+		width: SCREEN_WIDTH - 40,
+		height: SCREEN_WIDTH_400 ? 40 : 45,
+		alignItems: 'center',
+		justifyContent: 'center',
+		marginTop: 10
+	}
 })

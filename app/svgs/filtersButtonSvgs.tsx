@@ -1,8 +1,9 @@
 import Svg, { Ellipse, Path } from "react-native-svg";
+import { ISvgSettings } from "./settings";
 
-export const MorningSvg = () => {
+export const MorningSvg = ({ size }: ISvgSettings) => {
     return (
-    <Svg width={30} height={30} viewBox="0 0 52 52" fill="none">
+    <Svg width={size} height={size} viewBox="0 0 52 52" fill="none">
       <Path
         d="M32.2572 30.0413H17.742M30.2778 34H19.7214M34.2365 26.7424C34.2365 21.641 30.101 17.5055 24.9996 17.5055C19.8982 17.5055 15.7627 21.641 15.7627 26.7424H22L24.9996 24.5L28 26.7424H34.2365Z"
         stroke="white"
@@ -42,9 +43,9 @@ export const MorningSvg = () => {
   );
 }
 
-export const DaySvg = () => {
+export const DaySvg = ({ size }: ISvgSettings) => {
     return (
-    <Svg width={30} height={30} viewBox="0 0 53 52" fill="none">
+    <Svg width={size} height={size} viewBox="0 0 53 52" fill="none">
       <Ellipse
         cx={25.9997}
         cy={26}
@@ -105,9 +106,9 @@ export const DaySvg = () => {
   );
 }
 
-export const EveningSvg = () => {
+export const EveningSvg = ({ size }: ISvgSettings) => {
     return (
-        <Svg width="26" height="26" viewBox="0 0 55 54" fill="none">
+        <Svg width={size} height={size} viewBox="0 0 55 54" fill="none">
             <Path
             d="M26.9078 6.80726C22.5769 10.5672 19.8385 16.1138 19.8385 22.2994C19.8385 33.6252 29.0205 42.8063 40.3463 42.8063C41.8285 42.8063 43.2736 42.648 44.6666 42.3493C41.0679 45.4728 36.3704 47.3639 31.231 47.3639C19.9053 47.3638 10.7242 38.1818 10.7242 26.8561C10.7244 17.0138 17.6584 8.79228 26.9078 6.80726Z"
             fill="white"

@@ -28,7 +28,7 @@ const FilteringButtonsTime = (props: IFilteringButtonsTime) => {
                 onPress={() => setSelect('morning')}
             >
                 <XStack alignItems="center" justifyContent="center">
-                    <MorningSvg/>
+                    <MorningSvg size={30}/>
                     <Text style={styles.buttonText}>Утро</Text>
                 </XStack>
             </TouchableOpacity>
@@ -37,7 +37,7 @@ const FilteringButtonsTime = (props: IFilteringButtonsTime) => {
                 onPress={() => setSelect('day')}
             >
                 <XStack alignItems="center" justifyContent="center">
-                    <DaySvg/>
+                    <DaySvg size={30}/>
                     <Text style={styles.buttonText}>День</Text>
                 </XStack>
             </TouchableOpacity>
@@ -46,7 +46,7 @@ const FilteringButtonsTime = (props: IFilteringButtonsTime) => {
                 onPress={() => setSelect('evening')}
             >
                 <XStack alignItems="center" justifyContent="center">
-                    <EveningSvg/>
+                    <EveningSvg size={26}/>
                     <Text style={styles.buttonText}>Вечер</Text>
                 </XStack>
             </TouchableOpacity>
