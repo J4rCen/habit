@@ -10,7 +10,6 @@ import useStore, { IHabitTask } from "../store/zustand"
 const Statistics = () => {
 
     const store: IHabitTask[] = Object.values(useStore(store => store.habitTask))
-    const dataStart = useStore(store => store.startDateUser)
     const [searchValue, setSearchValue] = useState<string>('')
 
     const filteredHabits = useCallback(() => {
@@ -26,7 +25,7 @@ const Statistics = () => {
             
         }).map((item, index) => {
             return (
-                <TouchableOpacity key={index} onPress={() => router.navigate({ pathname: '/screens/statistics', params: { habitId: item.habitId, habitName: item.habitConfig.name, dataStart: dataStart, habitStart: item.habitConfig.day_of_create } })}>
+                <TouchableOpacity key={index} onPress={() => router.navigate({ pathname: '/screens/statistics', params: { habitId: item.habitId, habitName: item.habitConfig.name, habitStart: item.habitConfig.day_of_create } })}>
                     <XStack
                         height={SCREEN_WIDTH_400 ? 50 : 60}
                         width={'100%'}
@@ -45,7 +44,7 @@ const Statistics = () => {
                 </TouchableOpacity>
             )
         });
-    }, [store, searchValue, dataStart]);
+    }, [store, searchValue]);
 
     const habitListTask = useMemo(() => filteredHabits(), [filteredHabits]);
 

@@ -20,7 +20,6 @@ LocaleConfig.locales.ru = {
 LocaleConfig.defaultLocale = 'ru';
 
 interface ICalendarChart {
-    dataStart: string
     habitConfig: IHabitTask['habitConfig']
     statistics: IHabitTask['habitStatic']
     pastDays: number
@@ -29,17 +28,17 @@ interface ICalendarChart {
 
 dayjs.extend(customParseFormat)
 
+const CalendarChart = ({ statistics, pastDays, habitStart, habitConfig }: ICalendarChart) => {
+    const currentMonth = dayjs().format(DATE_FORMAT)
+    const [endMonth, setEndMonth] = useState(currentMonth);
+    
 
-const CalendarChart = ({ dataStart, statistics, pastDays, habitStart, habitConfig }: ICalendarChart) => {
-    const [currentMonth, setCurrentMonth] = useState(dataStart);
-
-    const disableArrowLeft = useMemo(
-        () => dayjs(currentMonth).subtract(1, 'month').isBefore(dataStart),
-        [currentMonth, dataStart]
-    );
+    const disableArrowLeft = useMemo(() => {
+        return dayjs(endMonth).isSame(habitStart, 'month')
+    }, [endMonth, habitStart]);
 
     const onMonthChange = (month: { dateString: string }) => {
-        setCurrentMonth(month.dateString);
+        setEndMonth(month.dateString);
     };
 
     const markedDates = useMemo(() => {
