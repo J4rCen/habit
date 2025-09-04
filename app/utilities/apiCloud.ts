@@ -11,11 +11,13 @@ export const saveInCloud = async () => {
         if (token && email) {
             const habitTasks = useStore.getState().habitTask
             const startDateUser = useStore.getState().startDateUser
+            const datInterval = useStore.getState().dayInterval
 
             const data = {
                 email: email,
                 dateOfStart: startDateUser,
-                userHabits: habitTasks
+                userHabits: habitTasks,
+                dayInterval: datInterval
             }
 
             return await apiSaveInCloud(data)
@@ -43,6 +45,7 @@ export const loadInCloud = async () => {
 
                 useStore.getState().initializeStartDateUser(data.dateOfStart)
                 useStore.getState().initializeHabits(data.userHabits)
+                useStore.getState().setDayInterval(data.dayInterval)
 
                 const permission = await GetPermissionAccess()
 

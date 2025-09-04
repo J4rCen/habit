@@ -106,10 +106,10 @@ const Settings = () => {
                                             <Text style={styles.buttonLabel}>Стиль</Text>
                                         </XStack>
                                     </TouchableOpacity> */}
-                                        <TouchableOpacity style={styles.button}>
+                                        <TouchableOpacity style={styles.button} onPress={(() => router.navigate('/screens/interval_day/' as any))}>
                                             <XStack gap={10} justifyContent="center">
                                                 <Watch size={28} />
-                                                <Text style={styles.buttonLabel}>Интервал времени</Text>
+                                                <Text style={styles.buttonLabel}>Дневной интервал</Text>
                                             </XStack>
                                         </TouchableOpacity>
                                         {/* <TouchableOpacity style={styles.button}>
