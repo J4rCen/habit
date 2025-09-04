@@ -20,10 +20,11 @@ dayjs.extend(customParseFormat)
 dayjs.locale(localeRu);
 
 const Statistics = () => {
-    const {habitId, habitName, dataStart, habitStart} = useLocalSearchParams()
+    const {habitId, habitName, habitStart} = useLocalSearchParams()
     const habitConfig: IHabitTask['habitConfig'] | undefined = useStore(store => store.getHabitTask(habitId as string)?.habitConfig) 
     const statistics: IHabitTask['habitStatic'] = useStore(store => store.getIsCompleat(habitId as string))
     const pastDays = dayjs().diff(dayjs(habitStart as string), 'day') + 1
+    const dataStart = useStore(state => state.startDateUser)
     
     return (
         <View height={SCREEN_HEIGHT} backgroundColor={'$dark'}>
@@ -46,7 +47,6 @@ const Statistics = () => {
                             
                             <CalendarChart
                                 habitConfig={habitConfig as IHabitTask['habitConfig']}
-                                dataStart={dataStart as string}
                                 statistics={statistics}
                                 pastDays={pastDays}
                                 habitStart={habitStart as string}

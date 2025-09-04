@@ -26,9 +26,11 @@ const PieChart = ({ pastDays, statistics, habitConfig, habitStart }: IPieChart) 
     useEffect(() => {
         let c = 0
         let p = 0
-        if (statistics !== null) {
-            if (habitConfig.interval_execution === 'every_day') {
-                p = pastDays
+
+        if (habitConfig.interval_execution === 'every_day') {
+            p = pastDays
+            c = 0
+            if (statistics !== null) {
                 c = Object.values(statistics).reduce((sum, item) => {
                     if (item.isCompleat === 1) {
                         return sum + 1
@@ -36,38 +38,38 @@ const PieChart = ({ pastDays, statistics, habitConfig, habitStart }: IPieChart) 
                     return sum
                 }, 0)
             }
+        }
 
-            if (habitConfig.interval_execution === 'certain_days') {
-                for (let i = 0; i < pastDays; i++) {
-                    const day = dayjs(habitStart).add(i, 'day');
+        if (habitConfig.interval_execution === 'certain_days') {
+            for (let i = 0; i < pastDays; i++) {
+                const day = dayjs(habitStart).add(i, 'day');
 
-                    if (habitConfig.days_of_week?.includes(day.format('dd').replace(/^[п,в,с,ч]/, c => c.toUpperCase()))) {
-                        p += 1
-                        if (statistics?.[day.format(DATE_FORMAT)]?.isCompleat === 1) {
-                            c += 1
-                        }
+                if (habitConfig.days_of_week?.includes(day.format('dd').replace(/^[п,в,с,ч]/, c => c.toUpperCase()))) {
+                    p += 1
+                    if (statistics?.[day.format(DATE_FORMAT)]?.isCompleat === 1) {
+                        c += 1
+                    }
+                }
+            }
+        }
+
+        if (habitConfig.interval_execution === 'gap') {
+            const { days_in_row, skip_days } = habitConfig.gap_interval as { days_in_row: number, skip_days: number }
+            const cycleDay = days_in_row + skip_days
+            const diffDay = dayjs().diff(dayjs(habitConfig.day_of_create, DATE_FORMAT), 'day')
+
+            for (let i = 0; i <= diffDay; i++) {
+                const cycleLength = i % cycleDay
+
+                if (cycleLength < days_in_row) {
+                    const day = dayjs(habitStart).add(i, 'day').format(DATE_FORMAT);
+                    p += 1
+                    if (statistics?.[day]?.isCompleat === 1) {
+                        c += 1
                     }
                 }
             }
 
-            if (habitConfig.interval_execution === 'gap') {
-                const { days_in_row, skip_days } = habitConfig.gap_interval as { days_in_row: number, skip_days: number }
-                const cycleDay = days_in_row + skip_days
-                const diffDay = dayjs().diff(dayjs(habitConfig.day_of_create, DATE_FORMAT), 'day')
-
-                for (let i = 0; i <= diffDay; i++) {
-                    const cycleLength = i % cycleDay
-
-                    if (cycleLength < days_in_row) {
-                        const day = dayjs(habitStart).add(i, 'day').format(DATE_FORMAT);
-                        p += 1
-                        if (statistics?.[day]?.isCompleat === 1) {
-                            c += 1
-                        }
-                    }
-                }
-
-            }
         }
 
         setCompleted(c)
@@ -94,7 +96,7 @@ const PieChart = ({ pastDays, statistics, habitConfig, habitStart }: IPieChart) 
                             {({ slice }) => {
                                 const outer = slice.radius ?? 100;
                                 const inner = slice.innerRadius ?? 50;
-                                
+
                                 let radiusOffset = ((outer + inner) / (2 * outer));
                                 const percent = total > 0 ? (slice.value / total) * 100 : 0;
                                 const text = `${Math.round(percent)}%`;
