@@ -5,7 +5,7 @@ import { TouchableOpacity, View } from "react-native"
 import Animated, { Easing, useAnimatedStyle, useSharedValue, withRepeat, withTiming } from "react-native-reanimated"
 import { AlertDialog, Text, XStack, YStack } from "tamagui"
 
-export const LoadingScreen: React.FC = () => {
+export const LoadingScreen: React.FC = ({customLoaderTitle}: {customLoaderTitle?: string}) => {
 	const progress = useSharedValue(0)
 
 	useEffect(() => {
@@ -25,7 +25,14 @@ export const LoadingScreen: React.FC = () => {
 
 	return (
 		<YStack justifyContent="center" alignItems="center" backgroundColor="$dark" padding="$4">
-			<Text fontSize="$6" marginBottom="$4" color='white'>Загрузка...</Text>
+			<Text fontSize="$6" marginBottom="$4" color='white'>
+				{
+					customLoaderTitle ?
+					customLoaderTitle :
+					'Загрузка...'
+				
+				}
+			</Text>
 			<View
 				style={{
 					height: 8,

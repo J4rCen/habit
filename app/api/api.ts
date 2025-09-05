@@ -103,3 +103,24 @@ export const apiLoadInCloud = async (data: any) => {
 		}
 	}
 }
+
+export const apiSendMessage = async (data: {email: string, message: string}) => {
+	try {
+		const response = await api.post('email', data)
+		return response
+	} catch (error) {
+		if (axios.isAxiosError(error)) {
+			if (error.response) {
+				console.log('Error response:', error.response);
+				return error.response;
+			} else if (error.request) {
+				console.log('No response received:', error.request);
+				return error.request;
+			} else {
+				console.log('Axios config error:', error.message);
+			}
+		} else {
+			console.log('Unexpected error:', error);
+		}
+	}
+}

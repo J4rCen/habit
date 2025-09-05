@@ -10,12 +10,13 @@ const AuthLoader = (props: {
 	open: boolean
 	isLoading: boolean
 	setOpenPopup: React.Dispatch<React.SetStateAction<boolean>>
+	customLoaderTitle?: string
 }) => {
 	return (
 		<AlertDialog open={props.open}>
 			<AlertDialog.Overlay
 				key="overlay"
-				opacity={0}
+				backgroundColor="$shadow6"
 				enterStyle={{ opacity: 0 }}
 				exitStyle={{ opacity: 0 }}
 			/>
@@ -33,7 +34,7 @@ const AuthLoader = (props: {
 			>
 				{
 					props.isLoading ?
-						<LoadingScreen /> :
+						<LoadingScreen customLoaderTitle={props.customLoaderTitle} /> :
 						<YStack gap={'$4'}>
 							<AlertDialog.Title fontSize={22} color={'white'}>
 								{
