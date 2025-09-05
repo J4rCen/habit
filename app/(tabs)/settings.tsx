@@ -130,7 +130,7 @@ const Settings = () => {
                                                 <Text style={styles.buttonLabel}>Оставить отзыв</Text>
                                             </XStack>
                                         </TouchableOpacity>
-                                        <TouchableOpacity style={styles.button}>
+                                        <TouchableOpacity style={styles.button} onPress={() => router.navigate('/screens/feedback')}>
                                             <XStack gap={10} justifyContent="center">
                                                 <Message size={26} />
                                                 <Text style={styles.buttonLabel}>Обратная связь</Text>
