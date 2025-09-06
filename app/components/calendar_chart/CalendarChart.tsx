@@ -34,7 +34,7 @@ const CalendarChart = ({ statistics, pastDays, habitStart, habitConfig }: ICalen
     
 
     const disableArrowLeft = useMemo(() => {
-        return dayjs(endMonth).isSame(habitStart, 'month')
+        return dayjs(endMonth).isSame(habitStart, 'year') && dayjs(endMonth).isSame(habitStart, 'month')
     }, [endMonth, habitStart]);
 
     const onMonthChange = (month: { dateString: string }) => {

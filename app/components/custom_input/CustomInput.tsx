@@ -30,7 +30,7 @@ const CustomInput = (props: IInput) => {
     };
 
     return (
-        <PlaceholderWrap height={props.height} width={props.width} isActive={props.alwaysOpen ? true : isActive} placeholder={props.placeholder}>
+        <PlaceholderWrap height={props.height} width={props.width} isActive={props.alwaysOpen || props.value ? true : isActive} placeholder={props.placeholder}>
             <Input
                 style={[styles.input, props.center ? { textAlign: 'center' } : {}]}
                 width={props.width ?? SCREEN_WIDTH}

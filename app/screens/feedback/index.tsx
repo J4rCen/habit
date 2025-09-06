@@ -107,7 +107,7 @@ const Feedback = () => {
 						<YStack width={SCREEN_WIDTH - 20} alignItems="center" paddingTop={10} gap={10}>
 							<CustomInput
 								value={email}
-								onChange={e => setEmail(e as string)}
+								onChange={e => {if (typeof e === 'string') setEmail(e)}}
 								placeholder="Укажите вашу почту"
 								height={50}
 								width={SCREEN_WIDTH - 20}

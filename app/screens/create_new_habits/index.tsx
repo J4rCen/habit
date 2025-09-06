@@ -355,7 +355,7 @@ const CreateNewHabits = () => {
                                             if (typeof e === 'string') setHabitName(e)
                                         }}
                                     />
-                                    <XStack margin={10} justifyContent='center'>
+                                    {/* <XStack margin={10} justifyContent='center'>
                                         <Button
                                             borderTopRightRadius={0}
                                             borderBottomRightRadius={0}
@@ -386,9 +386,9 @@ const CreateNewHabits = () => {
                                                 Одноразовая
                                             </Text>
                                         </Button>
-                                    </XStack>
+                                    </XStack> */}
 
-                                    <YStack marginTop={10} gap={15}>
+                                    <YStack marginTop={20} gap={15}>
                                         {typeOfHabit === 'reusable' &&
                                             <CustomSelect
                                                 id={1}
