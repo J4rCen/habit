@@ -4,7 +4,7 @@
     "slug": "habit",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/icon.png",
+    "icon": "./assets/images/logo25.png",
     "scheme": "habit",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
@@ -29,10 +29,9 @@
       [
         "expo-splash-screen",
         {
-          "image": "./assets/images/splash-icon.png",
-          "imageWidth": 200,
-          "resizeMode": "contain",
-          "backgroundColor": "#ffffff"
+          "backgroundColor": "#222831",
+          "image": "./assets/splash-icon.png",
+          "imageWidth": 200
         }
       ],
       "expo-background-task",
