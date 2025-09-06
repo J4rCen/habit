@@ -17,7 +17,6 @@ interface IInput {
 }
 
 const CustomInput = (props: IInput) => {
-    console.log(props)
     const [isActive, setIsActive] = useState<boolean>(false);
 
     const onChangeText = (value: string | number) => {
