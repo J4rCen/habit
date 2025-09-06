@@ -17,6 +17,7 @@ interface IInput {
 }
 
 const CustomInput = (props: IInput) => {
+    console.log(props)
     const [isActive, setIsActive] = useState<boolean>(false);
 
     const onChangeText = (value: string | number) => {
@@ -30,7 +31,7 @@ const CustomInput = (props: IInput) => {
     };
 
     return (
-        <PlaceholderWrap height={props.height} width={props.width} isActive={props.alwaysOpen ? true : isActive} placeholder={props.placeholder}>
+        <PlaceholderWrap height={props.height} width={props.width} isActive={props.alwaysOpen || props.value ? true : isActive} placeholder={props.placeholder}>
             <Input
                 style={[styles.input, props.center ? { textAlign: 'center' } : {}]}
                 width={props.width ?? SCREEN_WIDTH}
