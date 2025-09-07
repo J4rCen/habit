@@ -4,7 +4,7 @@
     "slug": "habit",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/logo25.png",
+    "icon": "./assets/images/adaptive-icon.png",
     "scheme": "habit",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
