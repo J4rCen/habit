@@ -1,18 +1,38 @@
 import customTamaguiConfig from "@/tamagui.config";
 import { Stack } from "expo-router";
+import { useState } from "react";
 import { SafeAreaProvider } from "react-native-safe-area-context";
-import { TamaguiProvider } from "tamagui";
-
-
+import { TamaguiProvider, View } from "tamagui";
+import LoadingScreen from "./screens/loadingScreen";
 
 export default function RootLayout() {
-  return (
-    <SafeAreaProvider>
-        <TamaguiProvider config={customTamaguiConfig}>
-          <Stack screenOptions={{ headerShown: false, contentStyle: {backgroundColor: '#222831'}}}>
-            <Stack.Screen name="(tabs)"/>
-          </Stack>
-        </TamaguiProvider>
-    </SafeAreaProvider>
-  );
+
+	const [showLoading, setShowLoading] = useState(true);
+
+	return (
+		<SafeAreaProvider>
+			<TamaguiProvider config={customTamaguiConfig}>
+
+				<Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: '#222831' } }}>
+					<Stack.Screen name="(tabs)" />
+				</Stack>
+
+				{ showLoading &&
+					<View style={{
+						position: 'absolute',
+						top: 0,
+						right: 0,
+						bottom: 0,
+						left: 0
+					}}>
+						<LoadingScreen
+							onFinish={async () => {
+								setShowLoading(false);
+							}}
+						/>
+					</View>
+				}
+			</TamaguiProvider>
+		</SafeAreaProvider>
+	);
 }
