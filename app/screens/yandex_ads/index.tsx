@@ -4,60 +4,64 @@ import { AppState } from "react-native";
 import {
 	AdRequestConfiguration,
 	AppOpenAdLoader,
+	MobileAds,
 } from "yandex-mobile-ads";
 
 export function useAppOpenAd() {
 	const appOpenRef = useRef<any>(null);
-	const loaderRef = useRef<any>(null);
-	const appStateRef = useRef(AppState.currentState);
 
 	const loadAd = async () => {
-		if (!loaderRef.current) return;
 
-		const config = new AdRequestConfiguration({
-			adUnitId: KEY_APP_OPEN_ADS,
-			contextQuery: "habits-app",
-		});
+		try {
+			const loader = await AppOpenAdLoader.create().catch((err) => {
+				console.error("Ошибка AppOpenAdLoader:", err)
+				return
+			});
+			if (!loader) return;
 
-		const ad = await loaderRef.current.loadAd(config).catch((err: any) => {
-			console.error("Ошибка loadAd:", err);
-			return null;
-		});
+			const config = new AdRequestConfiguration({
+				adUnitId: KEY_APP_OPEN_ADS,
+				contextQuery: "habits-app",
+			});
 
-		if (!ad) return;
+			const ad = await loader.loadAd(config).catch((err: any) => {
+				console.error("Ошибка loadAd:", err);
+				return null;
+			});
 
-		appOpenRef.current = ad;
+			if (!ad) return;
 
-		ad.onAdShown = () => console.log("AppOpen: показано");
+			appOpenRef.current = ad;
 
-		ad.onAdDismissed = () => {
-			console.log("AppOpen: закрыто");
-			appOpenRef.current = null;
-			loadAd();
-		};
+			ad.onAdShown = () => console.log("AppOpen: показано");
 
-		ad.onAdFailedToShow = (err: any) => {
-			console.warn("AppOpen: ошибка показа", err);
-			appOpenRef.current = null;
-			loadAd();
-		};
+			ad.onAdDismissed = () => {
+				console.log("AppOpen: закрыто");
+				appOpenRef.current = null;
+				loadAd();
+			};
+
+			ad.onAdFailedToShow = (err: any) => {
+				console.warn("AppOpen: ошибка показа", err);
+				appOpenRef.current = null;
+				loadAd();
+			};
+
+		} catch (error) {
+			console.error(error)
+		}
 	};
 
 	useEffect(() => {
 		(async () => {
-			const loader = await AppOpenAdLoader.create().catch((err) =>
-				console.error("Ошибка AppOpenAdLoader:", err)
-			);
-			if (!loader) return;
-			loaderRef.current = loader;
 
+			await MobileAds.initialize()
 			await loadAd();
 
 			const sub = AppState.addEventListener("change", (state) => {
-				if (state === "active" && appOpenRef.current) {
-					appOpenRef.current.show();
-				}
-				appStateRef.current = state;
+				// if (state === "active" && appOpenRef.current) {
+				// 	appOpenRef.current.show();
+				// }
 			});
 
 			return () => sub.remove();

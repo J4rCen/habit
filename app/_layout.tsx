@@ -1,9 +1,8 @@
 import customTamaguiConfig from "@/tamagui.config";
 import { Stack } from "expo-router";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { TamaguiProvider, View } from "tamagui";
-import { MobileAds } from "yandex-mobile-ads";
 import LoadingScreen from "./screens/loadingScreen";
 import { useAppOpenAd } from './screens/yandex_ads';
 
@@ -11,12 +10,6 @@ export default function RootLayout() {
 
 	const [showLoading, setShowLoading] = useState(true);
 	const appOpenAd = useAppOpenAd();
-
-	useEffect(() => {
-		(async () => {
-			await MobileAds.initialize()
-		})()
-	}, [])
 	
 	return (
 		<SafeAreaProvider>
@@ -25,6 +18,7 @@ export default function RootLayout() {
 				<Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: '#222831' } }}>
 					<Stack.Screen name="(tabs)" />
 				</Stack>
+
 				{ showLoading &&
 					<View style={{
 						position: 'absolute',
