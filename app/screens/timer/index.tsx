@@ -117,6 +117,7 @@ const Timer = () => {
     };
 
     const completeTimer = () => {
+        setTimerStart(false)
         setElapsed(duration);
         setIsFinish(1);
         updateCompletion(duration, true);
