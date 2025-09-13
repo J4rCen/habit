@@ -141,6 +141,9 @@ const HabitCard = ({ habitId, habitConfig, selectDate, dataStart }: IHabitCard) 
                             color={'white'}
                             fontSize={22}
                             marginLeft={10}
+                            numberOfLines={2}
+                            ellipsizeMode="tail"
+                            flex={1}
                         >
                             {habitConfig.name}
                         </Text>
