@@ -4,11 +4,13 @@ import { useState } from "react";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { TamaguiProvider, View } from "tamagui";
 import LoadingScreen from "./screens/loadingScreen";
+import { useAppOpenAd } from './screens/yandex_ads';
 
 export default function RootLayout() {
 
 	const [showLoading, setShowLoading] = useState(true);
-
+	const appOpenAd = useAppOpenAd();
+	
 	return (
 		<SafeAreaProvider>
 			<TamaguiProvider config={customTamaguiConfig}>
@@ -28,6 +30,7 @@ export default function RootLayout() {
 						<LoadingScreen
 							onFinish={async () => {
 								setShowLoading(false);
+								appOpenAd.show()
 							}}
 						/>
 					</View>
