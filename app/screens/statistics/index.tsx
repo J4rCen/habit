@@ -20,23 +20,26 @@ dayjs.extend(customParseFormat)
 dayjs.locale(localeRu);
 
 const Statistics = () => {
-    const {habitId, habitName, habitStart} = useLocalSearchParams()
-    const habitConfig: IHabitTask['habitConfig'] | undefined = useStore(store => store.getHabitTask(habitId as string)?.habitConfig) 
+    const { habitId, habitName, habitStart } = useLocalSearchParams()
+    const habitConfig: IHabitTask['habitConfig'] | undefined = useStore(store => store.getHabitTask(habitId as string)?.habitConfig)
     const statistics: IHabitTask['habitStatic'] = useStore(store => store.getIsCompleat(habitId as string))
     const pastDays = dayjs().diff(dayjs(habitStart as string), 'day') + 1
     const dataStart = useStore(state => state.startDateUser)
-    
+
     return (
         <View height={SCREEN_HEIGHT} backgroundColor={'$dark'}>
             <SafeAreaView>
-                <XStack alignItems='center' marginTop={10}>
+                <XStack alignItems='center' marginTop={10} width={'90%'}>
                     <View onPress={() => router.back()}>
-                        <ArrowBack size={36}/>
+                        <ArrowBack size={36} />
                     </View>
                     <Text
                         marginLeft={5}
                         color={"$white"}
                         fontSize={26}
+                        numberOfLines={2}
+                        ellipsizeMode="tail"
+                        flex={1}
                     >
                         {habitName}
                     </Text>
@@ -44,7 +47,7 @@ const Statistics = () => {
                 <YStack alignItems="center" marginTop={10}>
                     <ScrollView maxHeight={SCREEN_HEIGHT * 0.85} width={SCREEN_WIDTH - 20} showsVerticalScrollIndicator={false}>
                         <YStack gap={10}>
-                            
+
                             <CalendarChart
                                 habitConfig={habitConfig as IHabitTask['habitConfig']}
                                 statistics={statistics}

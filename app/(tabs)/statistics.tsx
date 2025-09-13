@@ -22,21 +22,25 @@ const Statistics = () => {
             }
 
             return true
-            
+
         }).map((item, index) => {
             return (
                 <TouchableOpacity key={index} onPress={() => router.navigate({ pathname: '/screens/statistics', params: { habitId: item.habitId, habitName: item.habitConfig.name, habitStart: item.habitConfig.day_of_create } })}>
                     <XStack
                         height={SCREEN_WIDTH_400 ? 50 : 60}
-                        width={'100%'}
-                        backgroundColor={'$gray'}
+                        width="100%"
+                        backgroundColor="$gray"
                         borderRadius={10}
                         alignItems="center"
+                        padding={5}
                     >
                         <Text
                             marginLeft={10}
-                            color={'white'}
+                            color="white"
                             fontSize={18}
+                            numberOfLines={2}
+                            ellipsizeMode="tail"
+                            flex={1} // Это важно, чтобы текст занимал всё доступное пространство
                         >
                             {item.habitConfig.name}
                         </Text>
