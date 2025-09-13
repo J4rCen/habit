@@ -1,6 +1,5 @@
 import { KEY_APP_OPEN_ADS } from '@/app/constants';
 import { useEffect, useRef } from "react";
-import { AppState } from "react-native";
 import {
 	AdRequestConfiguration,
 	AppOpenAdLoader,
@@ -57,14 +56,7 @@ export function useAppOpenAd() {
 
 			await MobileAds.initialize()
 			await loadAd();
-
-			const sub = AppState.addEventListener("change", (state) => {
-				// if (state === "active" && appOpenRef.current) {
-				// 	appOpenRef.current.show();
-				// }
-			});
-
-			return () => sub.remove();
+			
 		})();
 	}, []);
 
