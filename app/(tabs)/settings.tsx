@@ -39,10 +39,10 @@ const Settings = () => {
                                 <YStack marginBottom={20}>
                                     <Text style={styles.title_block}>Аккаунт</Text>
                                     {
-                                        isLogin !== null ?
+                                        isLogin !== null || true ?
                                             <View gap={10}>
                                                 <YStack>
-                                                    <TouchableOpacity style={[styles.button, { backgroundColor: '#194A98' }]}>
+                                                    <TouchableOpacity style={[styles.button, { backgroundColor: '#194A98' }]} onPress={() => router.navigate('/screens/buying_premium')}>
                                                         <XStack gap={10} justifyContent="center">
                                                             <Crown size={26} />
                                                             <Text style={styles.buttonLabel}>Оформить подписку</Text>
