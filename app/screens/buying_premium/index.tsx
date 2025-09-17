@@ -1,7 +1,7 @@
 import ContainerWrap from "@/app/components/container_wrap/ContainerWrap"
 import { SCREEN_HEIGHT, SCREEN_WIDTH, SCREEN_WIDTH_400 } from "@/app/constants"
-import { AdBlock, Heart, Infinity, OneTask, Smartphone } from "@/app/svgs/buyingPremiumSvg"
-import { Brush, Crown, LoadInCloud, SaveInCloud, Watch } from "@/app/svgs/settings"
+import { AdBlock, Heart, Infinity, OneTask } from "@/app/svgs/buyingPremiumSvg"
+import { Brush, LoadFile, SaveFile } from "@/app/svgs/settings"
 import { router } from "expo-router"
 import React from "react"
 import { TouchableOpacity } from "react-native"
@@ -15,37 +15,24 @@ const BuyingPremium = () => {
 		<ContainerWrap >
 			<ScrollView maxHeight={SCREEN_HEIGHT * 0.9} showsVerticalScrollIndicator={false} >
 				<YStack maxHeight={SCREEN_HEIGHT} justifyContent="center" marginTop={20}>
-					<YStack height={'90%'}>
+					<YStack height={'75%'}>
 						<YStack
+							height={SCREEN_WIDTH_400 ? 60 : 80}
 							gap={5}
 							backgroundColor={'$blue'}
 							borderTopLeftRadius={10}
 							borderTopRightRadius={10}
 							alignItems="center"
+							justifyContent="center"
 							padding={5}
 						>
 							<XStack gap={10} justifyContent="center">
-								<Crown size={SvgSize} />
+								<Heart size={30}/>
 								<Text
 									fontSize={TextFontSize}
 									color={'white'}
 								>
-									Оформить премиум
-								</Text>
-							</XStack>
-							<XStack gap={10} alignItems="center">
-								<Text
-									fontSize={TextFontSize}
-									color={'white'}
-								>
-									Все функции всего за
-								</Text>
-								<Text
-									fontSize={SCREEN_WIDTH_400 ? 22 : 28}
-									color={'white'}
-									fontWeight={'bold'}
-								>
-									399 ₽
+									Поддержать проект
 								</Text>
 							</XStack>
 						</YStack>
@@ -74,7 +61,7 @@ const BuyingPremium = () => {
 								</Text>
 							</XStack>
 							<XStack gap={10} alignItems="center">
-								<SaveInCloud size={SvgSize} />
+								<SaveFile size={SvgSize} />
 								<Text
 									color={'white'}
 									fontSize={TextFontSize}
@@ -83,30 +70,12 @@ const BuyingPremium = () => {
 								</Text>
 							</XStack>
 							<XStack gap={10} alignItems="center">
-								<LoadInCloud size={SvgSize} />
+								<LoadFile size={SvgSize} />
 								<Text
 									color={'white'}
 									fontSize={TextFontSize}
 								>
 									Восстановление данных
-								</Text>
-							</XStack>
-							<XStack gap={10} alignItems="center">
-								<Watch size={SvgSize} />
-								<Text
-									color={'white'}
-									fontSize={TextFontSize}
-								>
-									Привычки с таймером
-								</Text>
-							</XStack>
-							<XStack gap={10} alignItems="center">
-								<Heart size={SvgSize} />
-								<Text
-									color={'white'}
-									fontSize={TextFontSize}
-								>
-									Поддержка проекта
 								</Text>
 							</XStack>
 							<XStack gap={10} alignItems="center">
@@ -133,7 +102,7 @@ const BuyingPremium = () => {
 									{'(скоро)'}
 								</Text>
 							</XStack>
-							<XStack gap={10} alignItems="center">
+							{/* <XStack gap={10} alignItems="center">
 								<Smartphone size={SCREEN_WIDTH_400 ? 22 : 28} />
 								<Text
 									color={'white'}
@@ -144,7 +113,7 @@ const BuyingPremium = () => {
 								<Text color={'white'} fontSize={12}>
 									{'(скоро)'}
 								</Text>
-							</XStack>
+							</XStack> */}
 						</YStack>
 
 						<TouchableOpacity
