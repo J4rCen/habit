@@ -1,8 +1,61 @@
 import { SCREEN_WIDTH } from "@/app/constants"
-import React from "react"
-import { TouchableOpacity } from "react-native"
+import React, { useEffect } from "react"
+import { TouchableOpacity, View } from "react-native"
+import Animated, { Easing, useAnimatedStyle, useSharedValue, withRepeat, withTiming } from "react-native-reanimated"
 import { AlertDialog, Text, YStack } from "tamagui"
-import { LoadingScreen } from "../loader_popup/loaderPopup"
+
+export const LoadingScreen: React.FC = ({customLoaderTitle}: {customLoaderTitle?: string}) => {
+	const progress = useSharedValue(0)
+
+	useEffect(() => {
+		progress.value = withRepeat(
+			withTiming(1, {
+				duration: 1500,
+				easing: Easing.inOut(Easing.ease),
+			}),
+			-1,
+			true
+		)
+	}, [])
+
+	const animatedStyle = useAnimatedStyle(() => ({
+		transform: [{ scaleX: progress.value }],
+	}))
+
+	return (
+		<YStack justifyContent="center" alignItems="center" backgroundColor="$dark" padding="$4">
+			<Text fontSize="$6" marginBottom="$4" color='white'>
+				{
+					customLoaderTitle ?
+					customLoaderTitle :
+					'Загрузка...'
+				
+				}
+			</Text>
+			<View
+				style={{
+					height: 8,
+					width: 200,
+					backgroundColor: '#222831',
+					borderRadius: 4,
+					overflow: 'hidden',
+				}}
+			>
+				<Animated.View
+					style={[
+						{
+							height: '100%',
+							backgroundColor: '#194A98',
+							borderRadius: 4,
+							transform: [{ scaleX: 0 }],
+						},
+						animatedStyle,
+					]}
+				/>
+			</View>
+		</YStack>
+	)
+}
 
 const AuthLoader = (props: {
 	title: string,
@@ -34,7 +87,7 @@ const AuthLoader = (props: {
 			>
 				{
 					props.isLoading ?
-						<LoadingScreen customLoaderTitle={props.customLoaderTitle} /> :
+						<LoadingScreen /> :
 						<YStack gap={'$4'}>
 							<AlertDialog.Title fontSize={22} color={'white'}>
 								{

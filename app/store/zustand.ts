@@ -59,7 +59,6 @@ interface IStore {
 	getHabitTask: (habitId: string) => IHabitTask | null
 	updateHabitTask: (habitId: string, habitConfig: Omit<IHabitTask, 'habitId'>) => void
 	removeHabitTask: (habitId: string) => void,
-	setApiData: (data: { email: string | null, premium: false }) => void,
 	setDayInterval: (data: TDayInterval) => void
 }
 
@@ -160,14 +159,6 @@ const useStore = create<IStore>()(
 					return { habitTask: newHabitTask }
 				})
 			},
-			setApiData: (data) => {
-				set(() => {
-					return {
-						email: data.email,
-						premium: data.premium
-					}
-				})
-			}
 		}),
 		{
 			name: 'habit-storage-v2',

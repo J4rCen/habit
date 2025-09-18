@@ -3,28 +3,18 @@ import React, { useState } from "react"
 import { StyleSheet, TouchableOpacity } from "react-native"
 import { SafeAreaView } from "react-native-safe-area-context"
 import { PortalProvider, ScrollView, Text, View, XStack, YStack } from "tamagui"
-import LoaderPopup from "../components/loader_popup/loaderPopup"
+import AuthLoader from "../components/auth_loader/authLoader"
 import { SCREEN_HEIGHT, SCREEN_WIDTH, SCREEN_WIDTH_400 } from "../constants"
-import useStore from "../store/zustand"
 import { Language, LoadFile, SaveFile, Watch } from "../svgs/settings"
-import { deleteToken } from "../utilities/secureStore"
+import { loadFile, saveFile } from "../utilities/jsonHandler"
 
 
 const Settings = () => {
 
-	const isLogin = useStore(state => state.email)
-	const setApiData = useStore(state => state.setApiData)
-
-	const [openPopup, setOpenPopup] = useState<boolean>(false)
-	const [typePopup, setTypePopup] = useState<'save' | 'load'>('save')
-
-	const logout = async () => {
-		setApiData({
-			email: null,
-			premium: false
-		})
-		await deleteToken()
-	}
+	const [openPopup, setOpenPopup] = useState<boolean>(false) 
+	const [titlePopup, setTitlePopup] = useState<string>('')
+	const [messagePopup, setMessagePopup] = useState<string>('')
+	const [isLoading, setIsLoading] = useState<boolean>(false)
 
 	return (
 		<View backgroundColor={'$dark'} maxHeight={SCREEN_HEIGHT}>
@@ -33,7 +23,7 @@ const Settings = () => {
 					<YStack height={SCREEN_HEIGHT} backgroundColor='$dark'>
 						<YStack alignItems="center" height={SCREEN_HEIGHT * 0.8}>
 							{
-								openPopup && <LoaderPopup open={openPopup} type={typePopup} setOpenPopup={setOpenPopup} />
+								openPopup && <AuthLoader title={titlePopup} message={messagePopup} open={openPopup} setOpenPopup={setOpenPopup} isLoading={isLoading}/>
 							}
 							<ScrollView width={SCREEN_WIDTH - 20} showsVerticalScrollIndicator={false} >
 								<YStack marginBottom={20}>
@@ -48,9 +38,9 @@ const Settings = () => {
 											</TouchableOpacity> */}
 										</YStack>
 										<YStack>
-											<TouchableOpacity style={styles.button} onPress={() => {
-												setTypePopup('save')
+											<TouchableOpacity style={styles.button} onPress={ async () => {
 												setOpenPopup(true)
+												await saveFile({setOpenPopup, setTitlePopup, setMessagePopup, setIsLoading})
 											}}>
 												<XStack gap={10} justifyContent="center">
 													<SaveFile size={26} />
@@ -59,9 +49,9 @@ const Settings = () => {
 											</TouchableOpacity>
 										</YStack>
 										<YStack>
-											<TouchableOpacity style={styles.button} onPress={() => {
-												setTypePopup('load')
+											<TouchableOpacity style={styles.button} onPress={ async () => {
 												setOpenPopup(true)
+												await loadFile({setOpenPopup, setTitlePopup, setMessagePopup, setIsLoading})
 											}}>
 												<XStack gap={10} justifyContent="center">
 													<LoadFile size={26} />
