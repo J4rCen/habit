@@ -1,18 +1,18 @@
 import { isErrorWithCode, pick, saveDocuments } from '@react-native-documents/picker';
 import dayjs from 'dayjs';
-import RNFS from 'react-native-fs';
+import * as FileSystem from 'expo-file-system';
 import useStore, { IHabitTask } from '../store/zustand';
 import SetNotifications, { GetPermissionAccess } from './notifications';
 
 interface IFileController {
 	setOpenPopup: React.Dispatch<React.SetStateAction<boolean>>,
-	setTitlePopup:  React.Dispatch<React.SetStateAction<string>>,
+	setTitlePopup: React.Dispatch<React.SetStateAction<string>>,
 	setMessagePopup: React.Dispatch<React.SetStateAction<string>>,
 	setIsLoading: React.Dispatch<React.SetStateAction<boolean>>
 }
 
 const fileName = `track_habit_${dayjs().format('DD-MM-YYYY')}.json`
-const path = `${RNFS.CachesDirectoryPath}/${fileName}`
+const path = `${FileSystem.cacheDirectory}/${fileName}`
 
 export const saveFile = async (con: IFileController) => {
 	try {
@@ -30,9 +30,9 @@ export const saveFile = async (con: IFileController) => {
 			dayInterval: datInterval
 		})
 
-		await RNFS.writeFile(path, jsonData, 'utf8');
+		await FileSystem.writeAsStringAsync(path, jsonData, { encoding: 'utf8' });
 
-		const [{uri: pathUri}] = await saveDocuments({
+		const [{ uri: pathUri }] = await saveDocuments({
 			sourceUris: [`file://${path}`],
 			copy: false,
 			mimeType: 'application/json',
@@ -46,7 +46,7 @@ export const saveFile = async (con: IFileController) => {
 
 	} catch (err: unknown) {
 		if (isErrorWithCode(err)) {
-			
+
 			if (err.code === 'OPERATION_CANCELED') {
 				con.setTitlePopup('Отмена')
 				con.setMessagePopup('Сохранения отменено')
@@ -56,7 +56,7 @@ export const saveFile = async (con: IFileController) => {
 			con.setTitlePopup('Ошибка')
 			con.setMessagePopup('При сохранении произошла непредвиденная ошибка')
 		}
-		
+
 	} finally {
 		con.setIsLoading(false)
 	}
@@ -73,13 +73,21 @@ export const loadFile = async (con: IFileController) => {
 		const fileUri = res.uri;
 
 		let path = fileUri;
-		if (fileUri.startsWith('file://')) {
-			const stat = await RNFS.stat(fileUri);
-			path = stat.path;
+
+		if (!path.startsWith('file://')) {
+			const fileName = res.name || 'imported.json';
+			const newPath = FileSystem.cacheDirectory + fileName;
+			await FileSystem.copyAsync({ from: path, to: newPath });
+			path = newPath;
 		}
 
-		const fileContents = await RNFS.readFile(path, 'utf8');
+		if (!path.toLowerCase().endsWith('.json')) {
+			con.setTitlePopup('Ошибка')
+			con.setMessagePopup('При восстановление данных произошла ошибка, проверьте формат файла')
+			return;
+		}
 
+		const fileContents = await FileSystem.readAsStringAsync(path, { encoding: 'utf8' });
 		const data = JSON.parse(fileContents);
 
 		if ('dateOfStart' in data && 'userHabits' in data && 'dayInterval' in data) {
@@ -116,10 +124,10 @@ export const loadFile = async (con: IFileController) => {
 			con.setMessagePopup('При восстановление данных произошла ошибка, проверьте формат файла')
 		}
 
-		
+
 	} catch (err: unknown) {
 		if (isErrorWithCode(err)) {
-			
+
 			if (err.code === 'OPERATION_CANCELED') {
 				con.setTitlePopup('Отмена')
 				con.setMessagePopup('Выбор файла отменен')
@@ -129,7 +137,7 @@ export const loadFile = async (con: IFileController) => {
 			con.setTitlePopup('Ошибка')
 			con.setMessagePopup('При загрузки произошла непредвиденная ошибка')
 		}
-		
+
 	} finally {
 		con.setIsLoading(false)
 	}

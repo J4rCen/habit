@@ -17,8 +17,7 @@
 				"backgroundColor": "#194A98"
 			},
 			"edgeToEdgeEnabled": true,
-			"package": "com.j4rcen.habit",
-			"plugins": {}
+			"package": "com.j4rcen.habit"
 		},
 		"web": {
 			"bundler": "metro",
