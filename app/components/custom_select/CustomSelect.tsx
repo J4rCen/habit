@@ -104,6 +104,7 @@ const CustomSelect = (props: ISelect) => {
                     <YStack
                         borderColor={'$blue'}
                         backgroundColor={'$dark'}
+                        overflow="hidden"
                         paddingTop={15}
                         top={-15}
                         zIndex={props.isOpen ? 14 : 1}
