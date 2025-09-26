@@ -16,7 +16,8 @@ interface ISetNotifications {
     dayOfCreate?: string | null,
     habitId: string
     notid?: string | null,
-    typeOfHabit?: string | null
+    typeOfHabit?: string | null,
+    oneTimeDay?: string | null
 }
 
 Notifications.setNotificationHandler({
@@ -48,49 +49,63 @@ export const GetPermissionAccess = async () => {
     return existingStatus.status
 }
 
-export const CancelNotificationAsync = async (type: string, id: string, habitId: string) => {
-    try {
-        if (type === 'every_day') {
-            try {
-                await Notifications.cancelScheduledNotificationAsync(id)
-            } catch (error) {
-                const allNotifications = await Notifications.getAllScheduledNotificationsAsync()
+export const CancelNotificationAsync = async (type: string, id: string, habitId: string, typeOfHabit: 'reusable' | 'onetime') => {
+    if (typeOfHabit === 'onetime') {
+        try {
+            await Notifications.cancelScheduledNotificationAsync(id)
+        } catch (error) {
+            const allNotifications = await Notifications.getAllScheduledNotificationsAsync()
 
-                for (const notif of allNotifications) {
-                    if (notif.content.data?.habitId === habitId) {
-                        await Notifications.cancelScheduledNotificationAsync(notif.identifier);
-                    }
+            for (const notif of allNotifications) {
+                if (notif.content.data?.habitId === habitId) {
+                    await Notifications.cancelScheduledNotificationAsync(notif.identifier);
                 }
             }
         }
+    }
 
-        if (type === 'certain_days' || type === 'gap') {
+    if (typeOfHabit === 'reusable' && type === 'every_day') {
+        try {
+            await Notifications.cancelScheduledNotificationAsync(id)
+        } catch (error) {
+            const allNotifications = await Notifications.getAllScheduledNotificationsAsync()
 
-            const hid = JSON.parse(id)
-
-            try {
-                for (const i of hid) {
-                    await Notifications.cancelScheduledNotificationAsync(i)
-                }
-            } catch (error) {
-                const allNotifications = await Notifications.getAllScheduledNotificationsAsync()
-
-                for (const notif of allNotifications) {
-                    if (notif.content.data?.habitId === habitId) {
-                        await Notifications.cancelScheduledNotificationAsync(notif.identifier);
-                    }
+            for (const notif of allNotifications) {
+                if (notif.content.data?.habitId === habitId) {
+                    await Notifications.cancelScheduledNotificationAsync(notif.identifier);
                 }
             }
         }
-    } catch (error) {
-        console.error(error)
+    }
+
+    if (typeOfHabit === 'reusable' && type === 'certain_days' || type === 'gap') {
+
+        const hid = JSON.parse(id)
+
+        try {
+            for (const i of hid) {
+                await Notifications.cancelScheduledNotificationAsync(i)
+            }
+        } catch (error) {
+            const allNotifications = await Notifications.getAllScheduledNotificationsAsync()
+
+            for (const notif of allNotifications) {
+                if (notif.content.data?.habitId === habitId) {
+                    await Notifications.cancelScheduledNotificationAsync(notif.identifier);
+                }
+            }
+        }
     }
 }
 
 const SetNotifications = async (type: string, time: string, option: ISetNotifications) => {
     const [hour, minute] = time.split(':')
 
-    if (option.typeOfHabit === 'onetime') {
+    if (option.typeOfHabit === 'onetime' && option.oneTimeDay) {
+
+        const date = new Date(`${option.oneTimeDay}T${hour}:${minute}:00`)
+
+
 
         try {
             const notificationId = await Notifications.scheduleNotificationAsync({
@@ -100,9 +115,8 @@ const SetNotifications = async (type: string, time: string, option: ISetNotifica
                     data: { habitId: option.habitId }
                 },
                 trigger: {
-                    type: Notifications.SchedulableTriggerInputTypes.TIME_INTERVAL,
-                    repeats: false,
-                    seconds: 60 * (Number.isFinite(Number(minute)) ? Number(minute) : 1) * (Number.isFinite(Number(hour)) ? Number(hour) : 1)
+                    type: Notifications.SchedulableTriggerInputTypes.DATE,
+                    date
                 }
             })
 
@@ -112,11 +126,11 @@ const SetNotifications = async (type: string, time: string, option: ISetNotifica
         }
     }
 
-    if (type === 'every_day') {
+    if (option.typeOfHabit === 'reusable' && type === 'every_day') {
 
         try {
             if (option.notid) {
-                await CancelNotificationAsync(type, option.notid, option.habitId)
+                await CancelNotificationAsync(type, option.notid, option.habitId, option.typeOfHabit)
             }
 
             const notificationId = await Notifications.scheduleNotificationAsync({
@@ -138,11 +152,11 @@ const SetNotifications = async (type: string, time: string, option: ISetNotifica
         }
     }
 
-    if (type === 'certain_days' && option.daysOfWeek) {
+    if (option.typeOfHabit === 'reusable' && type === 'certain_days' && option.daysOfWeek) {
 
         try {
             if (option.notid) {
-                await CancelNotificationAsync(type, option.notid, option.habitId)
+                await CancelNotificationAsync(type, option.notid, option.habitId, option.typeOfHabit)
             }
 
             const notificationId = []
@@ -171,11 +185,11 @@ const SetNotifications = async (type: string, time: string, option: ISetNotifica
         }
     }
 
-    if (type === 'gap' && option.daysInRow && option.skipDays && option.dayOfCreate) {
+    if (option.typeOfHabit === 'reusable' && type === 'gap' && option.daysInRow && option.skipDays && option.dayOfCreate) {
 
         try {
             if (option.notid) {
-                await CancelNotificationAsync(type, option.notid, option.habitId)
+                await CancelNotificationAsync(type, option.notid, option.habitId, option.typeOfHabit)
             }
 
             const cycleLength = option.daysInRow + option.skipDays
@@ -184,7 +198,7 @@ const SetNotifications = async (type: string, time: string, option: ISetNotifica
             for (let i = 0; i <= 30; i++) {
                 const cycleDay = i % cycleLength
                 if (cycleDay < option.daysInRow) {
-                    
+
                     const notifyDate = dayjs(option.dayOfCreate, DATE_FORMAT).add(i, 'day')
 
                     const hid = await Notifications.scheduleNotificationAsync({

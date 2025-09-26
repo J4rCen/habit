@@ -9,7 +9,7 @@ interface IInput {
     height: number;
     value: string | number;
     placeholder: string;
-    onChange: (e: string | number) => void;
+    onChange?: (e: string | number) => void;
     center?: boolean;
     numbersOnly?: boolean;
     onReadonly?: boolean
@@ -20,6 +20,9 @@ const CustomInput = (props: IInput) => {
     const [isActive, setIsActive] = useState<boolean>(false);
 
     const onChangeText = (value: string | number) => {
+        
+        if (!props.onChange) return
+
         if (props.numbersOnly) {
             const onlyNumbers = value.toString().replace(/[^0-9]/g, '');
             const numericValue = onlyNumbers === '' ? '' : Number(onlyNumbers);

@@ -51,7 +51,7 @@ const HabitsRender = (props: IHabitRender) => {
 
     const isHabitVisible = (habit: IHabitTask['habitConfig']) => {
 
-        const {interval_execution, days_of_week, day_of_create, gap_interval, type_of_habit} = habit
+        const {interval_execution, days_of_week, day_of_create, gap_interval, type_of_habit, oneTimeDay} = habit
 
         if (interval_execution === 'every_day') {
             return true
@@ -74,8 +74,8 @@ const HabitsRender = (props: IHabitRender) => {
             return cycleDay < gap_interval?.days_in_row
         }
 
-        if (type_of_habit === 'onetime') {
-            return dayjs(props.selectDate, DATE_FORMAT).isSame(dayjs(day_of_create, DATE_FORMAT))
+        if (type_of_habit === 'onetime' && oneTimeDay) {
+            return dayjs(props.selectDate, DATE_FORMAT).isSame(dayjs(oneTimeDay, DATE_FORMAT))
         }
 
         return false

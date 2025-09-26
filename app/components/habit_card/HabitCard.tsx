@@ -110,7 +110,7 @@ const HabitCard = ({ habitId, habitConfig, selectDate, dataStart }: IHabitCard) 
     return (
         <Select open={isOpen} onOpenChange={setIsOpen}>
             <YStack
-                height={70}
+                height={80}
                 backgroundColor={'$gray'}
                 borderRadius={10}
                 zIndex={2}
@@ -124,6 +124,8 @@ const HabitCard = ({ habitId, habitConfig, selectDate, dataStart }: IHabitCard) 
                         backgroundColor={'$gray'}
                         width={'70%'}
                         height={'100%'}
+                        marginTop={10}
+                        marginBottom={10}
                         pressStyle={{
                             backgroundColor: 'none'
                         }}
@@ -144,6 +146,7 @@ const HabitCard = ({ habitId, habitConfig, selectDate, dataStart }: IHabitCard) 
                             numberOfLines={2}
                             ellipsizeMode="tail"
                             flex={1}
+                            
                         >
                             {habitConfig.name}
                         </Text>
