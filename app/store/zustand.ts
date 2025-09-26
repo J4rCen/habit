@@ -24,6 +24,7 @@ export interface IHabitTask {
 		name: string
 		day_of_create: string
 		type_of_habit: 'reusable' | 'onetime'
+		oneTimeDay: string | null,
 		interval_execution: 'every_day' | 'certain_days' | 'gap' | null
 		days_of_week?: Array<string> | null
 		gap_interval?: {

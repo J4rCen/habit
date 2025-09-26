@@ -1,5 +1,6 @@
 import CustomInput from '@/app/components/custom_input/CustomInput';
 import CustomSelect from '@/app/components/custom_select/CustomSelect';
+import CustomDataPicker from '@/app/components/datepicker/CustomDataPicker';
 import ReminderToggle from '@/app/components/reminder_toggle/ReminderToggle';
 import CustomTimePicker from '@/app/components/timepicker/CustomTimePicker';
 import { DATE_FORMAT, SCREEN_HEIGHT, SCREEN_WIDTH, SCREEN_WIDTH_400, WEEK_DAYS } from '@/app/constants';
@@ -18,7 +19,6 @@ import { optionIntervalExecution, optionTimesOfDay, optionTypeOfTask } from './s
 
 
 const CreateNewHabits = () => {
-
     const { habitId } = useLocalSearchParams()
     const habitConfig = habitId ? useStore(store => store.getHabitTask(habitId as string)?.habitConfig) : undefined
     const habitStatic = habitId ? useStore(store => store.getHabitTask(habitId as string)?.habitStatic) : undefined
@@ -34,6 +34,7 @@ const CreateNewHabits = () => {
     const [quantity, setQuantity] = useState<number | string>(habitConfig && habitConfig.quantity ? habitConfig.quantity : '')
     const [timerTime, setTimerTime] = useState(habitConfig && habitConfig.timer_time ? habitConfig.timer_time : '00:00')
     const [reminderOn, setReminderOn] = useState(habitConfig && habitConfig.reminder ? habitConfig.reminder : false)
+    const [oneTimeDay, setOneTimeDay] = useState<string>(habitConfig && habitConfig.oneTimeDay ? habitConfig.oneTimeDay : dayjs().format(DATE_FORMAT))
     const [reminderTime, setReminderTime] = useState(
         habitConfig && habitConfig.reminder_time ? habitConfig.reminder_time :
             `${new Date().getHours().toString().padStart(2, '0')
@@ -138,7 +139,9 @@ const CreateNewHabits = () => {
                     daysOfWeek,
                     daysInRow: Number(daysInRow),
                     skipDays: Number(skipDays),
-                    dayOfCreate
+                    dayOfCreate,
+                    oneTimeDay,
+                    typeOfHabit
                 })
 
                 notificationsId.current = id
@@ -149,7 +152,7 @@ const CreateNewHabits = () => {
 
         if (reminderOn === false && habitConfig?.notificationsId) {
             try {
-                await CancelNotificationAsync(intervalExecution, habitConfig?.notificationsId, hid)
+                await CancelNotificationAsync(intervalExecution, habitConfig?.notificationsId, hid, typeOfHabit)
                 notificationsId.current = null
             } catch (error) {
                 console.error(error)
@@ -162,6 +165,7 @@ const CreateNewHabits = () => {
                 name: habitName,
                 day_of_create: dayOfCreate,
                 type_of_habit: typeOfHabit,
+                oneTimeDay: typeOfHabit === 'onetime' ? oneTimeDay : null,
                 interval_execution:
                     typeOfHabit === 'reusable' ?
                         intervalExecution as 'every_day' | 'certain_days' | 'gap' :
@@ -212,7 +216,7 @@ const CreateNewHabits = () => {
                     onPress: async () => {
 
                         if (habitConfig?.notificationsId) {
-                            await CancelNotificationAsync(intervalExecution, habitConfig?.notificationsId, habitId as string)
+                            await CancelNotificationAsync(intervalExecution, habitConfig?.notificationsId, habitId as string, typeOfHabit)
                             notificationsId.current = null
                         }
 
@@ -223,7 +227,6 @@ const CreateNewHabits = () => {
             ]
         );
     }
-
 
     const toggleDay = (day: string) => {
         setDaysOfWeek((prev) =>
@@ -355,7 +358,7 @@ const CreateNewHabits = () => {
                                             if (typeof e === 'string') setHabitName(e)
                                         }}
                                     />
-                                    {/* <XStack margin={10} justifyContent='center'>
+                                    <XStack margin={10} justifyContent='center'>
                                         <Button
                                             borderTopRightRadius={0}
                                             borderBottomRightRadius={0}
@@ -386,10 +389,10 @@ const CreateNewHabits = () => {
                                                 Одноразовая
                                             </Text>
                                         </Button>
-                                    </XStack> */}
+                                    </XStack>
 
                                     <YStack marginTop={20} gap={15}>
-                                        {typeOfHabit === 'reusable' &&
+                                        {typeOfHabit === 'reusable' ?
                                             <CustomSelect
                                                 id={1}
                                                 placeholder='Интервал выполнения'
@@ -401,6 +404,12 @@ const CreateNewHabits = () => {
                                                 isOpen={oneActive === 1 ? isOpen : false}
                                                 setIsOpen={(e) => setIsOpen(e)}
                                                 setOneActive={(e) => setOneActive(e)}
+                                            /> : <CustomDataPicker
+                                                height={50}
+                                                width={SCREEN_WIDTH - 20}
+                                                placeholder='Выберете дату'
+                                                oneTimeDay={oneTimeDay}
+                                                setOneTimeDay={setOneTimeDay}
                                             />
                                         }
 

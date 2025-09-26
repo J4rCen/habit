@@ -1,7 +1,7 @@
 {
 	"expo": {
-		"name": "habit",
-		"slug": "habit",
+		"name": "Track Habit",
+		"slug": "Track Habit",
 		"version": "0.9.5",
 		"orientation": "portrait",
 		"icon": "./assets/images/adaptive-icon.png",
