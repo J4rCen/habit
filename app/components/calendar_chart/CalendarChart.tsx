@@ -4,20 +4,8 @@ import { ArrowLeft, ArrowRight } from "@/app/svgs/arrowBarCart";
 import dayjs from "dayjs";
 import customParseFormat from 'dayjs/plugin/customParseFormat';
 import React, { useMemo, useState } from "react";
-import { Calendar, LocaleConfig } from "react-native-calendars";
+import { Calendar } from "react-native-calendars";
 import { View, YStack } from "tamagui";
-
-LocaleConfig.locales.ru = {
-    monthNames: [
-        'Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь',
-        'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь'
-    ],
-    monthNamesShort: ['Янв.', 'Фев.', 'Март', 'Апр.', 'Май', 'Июнь', 'Июль', 'Авг.', 'Сен.', 'Окт.', 'Ноя.', 'Дек.'],
-    dayNames: ['Воскресенье', 'Понедельник', 'Вторник', 'Среда', 'Четверг', 'Пятница', 'Суббота'],
-    dayNamesShort: ['Вс', 'Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб'],
-    today: 'Сегодня'
-};
-LocaleConfig.defaultLocale = 'ru';
 
 interface ICalendarChart {
     habitConfig: IHabitTask['habitConfig']

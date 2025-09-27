@@ -1,8 +1,8 @@
 {
 	"expo": {
 		"name": "Track Habit",
-		"slug": "Track Habit",
-		"version": "0.9.5",
+		"slug": "habit",
+		"version": "0.9.6",
 		"orientation": "portrait",
 		"icon": "./assets/images/adaptive-icon.png",
 		"scheme": "habit",
@@ -17,7 +17,8 @@
 				"backgroundColor": "#194A98"
 			},
 			"edgeToEdgeEnabled": true,
-			"package": "com.j4rcen.habit"
+			"package": "com.j4rcen.habit",
+			"name": "Track Habit"
 		},
 		"web": {
 			"bundler": "metro",

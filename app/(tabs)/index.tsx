@@ -9,6 +9,7 @@ import { router } from "expo-router";
 import * as TaskManager from 'expo-task-manager';
 import { useEffect, useState } from "react";
 import { StyleSheet, TouchableOpacity } from "react-native";
+import { LocaleConfig } from 'react-native-calendars';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Text, View, YStack } from "tamagui";
 import FilteringButtonsTime from "../components/filtering_buttons_time/FilteringButtonsTime";
@@ -22,6 +23,18 @@ import SetNotifications from '../utilities/notifications';
 dayjs.extend(isoWeek);
 dayjs.extend(weekday);
 dayjs.extend(customParseFormat)
+
+LocaleConfig.locales.ru = {
+    monthNames: [
+        'Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь',
+        'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь'
+    ],
+    monthNamesShort: ['Янв.', 'Фев.', 'Март', 'Апр.', 'Май', 'Июнь', 'Июль', 'Авг.', 'Сен.', 'Окт.', 'Ноя.', 'Дек.'],
+    dayNames: ['Воскресенье', 'Понедельник', 'Вторник', 'Среда', 'Четверг', 'Пятница', 'Суббота'],
+    dayNamesShort: ['Вс', 'Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб'],
+    today: 'Сегодня'
+};
+LocaleConfig.defaultLocale = 'ru';
 
 const timeToSeconds = (timeStr: string): number => {
 	const [hours, minutes] = timeStr.split(':').map(Number);
