@@ -57,6 +57,7 @@ const SlidingCalendar = memo(({ selectDate, setSelectDate }: ISlidingCalendar) =
 	const startDateUser = useStore(store => store.startDateUser);
 	const scrollTriggered = useRef(false);
 	const todayIndexRef = useRef<number | null>(null);
+	const flatListReadyRef = useRef(false);
 
 	const [weeks, setWeeks] = useState<WeekItem[]>([]);
 
@@ -74,6 +75,8 @@ const SlidingCalendar = memo(({ selectDate, setSelectDate }: ISlidingCalendar) =
 
 			if (todayWeekIndex !== -1) {
 				todayIndexRef.current = todayWeekIndex + 1;
+			} else {
+				todayIndexRef.current = null;
 			}
 		}
 	}, [startDateUser]);
@@ -85,20 +88,35 @@ const SlidingCalendar = memo(({ selectDate, setSelectDate }: ISlidingCalendar) =
 		[setSelectDate]
 	);
 
-	const handleReadyToScroll = () => {
+	const attemptScrollToToday = useCallback(() => {
 		if (
 			!scrollTriggered.current &&
+			flatListReadyRef.current &&
 			todayIndexRef.current !== null &&
-			flatListRef.current &&
-			todayIndexRef.current < weeks.length
+			typeof todayIndexRef.current === 'number' &&
+			weeks.length > todayIndexRef.current &&
+			flatListRef.current
 		) {
 			scrollTriggered.current = true;
-			flatListRef.current.scrollToIndex({
-				index: todayIndexRef.current,
-				animated: false,
-			});
+			try {
+				flatListRef.current.scrollToIndex({
+					index: todayIndexRef.current,
+					animated: false,
+				});
+			} catch (e) {
+				scrollTriggered.current = false;
+			}
 		}
-	};
+	}, [weeks]);
+
+	useEffect(() => {
+		attemptScrollToToday();
+	}, [weeks, attemptScrollToToday]);
+
+	const handleFlatListReady = useCallback(() => {
+		flatListReadyRef.current = true;
+		attemptScrollToToday();
+	}, [attemptScrollToToday]);
 
 	const renderItem: ListRenderItem<WeekItem> = useCallback(
 		({ item }) => {
@@ -234,8 +252,8 @@ const SlidingCalendar = memo(({ selectDate, setSelectDate }: ISlidingCalendar) =
 							}
 						}, 300);
 					}}
-					onLayout={handleReadyToScroll}
-					onContentSizeChange={handleReadyToScroll}
+					onLayout={handleFlatListReady}
+					onContentSizeChange={handleFlatListReady}
 				/>
 			</YStack>
 		</YStack>

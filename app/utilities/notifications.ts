@@ -105,8 +105,6 @@ const SetNotifications = async (type: string, time: string, option: ISetNotifica
 
         const date = new Date(`${option.oneTimeDay}T${hour}:${minute}:00`)
 
-
-
         try {
             const notificationId = await Notifications.scheduleNotificationAsync({
                 content: {
