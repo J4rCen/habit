@@ -1,16 +1,34 @@
 import customTamaguiConfig from "@/tamagui.config";
+import * as Localization from 'expo-localization';
 import { Stack } from "expo-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { TamaguiProvider, View } from "tamagui";
+import i18n from "./i18/i18";
 import LoadingScreen from "./screens/loadingScreen";
 import { useAppOpenAd } from './screens/yandex_ads';
+import useStore from "./store/zustand";
 
 export default function RootLayout() {
 
 	const [showLoading, setShowLoading] = useState(true);
 	const appOpenAd = useAppOpenAd();
+	const systemLanguage = useStore(state => state.systemLocale)
+	const setSystemLanguage = useStore(state => state.setSystemLocal)
+	const language = Localization.getLocales()[0]['languageCode']
 	
+	useEffect(() => {
+		if (systemLanguage !== null) {
+			i18n.changeLanguage(systemLanguage)
+			return
+		}
+
+		if (systemLanguage === null && language) {
+			setSystemLanguage(language)
+			i18n.changeLanguage(language)
+		}
+	}, [systemLanguage])
+
 	return (
 		<SafeAreaProvider>
 			<TamaguiProvider config={customTamaguiConfig}>

@@ -48,6 +48,7 @@ interface IStore {
 	dayInterval: TDayInterval,
 	email: string | null,
 	premium: boolean,
+	systemLocale: string | null
 	_hasHydrated: boolean
 	setHasHydrated: (state: boolean) => void
 	initializeApp: () => void
@@ -61,6 +62,7 @@ interface IStore {
 	updateHabitTask: (habitId: string, habitConfig: Omit<IHabitTask, 'habitId'>) => void
 	removeHabitTask: (habitId: string) => void,
 	setDayInterval: (data: TDayInterval) => void
+	setSystemLocal: (language: string) => void
 }
 
 const useStore = create<IStore>()(
@@ -74,6 +76,7 @@ const useStore = create<IStore>()(
 				eveningTime: '18:00',
 			},
 			email: null,
+			systemLocale: 'en',
 			premium: false,
 			_hasHydrated: false,
 			setHasHydrated: (state) => set({ _hasHydrated: state }),
@@ -118,6 +121,7 @@ const useStore = create<IStore>()(
 					}
 				}))
 			},
+			setSystemLocal: (language) => set({systemLocale: language}),
 			setIsCompleat: (habitId, date, habitStatic) => {
 				set((state) => {
 					const habit = state.habitTask[habitId]
@@ -182,6 +186,8 @@ const useStore = create<IStore>()(
 				dayInterval: state.dayInterval,
 				email: state.email,
 				premium: state.premium,
+				systemLocale: state.systemLocale
+				
 			}),
 			onRehydrateStorage: () => (state) => {
 				state?.setHasHydrated(true)
