@@ -72,11 +72,11 @@ const SlidingCalendar = memo(({ selectDate, setSelectDate }: ISlidingCalendar) =
 				week.some((day) => keyConversion(day) === todayStr)
 			);
 
-			const allWeeks: WeekItem[] = ['На прошлой неделе вы не пользовались приложением', ...generatedWeeks];
+			const allWeeks: WeekItem[] = [...generatedWeeks];
 			setWeeks(allWeeks);
 
 			if (todayWeekIndex !== -1) {
-				todayIndexRef.current = todayWeekIndex + 1;
+				todayIndexRef.current = todayWeekIndex;
 			} else {
 				todayIndexRef.current = null;
 			}
