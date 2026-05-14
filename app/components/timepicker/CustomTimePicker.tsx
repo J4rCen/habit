@@ -1,6 +1,7 @@
 import CustomInput from '@/app/components/custom_input/CustomInput'
 import { SCREEN_WIDTH } from '@/app/constants'
 import React, { useEffect, useRef, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import {
 	FlatList,
 	NativeScrollEvent,
@@ -85,6 +86,7 @@ const PickerColumn = React.memo(({
 const CustomTimePicker = ({ width, height, value, placeholder, onChange }: ICustomTimePicker) => {
 	const [hours, setHours] = useState('00')
 	const [minutes, setMinutes] = useState('00')
+	const {t} = useTranslation()
 
 	const parseInitialValue = (val: string) => {
 		const [h = '00', m = '00'] = val.split(':')
@@ -93,8 +95,8 @@ const CustomTimePicker = ({ width, height, value, placeholder, onChange }: ICust
 	}
 
 	const timeUnits = [
-		{ label: 'Часы', value: hours, setValue: setHours, range: 24 },
-		{ label: 'Минуты', value: minutes, setValue: setMinutes, range: 60 },
+		{ label: t('createHabit.hours'), value: hours, setValue: setHours, range: 24 },
+		{ label: t('createHabit.minutes'), value: minutes, setValue: setMinutes, range: 60 },
 	]
 
 	return (
@@ -148,7 +150,7 @@ const CustomTimePicker = ({ width, height, value, placeholder, onChange }: ICust
 							<Dialog.Close asChild>
 								<Button backgroundColor="$gray">
 								<Text color="white" fontSize={16}>
-									Отмена
+									{t('createHabit.cancel')}
 								</Text>
 								</Button>
 							</Dialog.Close>
@@ -161,7 +163,7 @@ const CustomTimePicker = ({ width, height, value, placeholder, onChange }: ICust
 								}}
 								>
 								<Text color="white" fontSize={16}>
-									Подтвердить
+									{t('createHabit.confirm')}
 								</Text>
 								</Button>
 							</Dialog.Close>

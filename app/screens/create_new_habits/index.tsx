@@ -12,6 +12,7 @@ import dayjs from 'dayjs';
 import { router, useLocalSearchParams } from 'expo-router';
 import { nanoid } from 'nanoid/non-secure';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Alert } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Button, ScrollView, Stack, Text, View, XStack, YStack } from "tamagui";
@@ -46,6 +47,7 @@ const CreateNewHabits = () => {
     const [alertMessage, setAlertMessage] = useState<string>('')
     const [isOpen, setIsOpen] = useState<boolean>(false)
     const notificationsId = useRef(habitConfig && reminderOn ? habitConfig.notificationsId : null)
+    const {t} = useTranslation()
 
     const store = useStore(state => state)
 
@@ -69,7 +71,7 @@ const CreateNewHabits = () => {
         } else {
 
             if (permission === 'denied') {
-                setAlertMessage('Для работы напоминаний необходимо разрешить уведомления')
+                setAlertMessage(t('createHabit.notificationsMustBeEnabled'))
                 setAlertShow(true)
             }
 
@@ -81,49 +83,49 @@ const CreateNewHabits = () => {
     const saveHabit = async () => {
 
         if (habitName.length === 0) {
-            setAlertMessage('Ошибка сохранения: Название привычке не может быть пустым')
+            setAlertMessage(t('createHabit.errorHabitNameEmpty'))
             setAlertShow(true)
             return
         }
 
         if (intervalExecution === 'certain_days' && daysOfWeek.length === 0) {
-            setAlertMessage('Ошибка сохранения: Необходимо выбрать хотя бы один день недели')
+            setAlertMessage(t('createHabit.errorDaysOfWeekEmpty'))
             setAlertShow(true)
             return
         }
 
         if (intervalExecution === 'gap' && typeof daysInRow === 'string') {
-            setAlertMessage('Ошибка сохранения: Количество дней активности должно быть числом')
+            setAlertMessage(t('createHabit.errorDaysMustBeNumber'))
             setAlertShow(true)
             return
         }
 
         if (intervalExecution === 'gap' && Number(daysInRow) === 0) {
-            setAlertMessage('Ошибка сохранения: Количество дней активности не должны быть равны нулю')
+            setAlertMessage(t('createHabit.errorActiveDaysShouldNotBeZero'))
             setAlertShow(true)
             return
         }
 
         if (intervalExecution === 'gap' && typeof skipDays === 'string') {
-            setAlertMessage('Ошибка сохранения: Значение для отдыха должно быть числом')
+            setAlertMessage(t('createHabit.errorRestValueMustBeNumber'))
             setAlertShow(true)
             return
         }
 
         if (intervalExecution === 'gap' && Number(skipDays) === 0) {
-            setAlertMessage('Ошибка сохранения: Количество дней отдыха не должны быть равны нулю')
+            setAlertMessage(t('createHabit.errorRestDaysMustNotBeZero'))
             setAlertShow(true)
             return
         }
 
         if (typeOfTask === 'reusable_mark' && typeof quantity === 'string') {
-            setAlertMessage('Ошибка сохранения: Количество должно быть числом')
+            setAlertMessage(t('createHabit.errorQuantityMustBeNumber'))
             setAlertShow(true)
             return
         }
 
         if (typeOfTask === 'reusable_mark' && Number(quantity) === 0) {
-            setAlertMessage('Ошибка сохранения: Количество не должны быть равны нулю')
+            setAlertMessage(t('createHabit.errorQuantityMustNotBeZero'))
             setAlertShow(true)
             return
         }
@@ -206,12 +208,12 @@ const CreateNewHabits = () => {
 
     const deleteHabit = () => {
         Alert.alert(
-            "Удаление привычке",
-            "Данное действие полностью удалит привычку, хотите продолжить ?",
+            t('createHabit.deleteHabit'),
+            t('createHabit.removeHabitWantToContinue'),
             [
-                { text: "Отмена", style: "cancel" },
+                { text: t('createHabit.cancel'), style: "cancel" },
                 {
-                    text: "Удалить",
+                    text: t('createHabit.delete'),
                     style: "destructive",
                     onPress: async () => {
 
@@ -265,7 +267,7 @@ const CreateNewHabits = () => {
                             }}
                         >
                             <Text color="white" fontSize={SCREEN_WIDTH_400 ? 14 : 16}>
-                                {day}
+                                {t(`listHabit.${day}`)}
                             </Text>
                         </Stack>
                     )
@@ -280,7 +282,7 @@ const CreateNewHabits = () => {
                 <XStack gap={15} justifyContent='space-between'>
                     <CustomInput
                         value={daysInRow}
-                        placeholder='Активность'
+                        placeholder={t('createHabit.active')}
                         height={50}
                         width={SCREEN_WIDTH / 2 - 20}
                         onChange={(e) => {
@@ -291,7 +293,7 @@ const CreateNewHabits = () => {
                     />
                     <CustomInput
                         value={skipDays}
-                        placeholder='Отдых'
+                        placeholder={t('createHabit.rest')}
                         height={50}
                         width={SCREEN_WIDTH / 2 - 20}
                         onChange={(e) => {
@@ -301,7 +303,7 @@ const CreateNewHabits = () => {
                         numbersOnly={true}
                     />
                 </XStack>
-                <Text color={'white'} fontSize={12}>*Значение указывается в днях</Text>
+                <Text color={'white'} fontSize={12}>{t('createHabit.valueIsIndicatedInDays')}</Text>
             </YStack>
         )
     }, [daysInRow, skipDays])
@@ -311,7 +313,7 @@ const CreateNewHabits = () => {
             <YStack>
                 <CustomInput
                     value={quantity}
-                    placeholder='Количество'
+                    placeholder={t('createHabit.quantity')}
                     height={50}
                     width={SCREEN_WIDTH / 2 - 20}
                     onChange={(e) => {
@@ -340,7 +342,7 @@ const CreateNewHabits = () => {
                                         color={"$white"}
                                         fontSize={26}
                                     >
-                                        {habitId === undefined ? 'Добавить привычку' : 'Изменить привычку'}
+                                        {habitId === undefined ? t('createHabit.addHabit') : t('createHabit.changeHabit')}
                                     </Text>
                                 </XStack>
 
@@ -353,7 +355,7 @@ const CreateNewHabits = () => {
                                         value={habitName}
                                         height={50}
                                         width={SCREEN_WIDTH - 20}
-                                        placeholder='Название привычке'
+                                        placeholder={t('createHabit.habitName')}
                                         onChange={(e) => {
                                             if (typeof e === 'string') setHabitName(e)
                                         }}
@@ -370,7 +372,7 @@ const CreateNewHabits = () => {
                                                 color={'$white'}
                                                 fontSize={16}
                                             >
-                                                Регулярная
+                                                {t('createHabit.regular')}
                                             </Text>
                                         </Button>
                                         <Button
@@ -386,7 +388,7 @@ const CreateNewHabits = () => {
                                                 color={'$white'}
                                                 fontSize={16}
                                             >
-                                                Одноразовая
+                                                {t('createHabit.onetime')}
                                             </Text>
                                         </Button>
                                     </XStack>
@@ -395,7 +397,7 @@ const CreateNewHabits = () => {
                                         {typeOfHabit === 'reusable' ?
                                             <CustomSelect
                                                 id={1}
-                                                placeholder='Интервал выполнения'
+                                                placeholder={t('createHabit.executionInterval')}
                                                 height={50}
                                                 width={SCREEN_WIDTH - 20}
                                                 options={optionIntervalExecution}
@@ -407,7 +409,7 @@ const CreateNewHabits = () => {
                                             /> : <CustomDataPicker
                                                 height={50}
                                                 width={SCREEN_WIDTH - 20}
-                                                placeholder='Выберете дату'
+                                                placeholder={t('createHabit.selectDate')}
                                                 oneTimeDay={oneTimeDay}
                                                 setOneTimeDay={setOneTimeDay}
                                             />
@@ -427,7 +429,7 @@ const CreateNewHabits = () => {
 
                                         <CustomSelect
                                             id={2}
-                                            placeholder='Время суток'
+                                            placeholder={t('createHabit.timesOfDay')}
                                             height={50}
                                             width={SCREEN_WIDTH - 20}
                                             options={optionTimesOfDay}
@@ -439,7 +441,7 @@ const CreateNewHabits = () => {
                                         />
                                         <CustomSelect
                                             id={3}
-                                            placeholder='Тип задачи'
+                                            placeholder={t('createHabit.taskType')}
                                             height={50}
                                             width={SCREEN_WIDTH - 20}
                                             options={optionTypeOfTask}
@@ -462,7 +464,7 @@ const CreateNewHabits = () => {
                                                 height={50}
                                                 value={timerTime}
                                                 onChange={setTimerTime}
-                                                placeholder='Время'
+                                                placeholder={t('createHabit.time')}
                                             />
                                         }
 
@@ -478,7 +480,7 @@ const CreateNewHabits = () => {
                                                 height={50}
                                                 value={reminderTime}
                                                 onChange={setReminderTime}
-                                                placeholder='Укажите время'
+                                                placeholder={t('createHabit.specifyTime')}
 
                                             />
                                         }
@@ -496,7 +498,7 @@ const CreateNewHabits = () => {
                                             backgroundColor={'$blue'}
                                             onPress={() => saveHabit()}
                                         >
-                                            Сохранить
+                                            {t('createHabit.save')}
                                         </Button>
                                         <Button
                                             fontSize={16}
@@ -506,7 +508,7 @@ const CreateNewHabits = () => {
                                             backgroundColor={'$gray'}
                                             onPress={() => router.back()}
                                         >
-                                            Отмена
+                                            {t('createHabit.cancel')}
                                         </Button>
                                         {
                                             habitId &&
@@ -518,7 +520,7 @@ const CreateNewHabits = () => {
                                                 backgroundColor={'red'}
                                                 onPress={() => deleteHabit()}
                                             >
-                                                Удалить
+                                                {t('createHabit.delete')}
                                             </Button>
                                         }
                                     </YStack>

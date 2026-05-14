@@ -45,7 +45,7 @@ const CalendarChart = ({ statistics, pastDays, habitStart, habitConfig }: ICalen
             for (let i = 0; i < pastDays; i++) {
                 const day = dayjs(habitStart).add(i, 'day');
   
-                if (habitConfig.days_of_week?.includes(day.format('dd').replace(/^[п,в,с,ч]/, c => c.toUpperCase()))) {
+                if (habitConfig.days_of_week?.includes(day.locale('en').format('ddd').toLowerCase())) {
                     const completed = statistics?.[day.format(DATE_FORMAT)]?.isCompleat === 1;
                     marks[day.format(DATE_FORMAT)] = { selected: true, selectedColor: completed ? 'green' : 'darkred' };
                 }

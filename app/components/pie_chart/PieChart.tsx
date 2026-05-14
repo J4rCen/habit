@@ -4,6 +4,7 @@ import f from '@/assets/fonts/Inter_28pt-Regular.ttf';
 import { useFont } from "@shopify/react-native-skia";
 import dayjs from 'dayjs';
 import React, { useEffect, useMemo, useState } from "react";
+import { useTranslation } from 'react-i18next';
 import { StyleSheet } from "react-native";
 import { Text, View, YStack } from "tamagui";
 import { Pie, PolarChart } from "victory-native";
@@ -21,6 +22,7 @@ const PieChart = ({ pastDays, statistics, habitConfig, habitStart }: IPieChart) 
 
     const [completed, setCompleted] = useState<number>(0)
     const [missed, setMissed] = useState<number>(0)
+    const {t} = useTranslation()
 
 
     useEffect(() => {
@@ -44,7 +46,7 @@ const PieChart = ({ pastDays, statistics, habitConfig, habitStart }: IPieChart) 
             for (let i = 0; i < pastDays; i++) {
                 const day = dayjs(habitStart).add(i, 'day');
 
-                if (habitConfig.days_of_week?.includes(day.format('dd').replace(/^[п,в,с,ч]/, c => c.toUpperCase()))) {
+                if (habitConfig.days_of_week?.includes(day.locale('en').format('ddd').toLowerCase())) {
                     p += 1
                     if (statistics?.[day.format(DATE_FORMAT)]?.isCompleat === 1) {
                         c += 1
@@ -78,8 +80,8 @@ const PieChart = ({ pastDays, statistics, habitConfig, habitStart }: IPieChart) 
 
 
     const data = [
-        { label: "Завершено", value: completed, color: "#28a745" },
-        { label: "Пропущено", value: missed, color: "#8b0000" },
+        { label: t('statistics.complete'), value: completed, color: "#28a745" },
+        { label: t('statistics.missed'), value: missed, color: "#8b0000" },
     ];
 
     const total = useMemo(

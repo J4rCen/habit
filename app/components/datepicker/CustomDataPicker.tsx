@@ -1,7 +1,9 @@
 import { DATE_FORMAT, SCREEN_WIDTH } from "@/app/constants"
+import useStore from "@/app/store/zustand"
 import { ArrowLeft, ArrowRight } from "@/app/svgs/arrowBarCart"
 import dayjs from "dayjs"
 import React, { Dispatch, SetStateAction, useMemo, useState } from "react"
+import { useTranslation } from "react-i18next"
 import { Pressable } from "react-native"
 import { Calendar } from "react-native-calendars"
 import { Button, Dialog, Text, View, XStack, YStack } from "tamagui"
@@ -19,6 +21,8 @@ const CustomDataPicker = (props: ICustomDataPicker) => {
 
 	const currentMonth = dayjs().format(DATE_FORMAT)
 	const [endMonth, setEndMonth] = useState(currentMonth);
+	const {t} = useTranslation()
+	const systemLanguage = useStore(state => state.systemLocale)
 
 	const disableArrowLeft = useMemo(() => {
 		return dayjs(endMonth).isSame(dayjs().format(DATE_FORMAT), 'year') && dayjs(endMonth).isSame(dayjs().format(DATE_FORMAT), 'month')
@@ -36,7 +40,7 @@ const CustomDataPicker = (props: ICustomDataPicker) => {
 						placeholder={props.placeholder}
 						width={props.width}
 						height={props.height}
-						value={dayjs(props.oneTimeDay).format('DD MMMM YYYY')}
+						value={dayjs(props.oneTimeDay).locale(systemLanguage ?? 'en').format('DD MMMM YYYY')}
 						onReadonly
 						center
 					/>
@@ -84,7 +88,7 @@ const CustomDataPicker = (props: ICustomDataPicker) => {
 							<Dialog.Close asChild>
 								<Button backgroundColor="$gray">
 									<Text color="white" fontSize={16}>
-										Отмена
+										{t('createHabit.cancel')}
 									</Text>
 								</Button>
 							</Dialog.Close>
@@ -93,7 +97,7 @@ const CustomDataPicker = (props: ICustomDataPicker) => {
 									backgroundColor="$blue"
 								>
 									<Text color="white" fontSize={16}>
-										Подтвердить
+										{t('createHabit.confirm')}
 									</Text>
 								</Button>
 							</Dialog.Close>

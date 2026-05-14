@@ -1,5 +1,6 @@
 import { router } from "expo-router"
 import React, { useCallback, useMemo, useState } from "react"
+import { useTranslation } from "react-i18next"
 import { TouchableOpacity } from "react-native"
 import { SafeAreaView } from "react-native-safe-area-context"
 import { ScrollView, Text, View, XStack, YStack } from "tamagui"
@@ -11,6 +12,7 @@ const Statistics = () => {
 
     const store: IHabitTask[] = Object.values(useStore(store => store.habitTask))
     const [searchValue, setSearchValue] = useState<string>('')
+    const {t} = useTranslation()
 
     const filteredHabits = useCallback(() => {
         return store.filter((item) => {
@@ -40,7 +42,7 @@ const Statistics = () => {
                             fontSize={18}
                             numberOfLines={2}
                             ellipsizeMode="tail"
-                            flex={1} // Это важно, чтобы текст занимал всё доступное пространство
+                            flex={1}
                         >
                             {item.habitConfig.name}
                         </Text>
@@ -62,7 +64,7 @@ const Statistics = () => {
                             fontSize={26}
                             marginLeft={15}
                         >
-                            Статистика
+                            {t('listHabit.statistics')}
                         </Text>
                     </XStack>
                     <YStack alignItems="center" marginTop={10}>
@@ -73,7 +75,7 @@ const Statistics = () => {
                                     if (typeof e === 'string')
                                         setSearchValue(e)
                                 }}
-                                placeholder="Поиск"
+                                placeholder={t('statistics.search')}
                                 height={50}
                                 width={SCREEN_WIDTH - 20}
                             />
@@ -86,8 +88,8 @@ const Statistics = () => {
                                             <Text color={'white'} textAlign="center" width={SCREEN_WIDTH - 20} fontSize={SCREEN_WIDTH_400 ? 16 : 18}>
                                                 {
                                                     store.length > 0 ?
-                                                        'Привычка с таким названием не найдена' :
-                                                        'Для отображения статистики создайте хотя бы одну привычку'
+                                                        t('statistics.noHabitWithThisName') :
+                                                        t('statistics.toDisplayStatistics')
                                                 }
                                             </Text>
                                     }

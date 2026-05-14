@@ -8,8 +8,8 @@ import * as Notifications from 'expo-notifications';
 import { router } from "expo-router";
 import * as TaskManager from 'expo-task-manager';
 import { useEffect, useState } from "react";
+import { useTranslation } from 'react-i18next';
 import { StyleSheet, TouchableOpacity } from "react-native";
-import { LocaleConfig } from 'react-native-calendars';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Text, View, YStack } from "tamagui";
 import FilteringButtonsTime from "../components/filtering_buttons_time/FilteringButtonsTime";
@@ -24,18 +24,6 @@ dayjs.extend(isoWeek);
 dayjs.extend(weekday);
 dayjs.extend(customParseFormat)
 
-LocaleConfig.locales.ru = {
-    monthNames: [
-        'Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь',
-        'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь'
-    ],
-    monthNamesShort: ['Янв.', 'Фев.', 'Март', 'Апр.', 'Май', 'Июнь', 'Июль', 'Авг.', 'Сен.', 'Окт.', 'Ноя.', 'Дек.'],
-    dayNames: ['Воскресенье', 'Понедельник', 'Вторник', 'Среда', 'Четверг', 'Пятница', 'Суббота'],
-    dayNamesShort: ['Вс', 'Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб'],
-    today: 'Сегодня'
-};
-LocaleConfig.defaultLocale = 'ru';
-
 const timeToSeconds = (timeStr: string): number => {
 	const [hours, minutes] = timeStr.split(':').map(Number);
 	return hours * 3600 + minutes * 60;
@@ -47,6 +35,8 @@ const getCurrentTimeInSeconds = (): number => {
 };
 
 export default function Index() {
+
+	const {t} = useTranslation()
 
 	const store = useStore(state => state.habitTask)
 	const initApp = useStore(state => state.initializeApp)
@@ -173,7 +163,7 @@ export default function Index() {
 							<Text
 								color={'$white'}
 								fontSize={18}
-							>Добавить привычку</Text>
+							>{t('listHabit.addHabit')}</Text>
 						</TouchableOpacity>
 
 						<HabitsRender

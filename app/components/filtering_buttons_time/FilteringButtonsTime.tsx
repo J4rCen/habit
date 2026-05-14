@@ -1,6 +1,7 @@
 import { SCREEN_WIDTH, SCREEN_WIDTH_400 } from "@/app/constants";
 import { DaySvg, EveningSvg, MorningSvg } from "@/app/svgs/filtersButtonSvgs";
 import React, { Dispatch, SetStateAction } from "react";
+import { useTranslation } from "react-i18next";
 import { StyleSheet, TouchableOpacity } from "react-native";
 import { Text, XStack } from "tamagui";
 
@@ -11,6 +12,8 @@ interface IFilteringButtonsTime {
 
 const FilteringButtonsTime = (props: IFilteringButtonsTime) => {
 
+    const {t} = useTranslation()
+    
     const setSelect = (key: string) => {
         props.setSelectFilter(key)
     } 
@@ -21,7 +24,7 @@ const FilteringButtonsTime = (props: IFilteringButtonsTime) => {
                 style={[styles.filterButton, {borderTopLeftRadius: 10, borderBottomLeftRadius: 10}, props.selectFilter === 'all' && styles.selectButton]}
                 onPress={() => setSelect('all')}
             >
-                <Text style={styles.buttonText}>Любое</Text>
+                <Text style={styles.buttonText}>{t('listHabit.any')}</Text>
             </TouchableOpacity>
             <TouchableOpacity
                 style={[styles.filterButton, props.selectFilter === 'morning' && styles.selectButton]}  
@@ -29,7 +32,7 @@ const FilteringButtonsTime = (props: IFilteringButtonsTime) => {
             >
                 <XStack alignItems="center" justifyContent="center">
                     <MorningSvg size={30}/>
-                    <Text style={styles.buttonText}>Утро</Text>
+                    <Text style={styles.buttonText}>{t('listHabit.morning')}</Text>
                 </XStack>
             </TouchableOpacity>
             <TouchableOpacity 
@@ -38,7 +41,7 @@ const FilteringButtonsTime = (props: IFilteringButtonsTime) => {
             >
                 <XStack alignItems="center" justifyContent="center">
                     <DaySvg size={30}/>
-                    <Text style={styles.buttonText}>День</Text>
+                    <Text style={styles.buttonText}>{t('listHabit.day')}</Text>
                 </XStack>
             </TouchableOpacity>
             <TouchableOpacity 
@@ -47,7 +50,7 @@ const FilteringButtonsTime = (props: IFilteringButtonsTime) => {
             >
                 <XStack alignItems="center" justifyContent="center">
                     <EveningSvg size={26}/>
-                    <Text style={styles.buttonText}>Вечер</Text>
+                    <Text style={styles.buttonText}>{t('listHabit.evening')}</Text>
                 </XStack>
             </TouchableOpacity>
         </XStack>

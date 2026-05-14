@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next"
 import { styled, Switch, Text, XStack } from "tamagui"
 
 interface IReminderToggle  {
@@ -19,13 +20,16 @@ const CustomSwitch = styled(Switch, {
 })
 
 const ReminderToggle = ({value, onChange}: IReminderToggle) => {
+
+    const {t} = useTranslation()
+
     return (
         <XStack marginTop={30} alignItems='center' gap={10}>
             <Text
                 color={'white'}
                 fontSize={18}
             >
-                Напоминание
+                {t('createHabit.reminder')}
             </Text>
             <CustomSwitch size={'$3'} checked={value} defaultChecked={value} onCheckedChange={onChange}>
                 <Switch.Thumb size={'$3'} backgroundColor={'white'} animation="quicker"/>

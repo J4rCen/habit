@@ -40,21 +40,21 @@ export const saveFile = async (con: IFileController) => {
 		})
 
 		if (pathUri.length !== 0) {
-			con.setTitlePopup('Успешно')
-			con.setMessagePopup(`Файл успешно сохранен`)
+			con.setTitlePopup('settings.successfully')
+			con.setMessagePopup(`settings.fileSuccessfullySaved`)
 		}
 
 	} catch (err: unknown) {
 		if (isErrorWithCode(err)) {
 
 			if (err.code === 'OPERATION_CANCELED') {
-				con.setTitlePopup('Отмена')
-				con.setMessagePopup('Сохранения отменено')
+				con.setTitlePopup('createHabit.cancel')
+				con.setMessagePopup('settings.fileSaveCanceled')
 			}
 
 		} else {
-			con.setTitlePopup('Ошибка')
-			con.setMessagePopup('При сохранении произошла непредвиденная ошибка')
+			con.setTitlePopup('settings.error')
+			con.setMessagePopup('settings.fileSaveError')
 		}
 
 	} finally {
@@ -82,8 +82,8 @@ export const loadFile = async (con: IFileController) => {
 		}
 
 		if (!path.toLowerCase().endsWith('.json')) {
-			con.setTitlePopup('Ошибка')
-			con.setMessagePopup('При восстановление данных произошла ошибка, проверьте формат файла')
+			con.setTitlePopup('settings.error')
+			con.setMessagePopup('settings.restoringDataError')
 			return;
 		}
 
@@ -117,11 +117,11 @@ export const loadFile = async (con: IFileController) => {
 				})
 			}
 
-			con.setTitlePopup('Успешно')
-			con.setMessagePopup('Данные успешно восстановлены')
+			con.setTitlePopup('settings.successfully')
+			con.setMessagePopup('settings.fileRestoreSuccessfully')
 		} else {
-			con.setTitlePopup('Ошибка')
-			con.setMessagePopup('При восстановление данных произошла ошибка, проверьте формат файла')
+			con.setTitlePopup('settings.error')
+			con.setMessagePopup('settings.restoringDataError')
 		}
 
 
@@ -129,13 +129,13 @@ export const loadFile = async (con: IFileController) => {
 		if (isErrorWithCode(err)) {
 
 			if (err.code === 'OPERATION_CANCELED') {
-				con.setTitlePopup('Отмена')
-				con.setMessagePopup('Выбор файла отменен')
+				con.setTitlePopup('settings.error')
+				con.setMessagePopup('settings.selectFileCanceled')
 			}
 
 		} else {
-			con.setTitlePopup('Ошибка')
-			con.setMessagePopup('При загрузки произошла непредвиденная ошибка')
+			con.setTitlePopup('settings.error')
+			con.setMessagePopup('settings.fileLoadingError')
 		}
 
 	} finally {
