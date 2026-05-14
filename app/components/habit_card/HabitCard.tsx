@@ -27,7 +27,7 @@ const HabitCard = ({ habitId, habitConfig, selectDate, dataStart }: IHabitCard) 
     const [isOpen, setIsOpen] = useState(false);
 
     const [progress, setProgress] = useState<number>(0)
-    const {t} = useTranslation()
+    const { t } = useTranslation()
 
     useEffect(() => {
         const value = getIsCompleat
@@ -92,20 +92,24 @@ const HabitCard = ({ habitId, habitConfig, selectDate, dataStart }: IHabitCard) 
         }
 
         if (habitConfig.type_of_task === 'reusable_mark' && habitConfig.quantity) {
-            const max = habitConfig.quantity
-            const step = 1 / max
-            let newProgress = round(progress + step)
+            const max = habitConfig.quantity;
 
-            if (newProgress > 1) {
-                newProgress = 0
+            let currentCount = Math.round(progress * max);
+
+            currentCount++;
+
+            if (currentCount > max) {
+                currentCount = 0;
             }
 
-            setProgress(newProgress)
+            let newProgress = currentCount / max;
+
+            setProgress(newProgress);
             setIsCompleat(habitId, selectDate, {
                 isCompleat: newProgress,
                 total: max,
                 value: newProgress
-            })
+            });
         }
     }
 
@@ -148,7 +152,7 @@ const HabitCard = ({ habitId, habitConfig, selectDate, dataStart }: IHabitCard) 
                             numberOfLines={2}
                             ellipsizeMode="tail"
                             flex={1}
-                            
+
                         >
                             {habitConfig.name}
                         </Text>
