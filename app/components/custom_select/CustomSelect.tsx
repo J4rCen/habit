@@ -1,6 +1,7 @@
 import ArrowSelect from "@/app/svgs/arrowSelect"
 import PlaceholderWrap from "@/app/utilities/placeholderWrap"
 import React, { useState } from "react"
+import { useTranslation } from "react-i18next"
 import { Select, styled, YStack } from "tamagui"
 
 interface ISelect {
@@ -48,7 +49,7 @@ const CustomSelect = (props: ISelect) => {
 
     const [selectValue, setSelectValue] = useState<string>(props.options[0].key ?? '')
     const [isActive, setIsActive] = useState<boolean>(selectValue ? true : false)
-   
+    const {t} = useTranslation()
 
     const memoizedItems = React.useMemo(() => {
         return props.options.map((item, index) => (
@@ -58,7 +59,7 @@ const CustomSelect = (props: ISelect) => {
                 key={item.key}
             >
                 <CustomSelectItemText>
-                    {item.label}
+                    {t(`createHabit.${item.label}`)}
                 </CustomSelectItemText>
             </CustomSelectItem>
         ))
@@ -74,7 +75,8 @@ const CustomSelect = (props: ISelect) => {
     }
 
     const getLabelByKey = (key: string) => {
-        return props.options.find(option => option.key === key)?.label || ''
+        const glk = props.options.find(option => option.key === key)?.label || ''
+        return t(`createHabit.${glk}`)
     }
 
     return (

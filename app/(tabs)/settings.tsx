@@ -1,5 +1,6 @@
 import { router } from "expo-router"
 import React, { useState } from "react"
+import { useTranslation } from "react-i18next"
 import { StyleSheet, TouchableOpacity } from "react-native"
 import { SafeAreaView } from "react-native-safe-area-context"
 import { PortalProvider, ScrollView, Text, View, XStack, YStack } from "tamagui"
@@ -15,6 +16,7 @@ const Settings = () => {
 	const [titlePopup, setTitlePopup] = useState<string>('')
 	const [messagePopup, setMessagePopup] = useState<string>('')
 	const [isLoading, setIsLoading] = useState<boolean>(false)
+	const {t} = useTranslation()
 
 	return (
 		<View backgroundColor={'$dark'} maxHeight={SCREEN_HEIGHT}>
@@ -27,7 +29,7 @@ const Settings = () => {
 							}
 							<ScrollView width={SCREEN_WIDTH - 20} showsVerticalScrollIndicator={false} >
 								<YStack marginBottom={20}>
-									<Text style={styles.title_block}>Данные</Text>
+									<Text style={styles.title_block}>{t('settings.data')}</Text>
 									<View gap={10}>
 										<YStack>
 											{/* <TouchableOpacity style={[styles.button, { backgroundColor: '#194A98' }]} onPress={() => router.navigate('/screens/buying_premium')}>
@@ -44,7 +46,7 @@ const Settings = () => {
 											}}>
 												<XStack gap={10} justifyContent="center">
 													<SaveFile size={26} />
-													<Text style={styles.buttonLabel}>Сохранить данные</Text>
+													<Text style={styles.buttonLabel}>{t('settings.saveData')}</Text>
 												</XStack>
 											</TouchableOpacity>
 										</YStack>
@@ -55,7 +57,7 @@ const Settings = () => {
 											}}>
 												<XStack gap={10} justifyContent="center">
 													<LoadFile size={26} />
-													<Text style={styles.buttonLabel}>Восстановить данные</Text>
+													<Text style={styles.buttonLabel}>{t('settings.restoreData')}</Text>
 												</XStack>
 											</TouchableOpacity>
 										</YStack>
@@ -63,12 +65,12 @@ const Settings = () => {
 								</YStack>
 
 								<YStack marginBottom={20}>
-									<Text style={styles.title_block}>Настройки</Text>
+									<Text style={styles.title_block}>{t('settings.settings')}</Text>
 									<YStack gap={10}>
 										<TouchableOpacity style={styles.button} onPress={(() => router.navigate('/screens/languagePage/' as any))}>
 											<XStack gap={10} justifyContent="center">
 												<Language size={24} />
-												<Text style={styles.buttonLabel}>Языковые параметры</Text>
+												<Text style={styles.buttonLabel}>{t('settings.languageParameters')}</Text>
 											</XStack>
 										</TouchableOpacity>
 										{/* <TouchableOpacity style={styles.button}>
@@ -80,7 +82,7 @@ const Settings = () => {
 										<TouchableOpacity style={styles.button} onPress={(() => router.navigate('/screens/interval_day/' as any))}>
 											<XStack gap={10} justifyContent="center">
 												<Watch size={28} />
-												<Text style={styles.buttonLabel}>Дневной интервал</Text>
+												<Text style={styles.buttonLabel}>{t('settings.dailyInterval')}</Text>
 											</XStack>
 										</TouchableOpacity>
 										{/* <TouchableOpacity style={styles.button}>

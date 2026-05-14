@@ -4,6 +4,7 @@ import ArrowBack from "@/app/svgs/arrowBack"
 import { EngFlag, RusFlag } from "@/app/svgs/flags"
 import { router } from "expo-router"
 import React, { Children, cloneElement } from "react"
+import { useTranslation } from "react-i18next"
 import { StyleSheet, TouchableOpacity } from "react-native"
 import { SafeAreaView } from "react-native-safe-area-context"
 import { ScrollView, Text, View, XStack, YStack } from "tamagui"
@@ -12,6 +13,7 @@ const Language = () => {
 
     const systemLanguage = useStore(state => state.systemLocale)
     const setSystemLanguage = useStore(state => state.setSystemLocal)
+    const {t} = useTranslation()
 
     const SelectController = ({ children }: any) => {
         return (
@@ -39,7 +41,7 @@ const Language = () => {
                         color={"$white"}
                         fontSize={26}
                     >
-                        Языковые параметры
+                        {t('settings.languageParameters')}
                     </Text>
                 </XStack>
                 <YStack height={SCREEN_HEIGHT} backgroundColor='$dark' alignItems="center">

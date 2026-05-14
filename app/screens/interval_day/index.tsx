@@ -5,6 +5,7 @@ import ArrowBack from "@/app/svgs/arrowBack"
 import { DaySvg, EveningSvg, MorningSvg } from "@/app/svgs/filtersButtonSvgs"
 import { router } from "expo-router"
 import React, { useState } from "react"
+import { useTranslation } from "react-i18next"
 import { SafeAreaView } from "react-native-safe-area-context"
 import { Button, ScrollView, Text, View, XStack, YStack } from "tamagui"
 
@@ -13,6 +14,7 @@ const IntervalDay = () => {
 
 	const dayInterval = useStore(state => state.dayInterval)
 	const setDayInterval = useStore(state => state.setDayInterval)
+	const {t} = useTranslation()
 
 	const [morningTime, setMorningTime] = useState<string>(
 		dayInterval.morningTime ? dayInterval.morningTime : '08:00'
@@ -47,7 +49,7 @@ const IntervalDay = () => {
 						color={"$white"}
 						fontSize={26}
 					>
-						Дневной интервал
+						{t('settings.dailyInterval')}
 					</Text>
 				</XStack>
 				<YStack height={SCREEN_HEIGHT} backgroundColor='$dark' alignItems="center">
@@ -56,40 +58,40 @@ const IntervalDay = () => {
 							<XStack gap={10}>
 								<XStack alignItems="center" justifyContent='flex-start'>
 									<MorningSvg size={SCREEN_WIDTH_400 ? 28 : 32} />
-									<Text color={'white'} fontSize={SCREEN_WIDTH_400 ? 20 : 24}>Утро</Text>
+									<Text color={'white'} fontSize={SCREEN_WIDTH_400 ? 20 : 24}>{t('createHabit.morning')}</Text>
 								</XStack>
 								<CustomTimePicker
 									width={SCREEN_WIDTH * 0.7}
 									height={50}
 									value={morningTime}
 									onChange={setMorningTime}
-									placeholder='Начало утра'
+									placeholder={t('settings.morningStart')}
 								/>
 							</XStack>
 							<XStack gap={10}>
 								<XStack alignItems="center" justifyContent='flex-start'>
 									<DaySvg size={SCREEN_WIDTH_400 ? 28 : 32} />
-									<Text color={'white'} fontSize={SCREEN_WIDTH_400 ? 20 : 24}>День</Text>
+									<Text color={'white'} fontSize={SCREEN_WIDTH_400 ? 20 : 24}>{t('createHabit.day')}</Text>
 								</XStack>
 								<CustomTimePicker
 									width={SCREEN_WIDTH * 0.7}
 									height={50}
 									value={dayTime}
 									onChange={setDayTime}
-									placeholder='Начало дня'
+									placeholder={t('settings.dayStart')}
 								/>
 							</XStack>
 							<XStack gap={10}>
 								<XStack alignItems="center" justifyContent='flex-start'>
 									<EveningSvg size={SCREEN_WIDTH_400 ? 22 : 26} />
-									<Text color={'white'} fontSize={SCREEN_WIDTH_400 ? 20 : 24}>Вечер</Text>
+									<Text color={'white'} fontSize={SCREEN_WIDTH_400 ? 20 : 24}>{t('createHabit.evening')}</Text>
 								</XStack>
 								<CustomTimePicker
 									width={SCREEN_WIDTH * 0.7}
 									height={50}
 									value={eveningTime}
 									onChange={setEveningTime}
-									placeholder='Начало вечера'
+									placeholder={t('settings.eveningStart')}
 								/>
 							</XStack>
 						</YStack>
@@ -102,7 +104,7 @@ const IntervalDay = () => {
 								backgroundColor={'$blue'}
 								onPress={() => saveNewInterval()}
 							>
-								Сохранить
+								{t('createHabit.save')}
 							</Button>
 							<Button
 								fontSize={16}
@@ -112,7 +114,7 @@ const IntervalDay = () => {
 								backgroundColor={'$gray'}
 								onPress={() => router.back()}
 							>
-								Отмена
+								{t('createHabit.cancel')}
 							</Button>
 						</YStack>
 					</ScrollView>

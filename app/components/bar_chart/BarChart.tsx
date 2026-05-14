@@ -1,11 +1,12 @@
 import { SCREEN_WIDTH, SCREEN_WIDTH_400 } from '@/app/constants';
-import { IHabitTask } from '@/app/store/zustand';
+import useStore, { IHabitTask } from '@/app/store/zustand';
 import { ArrowLeft, ArrowRight } from '@/app/svgs/arrowBarCart';
 import f from '@/assets/fonts/Inter_28pt-Regular.ttf';
 import { Text as SkiaText, useFont } from '@shopify/react-native-skia';
 import dayjs from 'dayjs';
 import customParserFormat from 'dayjs/plugin/customParseFormat';
 import React, { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { StyleSheet, TouchableOpacity } from 'react-native';
 import { ScrollView, Text, View, XStack, YStack } from 'tamagui';
 import { Bar, CartesianChart } from 'victory-native';
@@ -23,6 +24,8 @@ const BarChart = ({ habitStart, statistics }: IBarChart) => {
     const [barTime, setBarTime] = useState<'month' | 'year'>('month');
     const [selectYear, setSelectYear] = useState(dayjs().format('YYYY'));
     const [data, setData] = useState<{ label: number | string; listenCount: number }[]>([]);
+    const {t} = useTranslation()
+    const systemLanguage = useStore(state => state.systemLocale)
 
     useEffect(() => {
         const generateEmptyData = () => {
@@ -119,7 +122,7 @@ const BarChart = ({ habitStart, statistics }: IBarChart) => {
                             font,
                             formatXLabel: (value) =>
                                 barTime === 'month'
-                                    ? new Date(Number(selectYear), Number(value) - 1).toLocaleString("ru", { month: "short" })
+                                    ? new Date(Number(selectYear), Number(value) - 1).toLocaleString(systemLanguage ?? 'en', { month: "short" })
                                     : value ? String(value) : ''
                         }}
                     >
@@ -150,7 +153,7 @@ const BarChart = ({ habitStart, statistics }: IBarChart) => {
                         style={[styles.buttonBar, barTime === mode ? { backgroundColor: '#194A98' } : { backgroundColor: '#393E46' }]}
                         onPress={() => setBarTime(mode as 'month' | 'year')}
                     >
-                        <Text style={styles.buttonTextBar}>{mode === 'month' ? 'Месяц' : 'Год'}</Text>
+                        <Text style={styles.buttonTextBar}>{mode === 'month' ? t('statistics.year') : t('statistics.month')}</Text>
                     </TouchableOpacity>
                 ))}
             </XStack>

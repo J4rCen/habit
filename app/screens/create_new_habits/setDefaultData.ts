@@ -1,18 +1,18 @@
 export const optionIntervalExecution = [
-    {key: 'every_day', label: 'Каждый день'}, 
-    {key: 'certain_days', label: 'Определенные дни недели'}, 
-    {key: 'gap', label: 'Промежуток'}
+    {key: 'every_day', label: 'everyDay'}, 
+    {key: 'certain_days', label: 'certainDays'}, 
+    {key: 'gap', label: 'gap'}
 ]
 
 export const optionTimesOfDay = [
-    {key: 'all', label: 'Любое'}, 
-    {key: 'morning', label: 'Утро'}, 
-    {key: 'day', label: 'День'}, 
-    {key: 'evening', label: 'Вечер'}
+    {key: 'all', label: 'any'}, 
+    {key: 'morning', label: 'morning'}, 
+    {key: 'day', label: 'day'}, 
+    {key: 'evening', label: 'evening'}
 ]
 
 export const optionTypeOfTask = [
-    {key: 'single_mark', label: 'Разовая отметка'}, 
-    {key: 'reusable_mark', label: 'Многоразовая отметка'}, 
-    {key: 'timer', label: 'Таймер'}
+    {key: 'single_mark', label: 'oneTimeMark'}, 
+    {key: 'reusable_mark', label: 'reusableMark'}, 
+    {key: 'timer', label: 'timer'}
 ]

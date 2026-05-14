@@ -5,6 +5,7 @@ import Pencil from "@/app/svgs/pencil."
 import dayjs from "dayjs"
 import { router } from "expo-router"
 import React, { useEffect, useState } from "react"
+import { useTranslation } from "react-i18next"
 import { TouchableOpacity } from "react-native"
 import { Select, Text, View, XStack, YStack } from "tamagui"
 import CircularProgress from "./circularProgress"
@@ -26,6 +27,7 @@ const HabitCard = ({ habitId, habitConfig, selectDate, dataStart }: IHabitCard) 
     const [isOpen, setIsOpen] = useState(false);
 
     const [progress, setProgress] = useState<number>(0)
+    const {t} = useTranslation()
 
     useEffect(() => {
         const value = getIsCompleat
@@ -190,7 +192,7 @@ const HabitCard = ({ habitId, habitConfig, selectDate, dataStart }: IHabitCard) 
                                             color={'white'}
                                             fontSize={'$4.5'}
                                         >
-                                            Изменить
+                                            {t('listHabit.change')}
                                         </Text>
                                     </XStack>
 
@@ -210,7 +212,7 @@ const HabitCard = ({ habitId, habitConfig, selectDate, dataStart }: IHabitCard) 
                                                     color={'white'}
                                                     fontSize={'$4.5'}
                                                 >
-                                                    Статистика
+                                                    {t('listHabit.statistics')}
                                                 </Text>
                                             </XStack>
                                         </TouchableOpacity>

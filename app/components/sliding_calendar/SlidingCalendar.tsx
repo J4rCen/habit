@@ -9,6 +9,7 @@ import isoWeek from "dayjs/plugin/isoWeek";
 import isSameOrBefore from "dayjs/plugin/isSameOrBefore";
 import weekday from "dayjs/plugin/weekday";
 import React, { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
 import {
 	FlatList,
 	ListRenderItem,
@@ -58,6 +59,7 @@ const SlidingCalendar = memo(({ selectDate, setSelectDate }: ISlidingCalendar) =
 	const scrollTriggered = useRef(false);
 	const todayIndexRef = useRef<number | null>(null);
 	const flatListReadyRef = useRef(false);
+	const {t} = useTranslation()
 
 	const [weeks, setWeeks] = useState<WeekItem[]>([]);
 
@@ -211,7 +213,7 @@ const SlidingCalendar = memo(({ selectDate, setSelectDate }: ISlidingCalendar) =
 						<XStack justifyContent="center" alignContent="center">
 							<ArrowBack size={SCREEN_WIDTH_400 ? 26 : 32} />
 							<Text color={"$white"} fontSize={SCREEN_WIDTH_400 ? 18 : 22}>
-								Сегодня
+								{t('listHabit.today')}
 							</Text>
 						</XStack>
 					</TouchableOpacity>
@@ -222,7 +224,7 @@ const SlidingCalendar = memo(({ selectDate, setSelectDate }: ISlidingCalendar) =
 				<XStack style={styles.weekDaysRow}>
 					{WEEK_DAYS.map((day) => (
 						<Text style={styles.weekDaysText} key={day}>
-							{day}
+							{t(`listHabit.${day}`)}
 						</Text>
 					))}
 				</XStack>

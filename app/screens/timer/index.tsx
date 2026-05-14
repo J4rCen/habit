@@ -5,6 +5,7 @@ import ArrowBack from "@/app/svgs/arrowBack";
 import { EventArg, NavigationAction } from "@react-navigation/native";
 import { useLocalSearchParams, useNavigation, useRouter } from "expo-router";
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Alert } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Button, Text, View, XStack, YStack } from "tamagui";
@@ -15,6 +16,7 @@ const Timer = () => {
     const { timer, habitId, selectDate } = useLocalSearchParams();
     const router = useRouter();
     const navigation = useNavigation();
+    const {t} = useTranslation()
 
     const setIsCompleat = useStore((store) => store.setIsCompleat);
 
@@ -60,12 +62,12 @@ const Timer = () => {
 
             e.preventDefault();
             Alert.alert(
-                "Выход со страницы таймера",
-                "Таймер остановится, но прогресс сохранится.",
+                t('timer.exitTimerPage'),
+                t('timer.theTimerWillStop'),
                 [
-                    { text: "Отмена", style: "cancel" },
+                    { text: t('createHabit.cancel'), style: "cancel" },
                     {
-                        text: "Выйти",
+                        text: t('timer.exit'),
                         style: "destructive",
                         onPress: () => {
                             setTimerStart(false);
@@ -132,7 +134,7 @@ const Timer = () => {
                             <ArrowBack size={36} />
                         </View>
                         <Text marginLeft={5} color="$white" fontSize={26}>
-                            Таймер
+                            {t('timer.timer')}
                         </Text>
                     </XStack>
 
@@ -153,17 +155,17 @@ const Timer = () => {
                                     onPress={startTimer}
                                     backgroundColor="$blue"
                                 >
-                                    <Text color="white" fontSize={18}>Старт</Text>
+                                    <Text color="white" fontSize={18}>{t('timer.start')}</Text>
                                 </Button>
                             )}
 
                             {timerStart && isFinish !== 1 && (
                                 <>
                                     <Button size="$5" onPress={stopTimer} backgroundColor="$blue">
-                                        <Text color="white" fontSize={18}>Стоп</Text>
+                                        <Text color="white" fontSize={18}>{t('timer.pause')}</Text>
                                     </Button>
                                     <Button size="$5" onPress={resetTimer} backgroundColor="$gray">
-                                        <Text color="white" fontSize={18}>Сбросить таймер</Text>
+                                        <Text color="white" fontSize={18}>{t('timer.reset')}</Text>
                                     </Button>
                                 </>
                             )}
@@ -185,7 +187,7 @@ const Timer = () => {
                                 backgroundColor="$green"
                                 onPress={completeTimer}
                             >
-                                <Text color="white" fontSize={18}>Завершить</Text>
+                                <Text color="white" fontSize={18}>{t('timer.complete')}</Text>
                             </Button>
                         ) : (
                             <Button
@@ -195,7 +197,7 @@ const Timer = () => {
                                 backgroundColor="red"
                                 onPress={resetTimer}
                             >
-                                <Text color="white" fontSize={18}>Сбросить результат</Text>
+                                <Text color="white" fontSize={18}>{t('timer.resetResult')}</Text>
                             </Button>
                         )}
                     </YStack>

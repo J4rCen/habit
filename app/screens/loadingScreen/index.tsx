@@ -1,5 +1,6 @@
 import { SCREEN_HEIGHT, SCREEN_WIDTH } from "@/app/constants"
 import React, { useEffect, useRef, useState } from "react"
+import { useTranslation } from "react-i18next"
 import { Animated, Image, StyleSheet } from "react-native"
 import { SafeAreaView } from "react-native-safe-area-context"
 import { Text, View, YStack } from "tamagui"
@@ -8,6 +9,7 @@ export const LoadingScreen = ({ onFinish }: { onFinish: () => void }) => {
 
 	const [progress] = useState(new Animated.Value(0))
 	const opacity = useRef(new Animated.Value(1)).current;
+	const {t} = useTranslation()
 
 	useEffect(() => {
 		Animated.timing(progress, {
@@ -38,7 +40,7 @@ export const LoadingScreen = ({ onFinish }: { onFinish: () => void }) => {
 									fontSize={24}
 									textAlign="center"
 								>
-									Подготовка приложения...
+									{t('loadingScreen.loading')}
 								</Text>
 								<View
 									height={15}

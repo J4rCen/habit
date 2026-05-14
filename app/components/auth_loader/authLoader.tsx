@@ -1,11 +1,13 @@
 import { SCREEN_WIDTH } from "@/app/constants"
 import React, { useEffect } from "react"
+import { useTranslation } from "react-i18next"
 import { TouchableOpacity, View } from "react-native"
 import Animated, { Easing, useAnimatedStyle, useSharedValue, withRepeat, withTiming } from "react-native-reanimated"
 import { AlertDialog, Text, YStack } from "tamagui"
 
 export const LoadingScreen: React.FC = ({customLoaderTitle}: {customLoaderTitle?: string}) => {
 	const progress = useSharedValue(0)
+	const {t} = useTranslation()
 
 	useEffect(() => {
 		progress.value = withRepeat(
@@ -22,14 +24,15 @@ export const LoadingScreen: React.FC = ({customLoaderTitle}: {customLoaderTitle?
 		transform: [{ scaleX: progress.value }],
 	}))
 
+	const load = t('settings.loading')
+
 	return (
 		<YStack justifyContent="center" alignItems="center" backgroundColor="$dark" padding="$4">
 			<Text fontSize="$6" marginBottom="$4" color='white'>
 				{
 					customLoaderTitle ?
 					customLoaderTitle :
-					'Загрузка...'
-				
+					load
 				}
 			</Text>
 			<View
@@ -65,6 +68,9 @@ const AuthLoader = (props: {
 	setOpenPopup: React.Dispatch<React.SetStateAction<boolean>>
 	customLoaderTitle?: string
 }) => {
+
+	const {t} = useTranslation()
+
 	return (
 		<AlertDialog open={props.open}>
 			<AlertDialog.Overlay
@@ -91,13 +97,13 @@ const AuthLoader = (props: {
 						<YStack gap={'$4'}>
 							<AlertDialog.Title fontSize={22} color={'white'}>
 								{
-									props.title
+									t(`${props.title}`)
 								}
 							</AlertDialog.Title>
 
 							<AlertDialog.Description fontSize={18} color={'white'}>
 								{
-									props.message
+									t(`${props.message}`)
 								}
 							</AlertDialog.Description>
 
@@ -117,7 +123,7 @@ const AuthLoader = (props: {
 										}}
 									>
 										<Text color={'white'} fontSize={16}>
-											Закрыть
+											{t('settings.close')}
 										</Text>
 									</TouchableOpacity>
 								</AlertDialog.Cancel>
