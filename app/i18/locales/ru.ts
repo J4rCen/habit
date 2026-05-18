@@ -108,5 +108,8 @@ export default {
         morningStart: 'Начало утра',
         dayStart: 'Начало дня',
         eveningStart: 'Начало вечера',
+    },
+    notifications: {
+        reminder: 'Продолжим ?'
     }
 }

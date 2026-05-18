@@ -5,8 +5,8 @@ import { useEffect, useState } from "react";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { TamaguiProvider, View } from "tamagui";
 import i18n from "./i18/i18";
-// import LoadingScreen from "./screens/loadingScreen";
-// import { useAppOpenAd } from './screens/yandex_ads';
+import LoadingScreen from "./screens/loadingScreen";
+import { useAppOpenAd } from './screens/yandex_ads';
 
 import LocaleConfig from "./calendarsLocalConfig";
 import useStore from "./store/zustand";
@@ -14,7 +14,7 @@ import useStore from "./store/zustand";
 export default function RootLayout() {
 
 	const [showLoading, setShowLoading] = useState(true);
-	// const appOpenAd = useAppOpenAd();
+	const appOpenAd = useAppOpenAd();
 	const systemLanguage = useStore(state => state.systemLocale)
 	const setSystemLanguage = useStore(state => state.setSystemLocal)
 	const language = Localization.getLocales()[0]['languageCode']
@@ -33,6 +33,7 @@ export default function RootLayout() {
 		}
 	}, [systemLanguage])
 
+
 	return (
 		<SafeAreaProvider>
 			<TamaguiProvider config={customTamaguiConfig}>
@@ -49,12 +50,12 @@ export default function RootLayout() {
 						bottom: 0,
 						left: 0
 					}}>
-						{/* <LoadingScreen
+						<LoadingScreen
 							onFinish={async () => {
 								setShowLoading(false);
 								appOpenAd.show()
 							}}
-						/> */}
+						/>
 					</View>
 				}
 			</TamaguiProvider>
