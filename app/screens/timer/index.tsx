@@ -1,3 +1,4 @@
+import ContainerWrap from "@/app/components/container_wrap/ContainerWrap";
 import CircularProgress from "@/app/components/habit_card/circularProgress";
 import { SCREEN_HEIGHT, SCREEN_WIDTH } from "@/app/constants";
 import useStore from "@/app/store/zustand";
@@ -7,7 +8,6 @@ import { useLocalSearchParams, useNavigation, useRouter } from "expo-router";
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Alert } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
 import { Button, Text, View, XStack, YStack } from "tamagui";
 
 type BeforeRemoveEvent = EventArg<"beforeRemove", true, { action: NavigationAction }>;
@@ -16,7 +16,7 @@ const Timer = () => {
     const { timer, habitId, selectDate } = useLocalSearchParams();
     const router = useRouter();
     const navigation = useNavigation();
-    const {t} = useTranslation()
+    const { t } = useTranslation()
 
     const setIsCompleat = useStore((store) => store.setIsCompleat);
 
@@ -36,6 +36,7 @@ const Timer = () => {
 
     const elapsedRef = useRef(elapsed);
     const isFinishRef = useRef(isFinish);
+    const refTimerStart = useRef(false)
 
     const updateCompletion = useCallback(
         (elapsedTime: number, completed: boolean) => {
@@ -58,7 +59,9 @@ const Timer = () => {
 
     useEffect(() => {
         const beforeRemove = (e: BeforeRemoveEvent) => {
+
             if (isFinishRef.current === 1) return;
+            if (!refTimerStart.current) return
 
             e.preventDefault();
             Alert.alert(
@@ -84,12 +87,13 @@ const Timer = () => {
 
     const startTimer = () => {
         setTimerStart(true)
+        refTimerStart.current = true
         setStartTime(Date.now() - elapsed * 1000);
     };
 
     useEffect(() => {
         if (!timerStart) return;
-        if (!startTime) return 
+        if (!startTime) return
         const interval = setInterval(() => {
             const diff = Math.floor((Date.now() - startTime) / 1000);
             setElapsed(diff);
@@ -108,6 +112,7 @@ const Timer = () => {
 
     const stopTimer = () => {
         setTimerStart(false);
+        refTimerStart.current = false
         updateCompletion(elapsed, false);
     };
 
@@ -115,75 +120,74 @@ const Timer = () => {
         setElapsed(0);
         setIsFinish(0);
         setTimerStart(false);
+        refTimerStart.current = false
         updateCompletion(0, false);
     };
 
     const completeTimer = () => {
         setTimerStart(false)
+        refTimerStart.current = false
         setElapsed(duration);
         setIsFinish(1);
         updateCompletion(duration, true);
     };
 
     return (
-        <View backgroundColor={'$dark'} height={SCREEN_HEIGHT}>
-            <SafeAreaView>
-                <YStack backgroundColor="$dark" justifyContent='space-between'>
-                    <XStack alignItems="center" marginTop={10}>
-                        <View onPress={() => router.back()}>
-                            <ArrowBack size={36} />
-                        </View>
-                        <Text marginLeft={5} color="$white" fontSize={26}>
-                            {t('timer.timer')}
-                        </Text>
-                    </XStack>
+        <ContainerWrap>
+            <XStack alignItems="center" marginTop={10}>
+                <View onPress={() => router.back()}>
+                    <ArrowBack size={36} />
+                </View>
+                <Text marginLeft={5} color="$white" fontSize={26}>
+                    {t('timer.timer')}
+                </Text>
+            </XStack>
+            <YStack flex={1} justifyContent='space-between'>
+                <YStack alignItems="center" marginTop={20}>
+                    <CircularProgress
+                        goalType="timer"
+                        duration={duration}
+                        elapsed={elapsed}
+                        progress={elapsed / duration}
+                        size={SCREEN_HEIGHT / 3}
+                        strokeWidth={40}
+                        timer
+                    />
+                </YStack>
 
-                    <YStack alignItems="center" marginTop={20}>
-                        <CircularProgress
-                            goalType="timer"
-                            duration={duration}
-                            elapsed={elapsed}
-                            progress={elapsed / duration}
-                            size={SCREEN_HEIGHT / 3}
-                            strokeWidth={40}
-                            timer
-                        />
-                        <YStack marginTop={20} gap={5} width={SCREEN_WIDTH - 40}>
-                            {!timerStart && isFinish !== 1 && (
-                                <Button
-                                    size="$5"
-                                    onPress={startTimer}
-                                    backgroundColor="$blue"
-                                >
-                                    <Text color="white" fontSize={18}>{t('timer.start')}</Text>
+                <YStack
+                    width={SCREEN_WIDTH}
+                    justifyContent="center"
+                    alignItems="center"
+                    backgroundColor="$dark"
+                    height={'20%'}
+                    marginBottom={10}
+                >
+                    <View width={SCREEN_WIDTH - 20} gap={10}>
+                        {!timerStart && isFinish !== 1 && (
+                            <Button
+                                size="$5"
+                                onPress={startTimer}
+                                backgroundColor="$blue"
+                            >
+                                <Text color="white" fontSize={18}>{t('timer.start')}</Text>
+                            </Button>
+                        )}
+
+                        {timerStart && isFinish !== 1 && (
+                            <>
+                                <Button size="$5" onPress={stopTimer} backgroundColor="$blue">
+                                    <Text color="white" fontSize={18}>{t('timer.pause')}</Text>
                                 </Button>
-                            )}
+                                <Button size="$5" onPress={resetTimer} backgroundColor="$gray">
+                                    <Text color="white" fontSize={18}>{t('timer.reset')}</Text>
+                                </Button>
+                            </>
+                        )}
 
-                            {timerStart && isFinish !== 1 && (
-                                <>
-                                    <Button size="$5" onPress={stopTimer} backgroundColor="$blue">
-                                        <Text color="white" fontSize={18}>{t('timer.pause')}</Text>
-                                    </Button>
-                                    <Button size="$5" onPress={resetTimer} backgroundColor="$gray">
-                                        <Text color="white" fontSize={18}>{t('timer.reset')}</Text>
-                                    </Button>
-                                </>
-                            )}
-                        </YStack>
-                    </YStack>
-
-                    <YStack
-                        width={SCREEN_WIDTH}
-                        padding={10}
-                        backgroundColor="$dark"
-
-
-                    >
                         {isFinish !== 1 ? (
                             <Button
-                                width={SCREEN_WIDTH - 40}
                                 size="$5"
-                                alignSelf="center"
                                 backgroundColor="$green"
                                 onPress={completeTimer}
                             >
@@ -191,19 +195,18 @@ const Timer = () => {
                             </Button>
                         ) : (
                             <Button
-                                width={SCREEN_WIDTH - 40}
                                 size="$5"
-                                alignSelf="center"
                                 backgroundColor="red"
                                 onPress={resetTimer}
                             >
                                 <Text color="white" fontSize={18}>{t('timer.resetResult')}</Text>
                             </Button>
                         )}
-                    </YStack>
+                    </View>
                 </YStack>
-            </SafeAreaView>
-        </View>
+            </YStack>
+
+        </ContainerWrap>
     );
 };
 

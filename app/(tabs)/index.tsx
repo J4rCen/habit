@@ -10,8 +10,8 @@ import * as TaskManager from 'expo-task-manager';
 import { useEffect, useState } from "react";
 import { useTranslation } from 'react-i18next';
 import { StyleSheet, TouchableOpacity } from "react-native";
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { Text, View, YStack } from "tamagui";
+import { Text, YStack } from "tamagui";
+import ContainerWrap from '../components/container_wrap/ContainerWrap';
 import FilteringButtonsTime from "../components/filtering_buttons_time/FilteringButtonsTime";
 import HabitsRender from '../components/habits_render/HabitsRender';
 import SlidingCalendar from "../components/sliding_calendar/SlidingCalendar";
@@ -144,8 +144,7 @@ export default function Index() {
 	})
 
 	return (
-		<View backgroundColor={'$dark'} maxHeight={SCREEN_HEIGHT}>
-			<SafeAreaView>
+		<ContainerWrap>
 				<YStack height={SCREEN_HEIGHT} backgroundColor='$dark'>
 					<SlidingCalendar
 						selectDate={selectDate}
@@ -173,8 +172,7 @@ export default function Index() {
 						/>
 					</YStack>
 				</YStack>
-			</SafeAreaView>
-		</View>
+		</ContainerWrap>
 	);
 }
 

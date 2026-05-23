@@ -28480,13 +28480,14 @@
         "minWidth": 1280
       },
       "lg": {
-        "minWidth": 1024
+        "minWidth": 421
       },
       "md": {
-        "minWidth": 768
+        "minWidth": 361,
+        "maxWidth": 420
       },
       "sm": {
-        "minWidth": 640
+        "maxWidth": 360
       },
       "xs": {
         "minWidth": 460

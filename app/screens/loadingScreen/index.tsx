@@ -1,8 +1,8 @@
+import ContainerWrap from "@/app/components/container_wrap/ContainerWrap"
 import { SCREEN_HEIGHT, SCREEN_WIDTH } from "@/app/constants"
 import React, { useEffect, useRef, useState } from "react"
 import { useTranslation } from "react-i18next"
 import { Animated, Image, StyleSheet } from "react-native"
-import { SafeAreaView } from "react-native-safe-area-context"
 import { Text, View, YStack } from "tamagui"
 
 export const LoadingScreen = ({ onFinish }: { onFinish: () => void }) => {
@@ -27,8 +27,7 @@ export const LoadingScreen = ({ onFinish }: { onFinish: () => void }) => {
 
 	return (
 		<Animated.View style={{ opacity }}>
-			<View backgroundColor={'$dark'} maxHeight={SCREEN_HEIGHT}>
-				<SafeAreaView>
+			<ContainerWrap>
 					<View height={SCREEN_HEIGHT} backgroundColor='$dark' >
 						<YStack height={SCREEN_HEIGHT * 0.9} alignItems="center">
 							<View height={'80%'} justifyContent="center">
@@ -62,8 +61,7 @@ export const LoadingScreen = ({ onFinish }: { onFinish: () => void }) => {
 							</View>
 						</YStack>
 					</View>
-				</SafeAreaView>
-			</View>
+				</ContainerWrap>
 		</Animated.View>
 	)
 }
