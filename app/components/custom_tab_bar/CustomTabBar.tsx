@@ -1,12 +1,16 @@
 import { SCREEN_WIDTH } from "@/app/constants"
 import { ClipboardIcon, Settings, Statistics } from "@/app/svgs/navigation"
 import { BottomTabBarProps } from "@react-navigation/bottom-tabs"
-import { useMedia, XStack } from "tamagui"
+import { useState } from "react"
+import { useSafeAreaInsets } from "react-native-safe-area-context"
+import { XStack } from "tamagui"
 
 const CustomTabBar = ({ state, navigation }: BottomTabBarProps) => {
 
 	const icons = [ClipboardIcon, Statistics, Settings]
-	const media = useMedia()
+	const inset = useSafeAreaInsets().bottom
+
+	const [insetHeight, setInsetHeight] = useState<number | null>(null)
 
 	return (
 		<XStack
@@ -14,15 +18,16 @@ const CustomTabBar = ({ state, navigation }: BottomTabBarProps) => {
 			borderTopLeftRadius={20}
 			borderTopRightRadius={20}
 			$sm={{
-				height: 70
+				height: 70 + inset
 			}}
 			$md={{
-				height: 80
+				height: 80 + inset
 			}}
 			$lg={{
-				height: 90
+				height: 90 + inset
 			}}
 			width={SCREEN_WIDTH}
+			onLayout={e => setInsetHeight(e.nativeEvent.layout.height)}
 		>
 			{
 				state.routes.map((item, index) => {
@@ -34,7 +39,7 @@ const CustomTabBar = ({ state, navigation }: BottomTabBarProps) => {
 							key={item.key}
 							onPress={() => navigation.navigate(item.name)}
 							flex={1}
-							height={'100%'}
+							height={insetHeight ? insetHeight - inset : '90%'}
 							justifyContent="center"
 							alignItems="center"
 						>

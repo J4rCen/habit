@@ -2,8 +2,9 @@ import { Tabs } from "expo-router";
 import React from "react";
 import CustomTabBar from "../components/custom_tab_bar/CustomTabBar";
 
-
 const TabLayout = () => {
+
+    
 
     return (
         <Tabs

@@ -19,7 +19,6 @@ export default function RootLayout() {
 	const systemLanguage = useStore(state => state.systemLocale)
 	const setSystemLanguage = useStore(state => state.setSystemLocal)
 	const language = Localization.getLocales()[0]['languageCode']
-	const dialog = useStore(state => state.dialog)
 
 	LocaleConfig.defaultLocale = systemLanguage;
 
@@ -56,7 +55,7 @@ export default function RootLayout() {
 							<LoadingScreen
 								onFinish={async () => {
 									setShowLoading(false);
-									appOpenAd.show()
+									// appOpenAd.show()
 								}}
 							/>
 						</View>

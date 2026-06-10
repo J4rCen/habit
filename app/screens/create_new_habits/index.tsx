@@ -332,7 +332,6 @@ const CreateNewHabits = () => {
         <ContainerWrap>
             <PortalProvider>
                 <YStack flex={1}>
-
                     <XStack alignItems='center' marginTop={10} marginBottom={5}>
                         <View onPress={() => router.back()}>
                             <ArrowBack size={36} />

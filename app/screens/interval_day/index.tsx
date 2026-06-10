@@ -51,7 +51,7 @@ const IntervalDay = () => {
 					{t('settings.dailyInterval')}
 				</Text>
 			</XStack>
-			<YStack height={'100%'} backgroundColor='$dark' alignItems="center" paddingBottom={20}>
+			<YStack flex={1} backgroundColor='$dark' alignItems="center" paddingBottom={20}>
 				<ScrollView height={'80%'} style={{ backgroundColor: '#222831' }} showsVerticalScrollIndicator={false}>
 					<YStack width={SCREEN_WIDTH - 20} gap={20} alignItems="center" paddingTop={10}>
 						<XStack gap={10} width={'100%'} display="flex" justifyContent='space-between'>
@@ -95,7 +95,7 @@ const IntervalDay = () => {
 						</XStack>
 					</YStack>
 				</ScrollView>
-				<YStack gap={10} height={'20%'} alignItems="center">
+				<YStack gap={10} alignItems="center">
 					<Button
 						fontSize={16}
 						color={'white'}

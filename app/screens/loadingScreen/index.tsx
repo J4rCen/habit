@@ -29,7 +29,7 @@ export const LoadingScreen = ({ onFinish }: { onFinish: () => void }) => {
 		<Animated.View style={{ opacity }}>
 			<ContainerWrap>
 					<View height={SCREEN_HEIGHT} backgroundColor='$dark' >
-						<YStack height={SCREEN_HEIGHT * 0.9} alignItems="center">
+						<YStack height={SCREEN_HEIGHT} alignItems="center">
 							<View height={'80%'} justifyContent="center">
 								<Image source={require('@/assets/images/adaptive-icon.png')} style={styles.logo} />
 							</View>
