@@ -1,10 +1,10 @@
 {
   "expo": {
-    "name": "habit",
+    "name": "Track Habit",
     "slug": "habit",
-    "version": "1.0.0",
+    "version": "0.9.6",
     "orientation": "portrait",
-    "icon": "./assets/images/icon.png",
+    "icon": "./assets/images/adaptive-icon.png",
     "scheme": "habit",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
@@ -14,9 +14,11 @@
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
-        "backgroundColor": "#ffffff"
+        "backgroundColor": "#194A98"
       },
-      "edgeToEdgeEnabled": true
+      "edgeToEdgeEnabled": true,
+      "package": "com.j4rcen.habit",
+      "name": "Track Habit"
     },
     "web": {
       "bundler": "metro",
@@ -28,15 +30,24 @@
       [
         "expo-splash-screen",
         {
+          "backgroundColor": "#222831",
           "image": "./assets/images/splash-icon.png",
-          "imageWidth": 200,
-          "resizeMode": "contain",
-          "backgroundColor": "#ffffff"
+          "imageWidth": 200
         }
-      ]
+      ],
+      "expo-background-task",
+      "expo-secure-store",
+      "expo-localization"
     ],
     "experiments": {
       "typedRoutes": true
-    }
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "cb66a769-4bc4-4a33-8a50-a39622764d48"
+      }
+    },
+    "owner": "j4rcen"
   }
 }

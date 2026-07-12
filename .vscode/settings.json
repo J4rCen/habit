@@ -3,5 +3,13 @@
     "source.fixAll": "explicit",
     "source.organizeImports": "explicit",
     "source.sortMembers": "explicit"
-  }
+  },
+  "cSpell.words": [
+    "сomponents",
+    "notid",
+    "notif",
+    "partialize",
+    "Schedulable",
+    "Tamagui"
+  ]
 }

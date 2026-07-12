@@ -1,75 +1,191 @@
-import { Image } from 'expo-image';
-import { Platform, StyleSheet } from 'react-native';
+import { DATE_FORMAT, REFRESH_NOTIFICATION } from '@/app/constants';
+import dayjs from "dayjs";
+import customParseFormat from 'dayjs/plugin/customParseFormat';
+import isoWeek from "dayjs/plugin/isoWeek";
+import weekday from "dayjs/plugin/weekday";
+import * as BackgroundTask from 'expo-background-task';
+import * as Notifications from 'expo-notifications';
+import { router } from "expo-router";
+import * as TaskManager from 'expo-task-manager';
+import { useEffect, useState } from "react";
+import { useTranslation } from 'react-i18next';
+import { StyleSheet, TouchableOpacity } from "react-native";
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { Text, View, YStack } from "tamagui";
+import FilteringButtonsTime from "../components/filtering_buttons_time/FilteringButtonsTime";
+import HabitsRender from '../components/habits_render/HabitsRender';
+import SlidingCalendar from "../components/sliding_calendar/SlidingCalendar";
+import { SCREEN_HEIGHT, SCREEN_WIDTH, SCREEN_WIDTH_400 } from "../constants";
+import useStore, { IHabitTask } from "../store/zustand";
+import getNextRenderBaseDate from '../utilities/calculatorDays';
+import SetNotifications from '../utilities/notifications';
 
-import { HelloWave } from '@/components/HelloWave';
-import ParallaxScrollView from '@/components/ParallaxScrollView';
-import { ThemedText } from '@/components/ThemedText';
-import { ThemedView } from '@/components/ThemedView';
+dayjs.extend(isoWeek);
+dayjs.extend(weekday);
+dayjs.extend(customParseFormat)
 
-export default function HomeScreen() {
-  return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
-      headerImage={
-        <Image
-          source={require('@/assets/images/partial-react-logo.png')}
-          style={styles.reactLogo}
-        />
-      }>
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Welcome!</ThemedText>
-        <HelloWave />
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 1: Try it</ThemedText>
-        <ThemedText>
-          Edit <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText> to see changes.
-          Press{' '}
-          <ThemedText type="defaultSemiBold">
-            {Platform.select({
-              ios: 'cmd + d',
-              android: 'cmd + m',
-              web: 'F12',
-            })}
-          </ThemedText>{' '}
-          to open developer tools.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 2: Explore</ThemedText>
-        <ThemedText>
-          {`Tap the Explore tab to learn more about what's included in this starter app.`}
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 3: Get a fresh start</ThemedText>
-        <ThemedText>
-          {`When you're ready, run `}
-          <ThemedText type="defaultSemiBold">npm run reset-project</ThemedText> to get a fresh{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> directory. This will move the current{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> to{' '}
-          <ThemedText type="defaultSemiBold">app-example</ThemedText>.
-        </ThemedText>
-      </ThemedView>
-    </ParallaxScrollView>
-  );
+const timeToSeconds = (timeStr: string): number => {
+	const [hours, minutes] = timeStr.split(':').map(Number);
+	return hours * 3600 + minutes * 60;
+};
+
+const getCurrentTimeInSeconds = (): number => {
+	const now = new Date();
+	return now.getHours() * 3600 + now.getMinutes() * 60 + now.getSeconds();
+};
+
+export default function Index() {
+
+	const {t} = useTranslation()
+
+	const store = useStore(state => state.habitTask)
+	const initApp = useStore(state => state.initializeApp)
+	const dayInterval = useStore(state => state.dayInterval)
+
+	const [selectDate, setSelectDate] = useState(dayjs().format(DATE_FORMAT))
+	const [selectFilter, setSelectFilter] = useState('all')
+	const [habitsStore, setHabitStore] = useState<IHabitTask[]>(Object.values(store) ?? [])
+
+	const morningStart = timeToSeconds(dayInterval.morningTime);
+	const dayStart = timeToSeconds(dayInterval.dayTime);
+	const eveningStart = timeToSeconds(dayInterval.eveningTime);
+	const nowSec = getCurrentTimeInSeconds();
+
+	useEffect(() => {
+		if (nowSec >= morningStart && nowSec < dayStart) {
+			setSelectFilter("morning")
+		} else if (nowSec >= dayStart && nowSec < eveningStart) {
+			setSelectFilter("day")
+		} else {
+			if (nowSec >= eveningStart || nowSec < morningStart) {
+				setSelectFilter('evening')
+			} else {
+				setSelectFilter('all')
+			}
+		}
+	}, [])
+
+	useEffect(() => {
+		initApp()
+		const registerBackgroundTask = async () => {
+			try {
+				await BackgroundTask.registerTaskAsync(REFRESH_NOTIFICATION, {
+					minimumInterval: 60 * 60 * 24
+				})
+			} catch (error) { }
+		}
+
+		registerBackgroundTask()
+
+	}, [])
+
+	useEffect(() => {
+		setHabitStore(Object.values(store) ?? [])
+	}, [store])
+
+	TaskManager.defineTask(REFRESH_NOTIFICATION, async () => {
+		try {
+
+			const scheduled = await Notifications.getAllScheduledNotificationsAsync()
+			const updateHabitTask = useStore.getState().updateHabitTask
+
+			const habitNotif = scheduled.reduce<Record<string, string | null>>((acc, item) => {
+				const data = item.content.data as any
+				const untilDay = data['untilDay'] as string | undefined
+
+				if (!untilDay) return acc
+
+				if (data['habitId']) {
+					if (
+						!acc[data.habitId] ||
+						dayjs(untilDay, DATE_FORMAT).isAfter(dayjs(acc[data.habitId]))
+					) {
+						acc[data.habitId] = untilDay
+					}
+				}
+
+				return acc
+
+			}, {})
+
+			for (const [key, value] of Object.entries(habitNotif)) {
+				if (dayjs(value, DATE_FORMAT).diff(dayjs(), 'day') <= 10) {
+					const habit = useStore.getState().getHabitTask(key)
+					if (habit && habit.habitConfig.reminder) {
+						const { skip_days, days_in_row } = habit.habitConfig.gap_interval as { skip_days: number, days_in_row: number }
+						const newDataOfCreate = getNextRenderBaseDate(habit.habitConfig.day_of_create, days_in_row, skip_days)
+						const notid = await SetNotifications('gap', habit?.habitConfig.reminder && habit.habitConfig.reminder_time ? habit?.habitConfig.reminder_time : '00:00', {
+							name: habit?.habitConfig.name,
+							habitId: key,
+							notid: habit.habitConfig.notificationsId,
+							skipDays: skip_days,
+							daysInRow: days_in_row,
+							dayOfCreate: newDataOfCreate
+						})
+
+						if (notid) {
+							const updateConfig: IHabitTask = {
+								...habit,
+								habitConfig: {
+									...habit.habitConfig,
+									notificationsId: notid
+								}
+							}
+							updateHabitTask(key, updateConfig)
+						}
+					}
+				}
+			}
+			return BackgroundTask.BackgroundTaskResult.Success
+		} catch (error) {
+			console.error(error)
+			return BackgroundTask.BackgroundTaskResult.Failed
+		}
+	})
+
+	return (
+		<View backgroundColor={'$dark'} maxHeight={SCREEN_HEIGHT}>
+			<SafeAreaView>
+				<YStack height={SCREEN_HEIGHT} backgroundColor='$dark'>
+					<SlidingCalendar
+						selectDate={selectDate}
+						setSelectDate={setSelectDate}
+					/>
+					<YStack alignItems="center">
+						<FilteringButtonsTime
+							selectFilter={selectFilter}
+							setSelectFilter={setSelectFilter}
+						/>
+						<TouchableOpacity
+							style={styles.buttonCreateNewHabit}
+							onPress={() => router.navigate('/screens/create_new_habits')}
+						>
+							<Text
+								color={'$white'}
+								fontSize={18}
+							>{t('listHabit.addHabit')}</Text>
+						</TouchableOpacity>
+
+						<HabitsRender
+							habitsStore={habitsStore}
+							selectDate={selectDate}
+							selectFilter={selectFilter}
+						/>
+					</YStack>
+				</YStack>
+			</SafeAreaView>
+		</View>
+	);
 }
 
 const styles = StyleSheet.create({
-  titleContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-  },
-  stepContainer: {
-    gap: 8,
-    marginBottom: 8,
-  },
-  reactLogo: {
-    height: 178,
-    width: 290,
-    bottom: 0,
-    left: 0,
-    position: 'absolute',
-  },
-});
+	buttonCreateNewHabit: {
+		borderRadius: 10,
+		backgroundColor: '#194A98',
+		width: SCREEN_WIDTH - 40,
+		height: SCREEN_WIDTH_400 ? 40 : 45,
+		alignItems: 'center',
+		justifyContent: 'center',
+		marginTop: 10
+	}
+})

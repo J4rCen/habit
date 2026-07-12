@@ -1,0 +1,237 @@
+import dayjs from 'dayjs';
+import customParseFormat from 'dayjs/plugin/customParseFormat';
+import isoWeek from "dayjs/plugin/isoWeek";
+import weekday from "dayjs/plugin/weekday";
+import * as Notifications from 'expo-notifications';
+import { DATE_FORMAT } from '../constants';
+
+dayjs.extend(isoWeek);
+dayjs.extend(weekday);
+dayjs.extend(customParseFormat)
+interface ISetNotifications {
+    name: string | null,
+    daysOfWeek?: Array<string> | null,
+    daysInRow?: number | null,
+    skipDays?: number | null,
+    dayOfCreate?: string | null,
+    habitId: string
+    notid?: string | null,
+    typeOfHabit?: string | null,
+    oneTimeDay?: string | null
+}
+
+Notifications.setNotificationHandler({
+    handleNotification: async () => ({
+        shouldShowBanner: true,
+        shouldShowList: true,
+        shouldPlaySound: false,
+        shouldSetBadge: false,
+    })
+})
+
+const listWeek: Record<string, number> = {
+    'Пн': 2,
+    'Вт': 3,
+    'Ср': 4,
+    'Чт': 5,
+    'Пт': 6,
+    'Сб': 7,
+    'Вс': 1,
+}
+
+export const GetPermissionAccess = async () => {
+    let existingStatus = await Notifications.getPermissionsAsync()
+
+    if (existingStatus.status !== 'granted') {
+        existingStatus = await Notifications.requestPermissionsAsync()
+    }
+
+    return existingStatus.status
+}
+
+export const CancelNotificationAsync = async (type: string, id: string, habitId: string, typeOfHabit: 'reusable' | 'onetime') => {
+    if (typeOfHabit === 'onetime') {
+        try {
+            await Notifications.cancelScheduledNotificationAsync(id)
+        } catch (error) {
+            const allNotifications = await Notifications.getAllScheduledNotificationsAsync()
+
+            for (const notif of allNotifications) {
+                if (notif.content.data?.habitId === habitId) {
+                    await Notifications.cancelScheduledNotificationAsync(notif.identifier);
+                }
+            }
+        }
+    }
+
+    if (typeOfHabit === 'reusable' && type === 'every_day') {
+        try {
+            await Notifications.cancelScheduledNotificationAsync(id)
+        } catch (error) {
+            const allNotifications = await Notifications.getAllScheduledNotificationsAsync()
+
+            for (const notif of allNotifications) {
+                if (notif.content.data?.habitId === habitId) {
+                    await Notifications.cancelScheduledNotificationAsync(notif.identifier);
+                }
+            }
+        }
+    }
+
+    if (typeOfHabit === 'reusable' && type === 'certain_days' || type === 'gap') {
+
+        const hid = JSON.parse(id)
+
+        try {
+            for (const i of hid) {
+                await Notifications.cancelScheduledNotificationAsync(i)
+            }
+        } catch (error) {
+            const allNotifications = await Notifications.getAllScheduledNotificationsAsync()
+
+            for (const notif of allNotifications) {
+                if (notif.content.data?.habitId === habitId) {
+                    await Notifications.cancelScheduledNotificationAsync(notif.identifier);
+                }
+            }
+        }
+    }
+}
+
+const SetNotifications = async (type: string, time: string, option: ISetNotifications) => {
+    const [hour, minute] = time.split(':')
+
+    if (option.typeOfHabit === 'onetime' && option.oneTimeDay) {
+
+        const date = new Date(`${option.oneTimeDay}T${hour}:${minute}:00`)
+
+        try {
+            const notificationId = await Notifications.scheduleNotificationAsync({
+                content: {
+                    title: 'Напоминание',
+                    body: `Пора выполнить ${option.name}`,
+                    data: { habitId: option.habitId }
+                },
+                trigger: {
+                    type: Notifications.SchedulableTriggerInputTypes.DATE,
+                    date
+                }
+            })
+
+            return notificationId
+        } catch (error) {
+            console.error(error)
+        }
+    }
+
+    if (option.typeOfHabit === 'reusable' && type === 'every_day') {
+
+        try {
+            if (option.notid) {
+                await CancelNotificationAsync(type, option.notid, option.habitId, option.typeOfHabit)
+            }
+
+            const notificationId = await Notifications.scheduleNotificationAsync({
+                content: {
+                    title: 'Напоминание',
+                    body: `Пора выполнить ${option.name}`,
+                    data: { habitId: option.habitId }
+                },
+                trigger: {
+                    type: Notifications.SchedulableTriggerInputTypes.DAILY,
+                    hour: Number.isFinite(Number(hour)) ? Number(hour) : 0,
+                    minute: Number.isFinite(Number(minute)) ? Number(minute) : 0
+                }
+            })
+
+            return notificationId
+        } catch (error) {
+            console.error(error)
+        }
+    }
+
+    if (option.typeOfHabit === 'reusable' && type === 'certain_days' && option.daysOfWeek) {
+
+        try {
+            if (option.notid) {
+                await CancelNotificationAsync(type, option.notid, option.habitId, option.typeOfHabit)
+            }
+
+            const notificationId = []
+
+            for (const week of option.daysOfWeek) {
+                const notid = await Notifications.scheduleNotificationAsync({
+                    content: {
+                        title: 'Напоминание',
+                        body: `Пора выполнить ${option.name}`,
+                        data: { habitId: option.habitId }
+                    },
+                    trigger: {
+                        type: Notifications.SchedulableTriggerInputTypes.WEEKLY,
+                        weekday: listWeek[week],
+                        hour: Number.isFinite(Number(hour)) ? Number(hour) : 0,
+                        minute: Number.isFinite(Number(minute)) ? Number(minute) : 0
+                    }
+                })
+
+                notificationId.push(notid)
+            }
+
+            return JSON.stringify(notificationId)
+        } catch (error) {
+            console.error(error)
+        }
+    }
+
+    if (option.typeOfHabit === 'reusable' && type === 'gap' && option.daysInRow && option.skipDays && option.dayOfCreate) {
+
+        try {
+            if (option.notid) {
+                await CancelNotificationAsync(type, option.notid, option.habitId, option.typeOfHabit)
+            }
+
+            const cycleLength = option.daysInRow + option.skipDays
+            const notificationId: string[] = []
+
+            for (let i = 0; i <= 30; i++) {
+                const cycleDay = i % cycleLength
+                if (cycleDay < option.daysInRow) {
+
+                    const notifyDate = dayjs(option.dayOfCreate, DATE_FORMAT).add(i, 'day')
+
+                    const hid = await Notifications.scheduleNotificationAsync({
+                        content: {
+                            title: 'Напоминание',
+                            body: `Пора выполнить ${option.name}`,
+                            data: {
+                                habitId: option.habitId,
+                                dayOfCreate: option.dayOfCreate,
+                                skipDays: option.skipDays,
+                                daysInRow: option.daysInRow,
+                                untilDay: notifyDate.format(DATE_FORMAT),
+                            }
+                        },
+                        trigger: {
+                            type: Notifications.SchedulableTriggerInputTypes.MONTHLY,
+                            day: Number(notifyDate.format('DD')),
+                            hour: Number.isFinite(Number(hour)) ? Number(hour) : 0,
+                            minute: Number.isFinite(Number(minute)) ? Number(minute) : 0
+                        }
+                    })
+
+                    notificationId.push(hid)
+                }
+            }
+
+            const jsonData = JSON.stringify(notificationId)
+
+            return jsonData
+        } catch (error) {
+            console.error(error)
+        }
+
+    }
+
+}
+
+export default SetNotifications

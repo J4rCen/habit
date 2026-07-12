@@ -1,29 +1,63 @@
-import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
-import { useFonts } from 'expo-font';
-import { Stack } from 'expo-router';
-import { StatusBar } from 'expo-status-bar';
-import 'react-native-reanimated';
+import customTamaguiConfig from "@/tamagui.config";
+import * as Localization from 'expo-localization';
+import { Stack } from "expo-router";
+import { useEffect, useState } from "react";
+import { SafeAreaProvider } from "react-native-safe-area-context";
+import { TamaguiProvider, View } from "tamagui";
+import i18n from "./i18/i18";
+// import LoadingScreen from "./screens/loadingScreen";
+// import { useAppOpenAd } from './screens/yandex_ads';
 
-import { useColorScheme } from '@/hooks/useColorScheme';
+import LocaleConfig from "./calendarsLocalConfig";
+import useStore from "./store/zustand";
 
 export default function RootLayout() {
-  const colorScheme = useColorScheme();
-  const [loaded] = useFonts({
-    SpaceMono: require('../assets/fonts/SpaceMono-Regular.ttf'),
-  });
 
-  if (!loaded) {
-    // Async font loading only occurs in development.
-    return null;
-  }
+	const [showLoading, setShowLoading] = useState(true);
+	// const appOpenAd = useAppOpenAd();
+	const systemLanguage = useStore(state => state.systemLocale)
+	const setSystemLanguage = useStore(state => state.setSystemLocal)
+	const language = Localization.getLocales()[0]['languageCode']
 
-  return (
-    <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-      <Stack>
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        <Stack.Screen name="+not-found" />
-      </Stack>
-      <StatusBar style="auto" />
-    </ThemeProvider>
-  );
+	LocaleConfig.defaultLocale = systemLanguage;
+
+	useEffect(() => {
+		if (systemLanguage !== null) {
+			i18n.changeLanguage(systemLanguage)
+			return
+		}
+
+		if (systemLanguage === null && language) {
+			setSystemLanguage(language)
+			i18n.changeLanguage(language)
+		}
+	}, [systemLanguage])
+
+	return (
+		<SafeAreaProvider>
+			<TamaguiProvider config={customTamaguiConfig}>
+
+				<Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: '#222831' } }}>
+					<Stack.Screen name="(tabs)" />
+				</Stack>
+
+				{showLoading &&
+					<View style={{
+						position: 'absolute',
+						top: 0,
+						right: 0,
+						bottom: 0,
+						left: 0
+					}}>
+						{/* <LoadingScreen
+							onFinish={async () => {
+								setShowLoading(false);
+								appOpenAd.show()
+							}}
+						/> */}
+					</View>
+				}
+			</TamaguiProvider>
+		</SafeAreaProvider>
+	);
 }
