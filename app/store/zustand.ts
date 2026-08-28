@@ -42,8 +42,14 @@ export interface IHabitTask {
 	habitStatic: Record<string, StaticConfig> | null
 }
 
-interface IStore {
+export interface IStore {
 	habitTask: Record<string, IHabitTask>
+	dialog: {
+		open?: boolean
+		title?: string
+		message?: string
+		isLoading?: boolean
+	}
 	startDateUser: string | null
 	dayInterval: TDayInterval,
 	email: string | null,
@@ -54,6 +60,7 @@ interface IStore {
 	initializeApp: () => void
 	initializeStartDateUser: (data: string) => void
 	initializeHabits: (data: any) => void
+	setConfigDialog: (configDialog: IStore['dialog']) => void
 	setStartDateUser: (date: Dayjs) => void
 	setHabitTask: (habitId: string, habitConfig: Omit<IHabitTask, 'habitId'>) => void
 	setIsCompleat: (habitId: string, date: string, habitStatic: StaticConfig) => void
@@ -76,6 +83,12 @@ const useStore = create<IStore>()(
 				eveningTime: '18:00',
 			},
 			email: null,
+			dialog: {
+				open: false,
+				title: '',
+				message: '',
+				isLoading: false
+			},
 			systemLocale: 'en',
 			premium: false,
 			_hasHydrated: false,
@@ -90,6 +103,17 @@ const useStore = create<IStore>()(
 				}
 			},
 			setStartDateUser: (date) => set({ startDateUser: date.format(DATE_FORMAT) }),
+			setConfigDialog: (configDialog) => {
+				set((state) => {
+					return {
+						...state,
+						dialog: {
+							...state.dialog,
+							...configDialog
+						}
+					}
+				})
+			},
 			setHabitTask: (habitId, habitConfig) => {
 				set((state) => ({
 					habitTask: {

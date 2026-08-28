@@ -4,6 +4,7 @@ import isoWeek from "dayjs/plugin/isoWeek";
 import weekday from "dayjs/plugin/weekday";
 import * as Notifications from 'expo-notifications';
 import { DATE_FORMAT } from '../constants';
+import i18n from '../i18/i18';
 
 dayjs.extend(isoWeek);
 dayjs.extend(weekday);
@@ -30,13 +31,13 @@ Notifications.setNotificationHandler({
 })
 
 const listWeek: Record<string, number> = {
-    'Пн': 2,
-    'Вт': 3,
-    'Ср': 4,
-    'Чт': 5,
-    'Пт': 6,
-    'Сб': 7,
-    'Вс': 1,
+    'mon': 2,
+    'tue': 3,
+    'wed': 4,
+    'thu': 5,
+    'fri': 6,
+    'sat': 7,
+    'sun': 1,
 }
 
 export const GetPermissionAccess = async () => {
@@ -100,6 +101,7 @@ export const CancelNotificationAsync = async (type: string, id: string, habitId:
 
 const SetNotifications = async (type: string, time: string, option: ISetNotifications) => {
     const [hour, minute] = time.split(':')
+    const t = i18n.t.bind(i18n)
 
     if (option.typeOfHabit === 'onetime' && option.oneTimeDay) {
 
@@ -108,8 +110,8 @@ const SetNotifications = async (type: string, time: string, option: ISetNotifica
         try {
             const notificationId = await Notifications.scheduleNotificationAsync({
                 content: {
-                    title: 'Напоминание',
-                    body: `Пора выполнить ${option.name}`,
+                    title: t('notifications.reminder'),
+                    body: `${option.name}`,
                     data: { habitId: option.habitId }
                 },
                 trigger: {
@@ -133,8 +135,8 @@ const SetNotifications = async (type: string, time: string, option: ISetNotifica
 
             const notificationId = await Notifications.scheduleNotificationAsync({
                 content: {
-                    title: 'Напоминание',
-                    body: `Пора выполнить ${option.name}`,
+                    title: t('notifications.reminder'),
+                    body: `${option.name}`,
                     data: { habitId: option.habitId }
                 },
                 trigger: {
@@ -162,8 +164,8 @@ const SetNotifications = async (type: string, time: string, option: ISetNotifica
             for (const week of option.daysOfWeek) {
                 const notid = await Notifications.scheduleNotificationAsync({
                     content: {
-                        title: 'Напоминание',
-                        body: `Пора выполнить ${option.name}`,
+                        title: t('notifications.reminder'),
+                        body: `${option.name}`,
                         data: { habitId: option.habitId }
                     },
                     trigger: {
@@ -201,8 +203,8 @@ const SetNotifications = async (type: string, time: string, option: ISetNotifica
 
                     const hid = await Notifications.scheduleNotificationAsync({
                         content: {
-                            title: 'Напоминание',
-                            body: `Пора выполнить ${option.name}`,
+                            title: t('notifications.reminder'),
+                            body: `${option.name}`,
                             data: {
                                 habitId: option.habitId,
                                 dayOfCreate: option.dayOfCreate,

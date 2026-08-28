@@ -108,5 +108,8 @@ export default {
         morningStart: 'Morning start',
         dayStart: 'Day start',
         eveningStart: 'Evening start',
+    },
+    notifications: {
+        reminder: 'Shall we continue ?'
     }
 }

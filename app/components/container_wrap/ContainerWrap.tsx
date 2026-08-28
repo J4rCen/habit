@@ -1,5 +1,5 @@
-import { SCREEN_HEIGHT, SCREEN_WIDTH } from "@/app/constants"
 import React from "react"
+import { Dimensions } from "react-native"
 import { SafeAreaView } from "react-native-safe-area-context"
 import { View, ViewStyle, YStack, YStackProps } from "tamagui"
 
@@ -8,16 +8,19 @@ interface IContainerWrapSettings {
 	ys?: YStackProps,
 }
 
+const width = Dimensions.get('window').width
+
 const ContainerWrap = ({ children, config }: { children: React.ReactNode, config?: IContainerWrapSettings }) => {
 	return (
-		<View backgroundColor={'$dark'} maxHeight={SCREEN_HEIGHT} {...config?.vw}>
-			<SafeAreaView>
+		<View
+			flex={1}
+			width={width}
+			backgroundColor={'$dark'} 
+			{...config?.vw}
+		>
+			<SafeAreaView style={{flex: 1, width: '100%'}}>
 				<YStack
-					height={SCREEN_HEIGHT}
-					width={SCREEN_WIDTH}
-					justifyContent="center"
-					alignItems="center"
-					{...config?.ys}
+					flex={1}
 				>
 					{children}
 				</YStack>

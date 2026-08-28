@@ -2,8 +2,8 @@ import { router } from "expo-router"
 import React, { useCallback, useMemo, useState } from "react"
 import { useTranslation } from "react-i18next"
 import { TouchableOpacity } from "react-native"
-import { SafeAreaView } from "react-native-safe-area-context"
 import { ScrollView, Text, View, XStack, YStack } from "tamagui"
+import ContainerWrap from "../components/container_wrap/ContainerWrap"
 import CustomInput from "../components/custom_input/CustomInput"
 import { SCREEN_HEIGHT, SCREEN_WIDTH, SCREEN_WIDTH_400 } from "../constants"
 import useStore, { IHabitTask } from "../store/zustand"
@@ -12,7 +12,7 @@ const Statistics = () => {
 
     const store: IHabitTask[] = Object.values(useStore(store => store.habitTask))
     const [searchValue, setSearchValue] = useState<string>('')
-    const {t} = useTranslation()
+    const { t } = useTranslation()
 
     const filteredHabits = useCallback(() => {
         return store.filter((item) => {
@@ -55,51 +55,49 @@ const Statistics = () => {
     const habitListTask = useMemo(() => filteredHabits(), [filteredHabits]);
 
     return (
-        <View backgroundColor={'$dark'} maxHeight={SCREEN_HEIGHT}>
-            <SafeAreaView>
-                <YStack height={SCREEN_HEIGHT} backgroundColor='$dark'>
+        <ContainerWrap>
+            <YStack height={SCREEN_HEIGHT} backgroundColor='$dark'>
+                <XStack>
+                    <Text
+                        color={'white'}
+                        fontSize={26}
+                        marginLeft={15}
+                    >
+                        {t('listHabit.statistics')}
+                    </Text>
+                </XStack>
+                <YStack alignItems="center" marginTop={10}>
                     <XStack>
-                        <Text
-                            color={'white'}
-                            fontSize={26}
-                            marginLeft={15}
-                        >
-                            {t('listHabit.statistics')}
-                        </Text>
+                        <CustomInput
+                            value={searchValue}
+                            onChange={(e) => {
+                                if (typeof e === 'string')
+                                    setSearchValue(e)
+                            }}
+                            placeholder={t('statistics.search')}
+                            height={50}
+                            width={SCREEN_WIDTH - 20}
+                        />
                     </XStack>
-                    <YStack alignItems="center" marginTop={10}>
-                        <XStack>
-                            <CustomInput
-                                value={searchValue}
-                                onChange={(e) => {
-                                    if (typeof e === 'string')
-                                        setSearchValue(e)
-                                }}
-                                placeholder={t('statistics.search')}
-                                height={50}
-                                width={SCREEN_WIDTH - 20}
-                            />
-                        </XStack>
-                        <YStack height={SCREEN_HEIGHT / 2} width={SCREEN_WIDTH - 20} marginTop={20}>
-                            <ScrollView>
-                                <View gap={10} alignContent="center">
-                                    {
-                                        habitListTask.length !== 0 ? habitListTask :
-                                            <Text color={'white'} textAlign="center" width={SCREEN_WIDTH - 20} fontSize={SCREEN_WIDTH_400 ? 16 : 18}>
-                                                {
-                                                    store.length > 0 ?
-                                                        t('statistics.noHabitWithThisName') :
-                                                        t('statistics.toDisplayStatistics')
-                                                }
-                                            </Text>
-                                    }
-                                </View>
-                            </ScrollView>
-                        </YStack>
+                    <YStack height={SCREEN_HEIGHT / 2} width={SCREEN_WIDTH - 20} marginTop={20}>
+                        <ScrollView>
+                            <View gap={10} alignContent="center">
+                                {
+                                    habitListTask.length !== 0 ? habitListTask :
+                                        <Text color={'white'} textAlign="center" width={SCREEN_WIDTH - 20} fontSize={SCREEN_WIDTH_400 ? 16 : 18}>
+                                            {
+                                                store.length > 0 ?
+                                                    t('statistics.noHabitWithThisName') :
+                                                    t('statistics.toDisplayStatistics')
+                                            }
+                                        </Text>
+                                }
+                            </View>
+                        </ScrollView>
                     </YStack>
                 </YStack>
-            </SafeAreaView>
-        </View>
+            </YStack>
+        </ContainerWrap>
     )
 }
 

@@ -1,9 +1,10 @@
+import ContainerWrap from '@/app/components/container_wrap/ContainerWrap';
 import CustomInput from '@/app/components/custom_input/CustomInput';
 import CustomSelect from '@/app/components/custom_select/CustomSelect';
 import CustomDataPicker from '@/app/components/datepicker/CustomDataPicker';
 import ReminderToggle from '@/app/components/reminder_toggle/ReminderToggle';
 import CustomTimePicker from '@/app/components/timepicker/CustomTimePicker';
-import { DATE_FORMAT, SCREEN_HEIGHT, SCREEN_WIDTH, SCREEN_WIDTH_400, WEEK_DAYS } from '@/app/constants';
+import { DATE_FORMAT, SCREEN_WIDTH, SCREEN_WIDTH_400, WEEK_DAYS } from '@/app/constants';
 import useStore, { IHabitTask } from '@/app/store/zustand';
 import ArrowBack from '@/app/svgs/arrowBack';
 import SetNotifications, { CancelNotificationAsync, GetPermissionAccess } from '@/app/utilities/notifications';
@@ -14,7 +15,6 @@ import { nanoid } from 'nanoid/non-secure';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Alert } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import { Button, ScrollView, Stack, Text, View, XStack, YStack } from "tamagui";
 import { optionIntervalExecution, optionTimesOfDay, optionTypeOfTask } from './setDefaultData';
 
@@ -47,7 +47,7 @@ const CreateNewHabits = () => {
     const [alertMessage, setAlertMessage] = useState<string>('')
     const [isOpen, setIsOpen] = useState<boolean>(false)
     const notificationsId = useRef(habitConfig && reminderOn ? habitConfig.notificationsId : null)
-    const {t} = useTranslation()
+    const { t } = useTranslation()
 
     const store = useStore(state => state)
 
@@ -82,52 +82,54 @@ const CreateNewHabits = () => {
 
     const saveHabit = async () => {
 
-        if (habitName.length === 0) {
-            setAlertMessage(t('createHabit.errorHabitNameEmpty'))
-            setAlertShow(true)
-            return
-        }
+        if (typeOfHabit === 'reusable') {
+            if (habitName.length === 0) {
+                setAlertMessage(t('createHabit.errorHabitNameEmpty'))
+                setAlertShow(true)
+                return
+            }
 
-        if (intervalExecution === 'certain_days' && daysOfWeek.length === 0) {
-            setAlertMessage(t('createHabit.errorDaysOfWeekEmpty'))
-            setAlertShow(true)
-            return
-        }
+            if (intervalExecution === 'certain_days' && daysOfWeek.length === 0) {
+                setAlertMessage(t('createHabit.errorDaysOfWeekEmpty'))
+                setAlertShow(true)
+                return
+            }
 
-        if (intervalExecution === 'gap' && typeof daysInRow === 'string') {
-            setAlertMessage(t('createHabit.errorDaysMustBeNumber'))
-            setAlertShow(true)
-            return
-        }
+            if (intervalExecution === 'gap' && typeof daysInRow === 'string') {
+                setAlertMessage(t('createHabit.errorDaysMustBeNumber'))
+                setAlertShow(true)
+                return
+            }
 
-        if (intervalExecution === 'gap' && Number(daysInRow) === 0) {
-            setAlertMessage(t('createHabit.errorActiveDaysShouldNotBeZero'))
-            setAlertShow(true)
-            return
-        }
+            if (intervalExecution === 'gap' && Number(daysInRow) === 0) {
+                setAlertMessage(t('createHabit.errorActiveDaysShouldNotBeZero'))
+                setAlertShow(true)
+                return
+            }
 
-        if (intervalExecution === 'gap' && typeof skipDays === 'string') {
-            setAlertMessage(t('createHabit.errorRestValueMustBeNumber'))
-            setAlertShow(true)
-            return
-        }
+            if (intervalExecution === 'gap' && typeof skipDays === 'string') {
+                setAlertMessage(t('createHabit.errorRestValueMustBeNumber'))
+                setAlertShow(true)
+                return
+            }
 
-        if (intervalExecution === 'gap' && Number(skipDays) === 0) {
-            setAlertMessage(t('createHabit.errorRestDaysMustNotBeZero'))
-            setAlertShow(true)
-            return
-        }
+            if (intervalExecution === 'gap' && Number(skipDays) === 0) {
+                setAlertMessage(t('createHabit.errorRestDaysMustNotBeZero'))
+                setAlertShow(true)
+                return
+            }
 
-        if (typeOfTask === 'reusable_mark' && typeof quantity === 'string') {
-            setAlertMessage(t('createHabit.errorQuantityMustBeNumber'))
-            setAlertShow(true)
-            return
-        }
+            if (typeOfTask === 'reusable_mark' && typeof quantity === 'string') {
+                setAlertMessage(t('createHabit.errorQuantityMustBeNumber'))
+                setAlertShow(true)
+                return
+            }
 
-        if (typeOfTask === 'reusable_mark' && Number(quantity) === 0) {
-            setAlertMessage(t('createHabit.errorQuantityMustNotBeZero'))
-            setAlertShow(true)
-            return
+            if (typeOfTask === 'reusable_mark' && Number(quantity) === 0) {
+                setAlertMessage(t('createHabit.errorQuantityMustNotBeZero'))
+                setAlertShow(true)
+                return
+            }
         }
 
         const hid = habitId ? habitId as string : nanoid()
@@ -327,210 +329,221 @@ const CreateNewHabits = () => {
     }, [quantity])
 
     return (
-        <View backgroundColor={'$dark'} maxHeight={SCREEN_HEIGHT}>
-            <SafeAreaView>
-                <PortalProvider>
-                    <YStack style={{ height: SCREEN_HEIGHT, width: SCREEN_WIDTH }}>
-                        <ScrollView maxHeight={SCREEN_HEIGHT} style={{ backgroundColor: '#222831' }} showsVerticalScrollIndicator={false}>
-                            <YStack width={SCREEN_WIDTH} position='relative' justifyContent='center'>
-                                <XStack alignItems='center' marginTop={10}>
-                                    <View onPress={() => router.back()}>
-                                        <ArrowBack size={36} />
-                                    </View>
-                                    <Text
-                                        marginLeft={5}
-                                        color={"$white"}
-                                        fontSize={26}
+        <ContainerWrap>
+            <PortalProvider>
+                <YStack flex={1}>
+                    <XStack alignItems='center' marginTop={10} marginBottom={5}>
+                        <View onPress={() => router.back()}>
+                            <ArrowBack size={36} />
+                        </View>
+                        <Text
+                            marginLeft={5}
+                            color={"$white"}
+                            fontSize={26}
+                        >
+                            {habitId === undefined ? t('createHabit.addHabit') : t('createHabit.changeHabit')}
+                        </Text>
+                    </XStack>
+
+                    <ScrollView
+                        style={{ backgroundColor: '#222831' }}
+                        showsVerticalScrollIndicator={false}
+                        height={'80%'}
+                    >
+                        <YStack width={SCREEN_WIDTH} position='relative' justifyContent='center'>
+
+
+                            <YStack
+                                flex={1}
+                                alignItems="center"
+                                marginTop={20}
+                            >
+                                <CustomInput
+                                    value={habitName}
+                                    height={50}
+                                    width={SCREEN_WIDTH - 20}
+                                    placeholder={t('createHabit.habitName')}
+                                    onChange={(e) => {
+                                        if (typeof e === 'string') setHabitName(e)
+                                    }}
+                                />
+                                <XStack margin={10} justifyContent='center'>
+                                    <Button
+                                        borderTopRightRadius={0}
+                                        borderBottomRightRadius={0}
+                                        backgroundColor={typeOfHabit === 'reusable' ? '$blue' : "$gray"}
+                                        onPress={() => setTypeOfHabit('reusable')}
+                                        width={SCREEN_WIDTH / 2 - 20}
                                     >
-                                        {habitId === undefined ? t('createHabit.addHabit') : t('createHabit.changeHabit')}
-                                    </Text>
+                                        <Text
+                                            color={'$white'}
+                                            fontSize={16}
+                                        >
+                                            {t('createHabit.regular')}
+                                        </Text>
+                                    </Button>
+                                    <Button
+                                        borderTopLeftRadius={0}
+                                        borderBottomLeftRadius={0}
+                                        backgroundColor={typeOfHabit === 'onetime' ? '$blue' : "$gray"}
+                                        onPress={() => {
+                                            setTypeOfHabit('onetime')
+                                        }}
+                                        width={SCREEN_WIDTH / 2 - 20}
+                                    >
+                                        <Text
+                                            color={'$white'}
+                                            fontSize={16}
+                                        >
+                                            {t('createHabit.onetime')}
+                                        </Text>
+                                    </Button>
                                 </XStack>
 
-                                <YStack
-                                    flex={1}
-                                    alignItems="center"
-                                    marginTop={20}
-                                >
-                                    <CustomInput
-                                        value={habitName}
+                                <YStack marginTop={20} gap={15}>
+                                    {typeOfHabit === 'reusable' ?
+                                        <CustomSelect
+                                            id={1}
+                                            placeholder={t('createHabit.executionInterval')}
+                                            height={50}
+                                            width={SCREEN_WIDTH - 20}
+                                            options={optionIntervalExecution}
+                                            value={intervalExecution}
+                                            onChange={(e) => setIntervalExecution(e)}
+                                            isOpen={oneActive === 1 ? isOpen : false}
+                                            setIsOpen={(e) => setIsOpen(e)}
+                                            setOneActive={(e) => setOneActive(e)}
+                                        /> : <CustomDataPicker
+                                            height={50}
+                                            width={SCREEN_WIDTH - 20}
+                                            placeholder={t('createHabit.selectDate')}
+                                            oneTimeDay={oneTimeDay}
+                                            setOneTimeDay={setOneTimeDay}
+                                        />
+                                    }
+
+                                    {
+                                        typeOfHabit === 'reusable' &&
+                                        intervalExecution === 'certain_days' &&
+                                        choiceOfDays
+                                    }
+
+                                    {
+                                        typeOfHabit === 'reusable' &&
+                                        intervalExecution === 'gap' &&
+                                        choiceOfGapInterval
+                                    }
+
+                                    <CustomSelect
+                                        id={2}
+                                        placeholder={t('createHabit.timesOfDay')}
                                         height={50}
                                         width={SCREEN_WIDTH - 20}
-                                        placeholder={t('createHabit.habitName')}
-                                        onChange={(e) => {
-                                            if (typeof e === 'string') setHabitName(e)
-                                        }}
+                                        options={optionTimesOfDay}
+                                        value={timesOfDay}
+                                        onChange={(e) => setTimesOfDay(e)}
+                                        isOpen={oneActive === 2 ? isOpen : false}
+                                        setIsOpen={(e) => setIsOpen(e)}
+                                        setOneActive={(e) => setOneActive(e)}
                                     />
-                                    <XStack margin={10} justifyContent='center'>
-                                        <Button
-                                            borderTopRightRadius={0}
-                                            borderBottomRightRadius={0}
-                                            backgroundColor={typeOfHabit === 'reusable' ? '$blue' : "$gray"}
-                                            onPress={() => setTypeOfHabit('reusable')}
-                                            width={SCREEN_WIDTH / 2 - 20}
-                                        >
-                                            <Text
-                                                color={'$white'}
-                                                fontSize={16}
-                                            >
-                                                {t('createHabit.regular')}
-                                            </Text>
-                                        </Button>
-                                        <Button
-                                            borderTopLeftRadius={0}
-                                            borderBottomLeftRadius={0}
-                                            backgroundColor={typeOfHabit === 'onetime' ? '$blue' : "$gray"}
-                                            onPress={() => {
-                                                setTypeOfHabit('onetime')
-                                            }}
-                                            width={SCREEN_WIDTH / 2 - 20}
-                                        >
-                                            <Text
-                                                color={'$white'}
-                                                fontSize={16}
-                                            >
-                                                {t('createHabit.onetime')}
-                                            </Text>
-                                        </Button>
-                                    </XStack>
+                                    <CustomSelect
+                                        id={3}
+                                        placeholder={t('createHabit.taskType')}
+                                        height={50}
+                                        width={SCREEN_WIDTH - 20}
+                                        options={optionTypeOfTask}
+                                        value={typeOfTask}
+                                        onChange={(e) => setTypeOfTask(e)}
+                                        isOpen={oneActive === 3 ? isOpen : false}
+                                        setIsOpen={(e) => setIsOpen(e)}
+                                        setOneActive={(e) => setOneActive(e)}
+                                    />
 
-                                    <YStack marginTop={20} gap={15}>
-                                        {typeOfHabit === 'reusable' ?
-                                            <CustomSelect
-                                                id={1}
-                                                placeholder={t('createHabit.executionInterval')}
-                                                height={50}
-                                                width={SCREEN_WIDTH - 20}
-                                                options={optionIntervalExecution}
-                                                value={intervalExecution}
-                                                onChange={(e) => setIntervalExecution(e)}
-                                                isOpen={oneActive === 1 ? isOpen : false}
-                                                setIsOpen={(e) => setIsOpen(e)}
-                                                setOneActive={(e) => setOneActive(e)}
-                                            /> : <CustomDataPicker
-                                                height={50}
-                                                width={SCREEN_WIDTH - 20}
-                                                placeholder={t('createHabit.selectDate')}
-                                                oneTimeDay={oneTimeDay}
-                                                setOneTimeDay={setOneTimeDay}
-                                            />
-                                        }
+                                    {
+                                        typeOfTask === 'reusable_mark' &&
+                                        choiceQuantity
+                                    }
 
-                                        {
-                                            typeOfHabit === 'reusable' &&
-                                            intervalExecution === 'certain_days' &&
-                                            choiceOfDays
-                                        }
-
-                                        {
-                                            typeOfHabit === 'reusable' &&
-                                            intervalExecution === 'gap' &&
-                                            choiceOfGapInterval
-                                        }
-
-                                        <CustomSelect
-                                            id={2}
-                                            placeholder={t('createHabit.timesOfDay')}
+                                    {
+                                        typeOfTask === 'timer' &&
+                                        <CustomTimePicker
+                                            width={SCREEN_WIDTH / 2}
                                             height={50}
-                                            width={SCREEN_WIDTH - 20}
-                                            options={optionTimesOfDay}
-                                            value={timesOfDay}
-                                            onChange={(e) => setTimesOfDay(e)}
-                                            isOpen={oneActive === 2 ? isOpen : false}
-                                            setIsOpen={(e) => setIsOpen(e)}
-                                            setOneActive={(e) => setOneActive(e)}
+                                            value={timerTime}
+                                            onChange={setTimerTime}
+                                            placeholder={t('createHabit.time')}
                                         />
-                                        <CustomSelect
-                                            id={3}
-                                            placeholder={t('createHabit.taskType')}
+                                    }
+
+                                    <ReminderToggle
+                                        value={reminderOn}
+                                        onChange={reminder}
+                                    />
+
+                                    {
+                                        reminderOn &&
+                                        <CustomTimePicker
+                                            width={SCREEN_WIDTH - 20}
                                             height={50}
-                                            width={SCREEN_WIDTH - 20}
-                                            options={optionTypeOfTask}
-                                            value={typeOfTask}
-                                            onChange={(e) => setTypeOfTask(e)}
-                                            isOpen={oneActive === 3 ? isOpen : false}
-                                            setIsOpen={(e) => setIsOpen(e)}
-                                            setOneActive={(e) => setOneActive(e)}
+                                            value={reminderTime}
+                                            onChange={setReminderTime}
+                                            placeholder={t('createHabit.specifyTime')}
+
                                         />
+                                    }
 
-                                        {
-                                            typeOfTask === 'reusable_mark' &&
-                                            choiceQuantity
-                                        }
-
-                                        {
-                                            typeOfTask === 'timer' &&
-                                            <CustomTimePicker
-                                                width={SCREEN_WIDTH / 2}
-                                                height={50}
-                                                value={timerTime}
-                                                onChange={setTimerTime}
-                                                placeholder={t('createHabit.time')}
-                                            />
-                                        }
-
-                                        <ReminderToggle
-                                            value={reminderOn}
-                                            onChange={reminder}
-                                        />
-
-                                        {
-                                            reminderOn &&
-                                            <CustomTimePicker
-                                                width={SCREEN_WIDTH - 20}
-                                                height={50}
-                                                value={reminderTime}
-                                                onChange={setReminderTime}
-                                                placeholder={t('createHabit.specifyTime')}
-
-                                            />
-                                        }
-
-                                    </YStack>
-                                    <YStack gap={10} marginTop={50} marginBottom={50}>
-                                        <View height={50} width={SCREEN_WIDTH - 20}>
-                                            {alertShow && <Text fontSize={SCREEN_WIDTH_400 ? 14 : 16} color={'red'}>{`${alertMessage}`}</Text>}
-                                        </View>
-                                        <Button
-                                            fontSize={16}
-                                            color={'white'}
-                                            width={SCREEN_WIDTH - 20}
-                                            size={'$5'}
-                                            backgroundColor={'$blue'}
-                                            onPress={() => saveHabit()}
-                                        >
-                                            {t('createHabit.save')}
-                                        </Button>
-                                        <Button
-                                            fontSize={16}
-                                            color={'white'}
-                                            width={SCREEN_WIDTH - 20}
-                                            size={'$5'}
-                                            backgroundColor={'$gray'}
-                                            onPress={() => router.back()}
-                                        >
-                                            {t('createHabit.cancel')}
-                                        </Button>
-                                        {
-                                            habitId &&
-                                            <Button
-                                                fontSize={16}
-                                                color={'white'}
-                                                width={SCREEN_WIDTH - 20}
-                                                size={'$5'}
-                                                backgroundColor={'red'}
-                                                onPress={() => deleteHabit()}
-                                            >
-                                                {t('createHabit.delete')}
-                                            </Button>
-                                        }
-                                    </YStack>
                                 </YStack>
+
                             </YStack>
-                        </ScrollView>
+                        </YStack>
+                    </ScrollView>
+                    <YStack gap={10} alignItems='center' marginBottom={10}>
+                        <View height={50} width={SCREEN_WIDTH - 20}>
+                            {alertShow && <Text fontSize={SCREEN_WIDTH_400 ? 14 : 16} color={'red'}>{`${alertMessage}`}</Text>}
+                        </View>
+                        <XStack width={SCREEN_WIDTH - 20} justifyContent='center' alignItems='baseline'>
+                            <Button
+                                fontSize={16}
+                                flex={1}
+                                borderBottomRightRadius={0}
+                                borderTopRightRadius={0}
+                                color={'white'}
+                                size={'$5'}
+                                backgroundColor={'$gray'}
+                                onPress={() => router.back()}
+                            >
+                                {t('createHabit.cancel')}
+                            </Button>
+                            <Button
+                                fontSize={16}
+                                flex={1}
+                                borderBottomLeftRadius={0}
+                                borderTopLeftRadius={0}
+                                color={'white'}
+                                size={'$5'}
+                                backgroundColor={'$blue'}
+                                onPress={() => saveHabit()}
+                            >
+                                {t('createHabit.save')}
+                            </Button>
+                        </XStack>
+                        {
+                            habitId &&
+                            <Button
+                                fontSize={16}
+                                color={'white'}
+                                width={SCREEN_WIDTH - 20}
+                                size={'$5'}
+                                backgroundColor={'red'}
+                                onPress={() => deleteHabit()}
+                            >
+                                {t('createHabit.delete')}
+                            </Button>
+                        }
                     </YStack>
-                </PortalProvider>
-            </SafeAreaView>
-        </View>
+                </YStack>
+            </PortalProvider>
+        </ContainerWrap>
     )
 }
 

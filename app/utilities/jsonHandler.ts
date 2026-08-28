@@ -1,24 +1,18 @@
 import { isErrorWithCode, pick, saveDocuments } from '@react-native-documents/picker';
 import dayjs from 'dayjs';
 import * as FileSystem from 'expo-file-system';
-import useStore, { IHabitTask } from '../store/zustand';
+import useStore, { IHabitTask, IStore } from '../store/zustand';
 import SetNotifications, { GetPermissionAccess } from './notifications';
-
-interface IFileController {
-	setOpenPopup: React.Dispatch<React.SetStateAction<boolean>>,
-	setTitlePopup: React.Dispatch<React.SetStateAction<string>>,
-	setMessagePopup: React.Dispatch<React.SetStateAction<string>>,
-	setIsLoading: React.Dispatch<React.SetStateAction<boolean>>
-}
 
 const fileName = `track_habit_${dayjs().format('DD-MM-YYYY')}.json`
 const path = `${FileSystem.cacheDirectory}/${fileName}`
 
-export const saveFile = async (con: IFileController) => {
+export const saveFile = async (setDialog: IStore['setConfigDialog']) => {
 	try {
-
-		con.setOpenPopup(true)
-		con.setIsLoading(true)
+		setDialog({
+			open: true,
+			isLoading: true
+		})
 
 		const habitTasks = useStore.getState().habitTask
 		const startDateUser = useStore.getState().startDateUser
@@ -40,34 +34,32 @@ export const saveFile = async (con: IFileController) => {
 		})
 
 		if (pathUri.length !== 0) {
-			con.setTitlePopup('settings.successfully')
-			con.setMessagePopup(`settings.fileSuccessfullySaved`)
+			setDialog({title: 'settings.successfully', message: `settings.fileSuccessfullySaved`})
 		}
 
 	} catch (err: unknown) {
 		if (isErrorWithCode(err)) {
 
 			if (err.code === 'OPERATION_CANCELED') {
-				con.setTitlePopup('createHabit.cancel')
-				con.setMessagePopup('settings.fileSaveCanceled')
+				setDialog({title: 'createHabit.cancel', message: 'settings.fileSaveCanceled'})
 			}
 
 		} else {
-			con.setTitlePopup('settings.error')
-			con.setMessagePopup('settings.fileSaveError')
+			setDialog({title: 'settings.error', message: 'settings.fileSaveError'})
 		}
 
 	} finally {
-		con.setIsLoading(false)
+		setDialog({isLoading: false})
 	}
-
 }
 
-export const loadFile = async (con: IFileController) => {
+export const loadFile = async (setDialog: IStore['setConfigDialog']) => {
 	try {
 
-		con.setOpenPopup(true)
-		con.setIsLoading(true)
+		setDialog({
+			open: true,
+			isLoading: true
+		})
 
 		const [res] = await pick();
 		const fileUri = res.uri;
@@ -82,8 +74,7 @@ export const loadFile = async (con: IFileController) => {
 		}
 
 		if (!path.toLowerCase().endsWith('.json')) {
-			con.setTitlePopup('settings.error')
-			con.setMessagePopup('settings.restoringDataError')
+			setDialog({title: 'settings.error', message: 'settings.restoringDataError'})
 			return;
 		}
 
@@ -117,11 +108,9 @@ export const loadFile = async (con: IFileController) => {
 				})
 			}
 
-			con.setTitlePopup('settings.successfully')
-			con.setMessagePopup('settings.fileRestoreSuccessfully')
+			setDialog({title: 'settings.successfully', message: 'settings.fileRestoreSuccessfully'})
 		} else {
-			con.setTitlePopup('settings.error')
-			con.setMessagePopup('settings.restoringDataError')
+			setDialog({title: 'settings.error', message: 'settings.restoringDataError'})
 		}
 
 
@@ -129,16 +118,14 @@ export const loadFile = async (con: IFileController) => {
 		if (isErrorWithCode(err)) {
 
 			if (err.code === 'OPERATION_CANCELED') {
-				con.setTitlePopup('settings.error')
-				con.setMessagePopup('settings.selectFileCanceled')
+				setDialog({title: 'settings.error', message: 'settings.selectFileCanceled'})
 			}
 
 		} else {
-			con.setTitlePopup('settings.error')
-			con.setMessagePopup('settings.fileLoadingError')
+			setDialog({title: 'settings.error', message: 'settings.fileLoadingError'})
 		}
 
 	} finally {
-		con.setIsLoading(false)
+		setDialog({isLoading: false})
 	}
 }
